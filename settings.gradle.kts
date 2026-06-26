@@ -33,8 +33,10 @@ plugins {
 }
 
 include(":app:androidApp")
-include(":app:desktopApp")
 include(":app:shared")
-include(":app:webApp")
 include(":core")
-include(":server")
+
+// Вернуть, когда дойдём до Desktop/Web/Backend:
+// include(":app:desktopApp")
+// include(":app:webApp")
+// include(":server")
