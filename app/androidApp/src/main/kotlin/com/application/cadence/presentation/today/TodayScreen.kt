@@ -18,38 +18,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
-import androidx.compose.runtime.getValue
+import com.application.cadence.presentation.common.ScreenContainer
 
 @Composable
 fun TodayScreen(viewModel: TodayViewModel) {
     val lessons by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-    ) {
-        Text(text = "Занятия", style = MaterialTheme.typography.titleLarge)
-        Spacer(Modifier.height(16.dp))
+    ScreenContainer {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+        ) {
+            Text(text = "Занятия", style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(16.dp))
 
-        if (lessons.isEmpty()) {
-            Text("Сегодня занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(lessons, key = { it.lessonId }) { lesson -> LessonCard(lesson) }
+            if (lessons.isEmpty()) {
+                Text("Сегодня занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(lessons, key = { it.lessonId }) { lesson -> LessonCard(lesson) }
+                }
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        Button(onClick = { /* TODO: форма добавления */ }, modifier = Modifier.fillMaxWidth()) {
-            Text("Добавить занятие")
+            Button(onClick = { /* TODO: форма добавления */ }, modifier = Modifier.fillMaxWidth()) {
+                Text("Добавить занятие")
+            }
         }
     }
 }
