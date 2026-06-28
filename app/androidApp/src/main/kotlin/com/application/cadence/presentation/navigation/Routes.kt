@@ -6,4 +6,6 @@ import kotlinx.serialization.Serializable
 object TodayRoute
 
 @Serializable
+object AddStudentRoute
+@Serializable
 data class StudentProfileRoute(val studentId: Long)
