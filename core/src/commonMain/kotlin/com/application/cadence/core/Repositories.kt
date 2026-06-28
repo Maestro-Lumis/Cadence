@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 
 interface StudentRepository {
     fun observeAll(): Flow<List<Student>>
+    fun observeById(studentId: Long): Flow<Student?>
     suspend fun add(student: Student): Long
     suspend fun update(student: Student)
     suspend fun delete(studentId: Long)

@@ -17,6 +17,9 @@ class StudentRepositoryImpl(private val dao: StudentDao) : StudentRepository {
     override fun observeAll(): Flow<List<Student>> =
         dao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    override fun observeById(studentId: Long): Flow<Student?> =
+        dao.observeById(studentId).map { it?.toDomain() }
+
     override suspend fun add(student: Student) = dao.insert(student.toEntity())
     override suspend fun update(student: Student) = dao.update(student.toEntity())
     override suspend fun delete(studentId: Long) = dao.deleteById(studentId)

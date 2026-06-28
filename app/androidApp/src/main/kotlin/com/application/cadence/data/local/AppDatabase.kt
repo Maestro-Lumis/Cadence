@@ -14,6 +14,9 @@ interface StudentDao {
     @Query("SELECT * FROM students ORDER BY name")
     fun observeAll(): Flow<List<StudentEntity>>
 
+    @Query("SELECT * FROM students WHERE id = :id")
+    fun observeById(id: Long): Flow<StudentEntity?>
+
     @Insert suspend fun insert(s: StudentEntity): Long
     @Update suspend fun update(s: StudentEntity)
     @Delete suspend fun delete(s: StudentEntity)

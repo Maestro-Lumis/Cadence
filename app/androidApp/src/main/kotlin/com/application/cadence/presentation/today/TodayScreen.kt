@@ -1,6 +1,7 @@
 package com.application.cadence.presentation.today
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +28,7 @@ import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
 
 @Composable
-fun TodayScreen(viewModel: TodayViewModel) {
+fun TodayScreen(viewModel: TodayViewModel, onLessonClick: (Long) -> Unit) {
     val lessons by viewModel.uiState.collectAsState()
 
     ScreenContainer {
@@ -44,7 +45,9 @@ fun TodayScreen(viewModel: TodayViewModel) {
                 Text("Сегодня занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(lessons, key = { it.lessonId }) { lesson -> LessonCard(lesson) }
+                    items(lessons, key = { it.lessonId }) { lesson ->
+                        LessonCard(lesson, onClick = { onLessonClick(lesson.studentId) })
+                    }
                 }
             }
 
@@ -58,7 +61,7 @@ fun TodayScreen(viewModel: TodayViewModel) {
 }
 
 @Composable
-private fun LessonCard(lesson: TodayLessonUi) {
+private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
     val statusLabel = when (lesson.status) {
         LessonStatus.HELD -> "Проведён"
         LessonStatus.CANCELLED -> "Отменён"
@@ -69,6 +72,7 @@ private fun LessonCard(lesson: TodayLessonUi) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
             .padding(12.dp)
     ) {

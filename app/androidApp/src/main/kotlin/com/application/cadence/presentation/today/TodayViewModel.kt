@@ -15,6 +15,7 @@ import kotlin.time.Clock
 
 data class TodayLessonUi(
     val lessonId: Long,
+    val studentId: Long,
     val studentName: String,
     val course: String,
     val time: String,
@@ -39,6 +40,7 @@ class TodayViewModel(
             val student = byId[lesson.studentId] ?: return@mapNotNull null
             TodayLessonUi(
                 lessonId = lesson.id,
+                studentId = lesson.studentId,
                 studentName = student.name,
                 course = student.course,
                 time = lesson.time,
