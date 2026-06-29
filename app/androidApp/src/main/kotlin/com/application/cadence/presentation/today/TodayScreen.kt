@@ -31,7 +31,8 @@ import com.application.cadence.presentation.common.ScreenContainer
 fun TodayScreen(
     viewModel: TodayViewModel,
     onLessonClick: (Long) -> Unit,
-    onAddStudentClick: () -> Unit
+    onAddStudentClick: () -> Unit,
+    onAddLessonClick: () -> Unit
 ) {
     val lessons by viewModel.uiState.collectAsState()
 
@@ -57,7 +58,7 @@ fun TodayScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            Button(onClick = { /* TODO: форма добавления занятия */ }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = onAddLessonClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Добавить занятие")
             }
             Spacer(Modifier.height(8.dp))

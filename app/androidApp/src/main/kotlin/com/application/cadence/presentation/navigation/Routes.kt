@@ -7,5 +7,9 @@ object TodayRoute
 
 @Serializable
 object AddStudentRoute
+
+@Serializable
+object AddLessonRoute
+
 @Serializable
 data class StudentProfileRoute(val studentId: Long)
