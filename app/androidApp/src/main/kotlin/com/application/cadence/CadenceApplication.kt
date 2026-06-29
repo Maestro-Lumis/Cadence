@@ -3,11 +3,13 @@ package com.application.cadence
 import android.app.Application
 import androidx.room.Room
 import com.application.cadence.core.Lesson
+import com.application.cadence.core.LessonPackageRepository
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.data.local.AppDatabase
+import com.application.cadence.data.repository.LessonPackageRepositoryImpl
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.StudentRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +32,7 @@ class CadenceApplication : Application() {
 
     val studentRepository: StudentRepository by lazy { StudentRepositoryImpl(database.studentDao()) }
     val lessonRepository: LessonRepository by lazy { LessonRepositoryImpl(database.lessonDao()) }
+    val packageRepository: LessonPackageRepository by lazy { LessonPackageRepositoryImpl(database.packageDao()) }
 
     override fun onCreate() {
         super.onCreate()

@@ -1,9 +1,11 @@
 package com.application.cadence.data.mapper
 
 import com.application.cadence.core.Lesson
+import com.application.cadence.core.LessonPackage
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.data.local.LessonEntity
+import com.application.cadence.data.local.PackageEntity
 import com.application.cadence.data.local.StudentEntity
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -45,4 +47,22 @@ fun Lesson.toEntity() = LessonEntity(
     lessonNumber = lessonNumber,
     packageId = packageId,
     paid = paid
+)
+
+fun PackageEntity.toDomain() = LessonPackage(
+    id = id,
+    studentId = studentId,
+    totalLessons = totalLessons,
+    usedLessons = usedLessons,
+    paid = paid,
+    createdAt = Instant.fromEpochMilliseconds(createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
+)
+
+fun LessonPackage.toEntity() = PackageEntity(
+    id = id,
+    studentId = studentId,
+    totalLessons = totalLessons,
+    usedLessons = usedLessons,
+    paid = paid,
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 )

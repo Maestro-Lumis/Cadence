@@ -39,11 +39,15 @@ interface LessonDao {
 
 @Dao
 interface PackageDao {
-    @Query("SELECT * FROM packages WHERE studentId = :studentId")
+    @Query("SELECT * FROM packages WHERE studentId = :studentId ORDER BY createdAt DESC")
     fun observeByStudent(studentId: Long): Flow<List<PackageEntity>>
+
+    @Query("SELECT * FROM packages WHERE id = :id")
+    fun observeById(id: Long): Flow<PackageEntity?>
 
     @Insert suspend fun insert(p: PackageEntity): Long
     @Update suspend fun update(p: PackageEntity)
+    @Query("DELETE FROM packages WHERE id = :id") suspend fun deleteById(id: Long)
 }
 
 @Database(
