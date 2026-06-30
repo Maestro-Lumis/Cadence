@@ -59,7 +59,7 @@ fun AppNavHost(app: CadenceApplication) {
             )
         }
         composable<AddLessonRoute> {
-            val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository)
+            val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository, app.packageRepository)
             AddLessonScreen(
                 viewModel = viewModel(factory = factory),
                 onSaved = { navController.popBackStack() },
