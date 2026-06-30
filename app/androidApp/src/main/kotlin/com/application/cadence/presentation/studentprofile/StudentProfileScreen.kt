@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,7 +27,11 @@ import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
 
 @Composable
-fun StudentProfileScreen(viewModel: StudentProfileViewModel, onBack: () -> Unit) {
+fun StudentProfileScreen(
+    viewModel: StudentProfileViewModel,
+    onBack: () -> Unit,
+    onAddPackageClick: () -> Unit
+) {
     val state by viewModel.uiState.collectAsState()
 
     ScreenContainer {
@@ -65,7 +70,12 @@ fun StudentProfileScreen(viewModel: StudentProfileViewModel, onBack: () -> Unit)
                         highlight = profile.unpaidLessons > 0
                     )
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
+
+                TextButton(onClick = onAddPackageClick) {
+                    Text("+ Добавить пакет")
+                }
+                Spacer(Modifier.height(8.dp))
 
                 Text("История", style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(8.dp))

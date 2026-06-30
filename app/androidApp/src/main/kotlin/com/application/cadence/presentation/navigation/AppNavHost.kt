@@ -9,6 +9,8 @@ import androidx.navigation.toRoute
 import com.application.cadence.CadenceApplication
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
+import com.application.cadence.presentation.addpackage.AddPackageScreen
+import com.application.cadence.presentation.addpackage.AddPackageViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
 import com.application.cadence.presentation.studentprofile.StudentProfileScreen
@@ -35,6 +37,16 @@ fun AppNavHost(app: CadenceApplication) {
             val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository)
             StudentProfileScreen(
                 viewModel = viewModel(factory = factory),
+                onBack = { navController.popBackStack() },
+                onAddPackageClick = { navController.navigate(AddPackageRoute(route.studentId)) }
+            )
+        }
+        composable<AddPackageRoute> { backStackEntry ->
+            val route: AddPackageRoute = backStackEntry.toRoute()
+            val factory = AddPackageViewModelFactory(route.studentId, app.packageRepository)
+            AddPackageScreen(
+                viewModel = viewModel(factory = factory),
+                onSaved = { navController.popBackStack() },
                 onBack = { navController.popBackStack() }
             )
         }

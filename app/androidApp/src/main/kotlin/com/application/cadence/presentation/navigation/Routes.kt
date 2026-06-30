@@ -13,3 +13,6 @@ object AddLessonRoute
 
 @Serializable
 data class StudentProfileRoute(val studentId: Long)
+
+@Serializable
+data class AddPackageRoute(val studentId: Long)
