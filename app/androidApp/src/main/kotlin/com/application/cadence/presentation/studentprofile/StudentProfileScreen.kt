@@ -70,8 +70,21 @@ fun StudentProfileScreen(
                         highlight = profile.unpaidLessons > 0
                     )
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
 
+                Text("Пакеты", style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.height(8.dp))
+                if (profile.packages.isEmpty()) {
+                    Text(
+                        "Нет активных пакетов",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        profile.packages.forEach { pkg -> PackageRow(pkg) }
+                    }
+                }
                 TextButton(onClick = onAddPackageClick) {
                     Text("+ Добавить пакет")
                 }
@@ -81,7 +94,7 @@ fun StudentProfileScreen(
                 Spacer(Modifier.height(8.dp))
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(profile.history, key = { it.id }) { lesson -> HistoryRow(lesson) }
+                    items(profile.history, key = { it.lesson.id }) { item -> HistoryRow(item) }
                 }
             }
         }
@@ -104,7 +117,33 @@ private fun StatBox(label: String, value: String, modifier: Modifier = Modifier,
 }
 
 @Composable
-private fun HistoryRow(lesson: Lesson) {
+private fun PackageRow(pkg: PackageUi) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text("Пакет на ${pkg.total} занятий")
+            Text(
+                "Использовано: ${pkg.used} из ${pkg.total}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        if (pkg.paid) {
+            Text("Оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
+        } else {
+            Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
+        }
+    }
+}
+
+@Composable
+private fun HistoryRow(item: HistoryItemUi) {
+    val lesson = item.lesson
     val statusLabel = when (lesson.status) {
         LessonStatus.HELD -> "Проведён"
         LessonStatus.CANCELLED -> "Отменён"
@@ -116,7 +155,7 @@ private fun HistoryRow(lesson: Lesson) {
             Text(lesson.date.toString())
             Text(statusLabel, style = MaterialTheme.typography.labelSmall)
         }
-        if (lesson.status != LessonStatus.CANCELLED && !lesson.paid) {
+        if (item.unpaid) {
             Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
         }
     }
