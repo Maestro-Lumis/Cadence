@@ -13,6 +13,8 @@ import com.application.cadence.presentation.addpackage.AddPackageScreen
 import com.application.cadence.presentation.addpackage.AddPackageViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
+import com.application.cadence.presentation.students.StudentsScreen
+import com.application.cadence.presentation.students.StudentsViewModelFactory
 import com.application.cadence.presentation.studentprofile.StudentProfileScreen
 import com.application.cadence.presentation.studentprofile.StudentProfileViewModelFactory
 import com.application.cadence.presentation.today.TodayScreen
@@ -29,7 +31,17 @@ fun AppNavHost(app: CadenceApplication) {
                 viewModel = viewModel(factory = factory),
                 onLessonClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
                 onAddStudentClick = { navController.navigate(AddStudentRoute) },
-                onAddLessonClick = { navController.navigate(AddLessonRoute) }
+                onAddLessonClick = { navController.navigate(AddLessonRoute) },
+                onAllStudentsClick = { navController.navigate(StudentsRoute) }
+            )
+        }
+        composable<StudentsRoute> {
+            val factory = StudentsViewModelFactory(app.studentRepository)
+            StudentsScreen(
+                viewModel = viewModel(factory = factory),
+                onBack = { navController.popBackStack() },
+                onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
+                onAddStudentClick = { navController.navigate(AddStudentRoute) }
             )
         }
         composable<StudentProfileRoute> { backStackEntry ->

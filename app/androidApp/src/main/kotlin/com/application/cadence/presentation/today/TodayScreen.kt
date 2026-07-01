@@ -32,7 +32,8 @@ fun TodayScreen(
     viewModel: TodayViewModel,
     onLessonClick: (Long) -> Unit,
     onAddStudentClick: () -> Unit,
-    onAddLessonClick: () -> Unit
+    onAddLessonClick: () -> Unit,
+    onAllStudentsClick: () -> Unit
 ) {
     val lessons by viewModel.uiState.collectAsState()
 
@@ -43,7 +44,19 @@ fun TodayScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Text(text = "Занятия", style = MaterialTheme.typography.titleLarge)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Занятия", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "Все ученики",
+                    modifier = Modifier.clickable { onAllStudentsClick() },
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
             Spacer(Modifier.height(16.dp))
 
             if (lessons.isEmpty()) {

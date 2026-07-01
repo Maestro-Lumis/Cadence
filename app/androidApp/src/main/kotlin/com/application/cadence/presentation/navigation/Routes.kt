@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 object TodayRoute
 
 @Serializable
+object StudentsRoute
+
+@Serializable
 object AddStudentRoute
 
 @Serializable
