@@ -4,51 +4,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.Lesson
-import com.application.cadence.core.LessonPackage
-import com.application.cadence.core.LessonPackageRepository
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AddLessonViewModel(
     private val lessonRepository: LessonRepository,
-    studentRepository: StudentRepository,
-    packageRepository: LessonPackageRepository
+    studentRepository: StudentRepository
 ) : ViewModel() {
 
     val students: StateFlow<List<Student>> = studentRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val selectedStudentId = MutableStateFlow<Long?>(null)
-
-    val packages: StateFlow<List<LessonPackage>> = selectedStudentId
-        .flatMapLatest { id ->
-            if (id == null) flowOf(emptyList()) else packageRepository.observeByStudent(id)
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun selectStudent(studentId: Long?) {
-        selectedStudentId.value = studentId
-    }
-
     fun save(
         studentId: Long,
         date: LocalDate,
         time: String,
+        durationMinutes: Int,
         status: LessonStatus,
         lessonNumber: Int?,
-        packageId: Long?,
         paid: Boolean,
         onSaved: () -> Unit
     ) {
@@ -59,10 +39,11 @@ class AddLessonViewModel(
                     studentId = studentId,
                     date = date,
                     time = time,
+                    durationMinutes = durationMinutes,
                     status = status,
                     lessonNumber = lessonNumber,
-                    packageId = packageId,
-                    paid = if (packageId != null) false else paid
+                    packageId = null,
+                    paid = paid
                 )
             )
             onSaved()
@@ -72,11 +53,10 @@ class AddLessonViewModel(
 
 class AddLessonViewModelFactory(
     private val lessonRepository: LessonRepository,
-    private val studentRepository: StudentRepository,
-    private val packageRepository: LessonPackageRepository
+    private val studentRepository: StudentRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AddLessonViewModel(lessonRepository, studentRepository, packageRepository) as T
+        return AddLessonViewModel(lessonRepository, studentRepository) as T
     }
 }

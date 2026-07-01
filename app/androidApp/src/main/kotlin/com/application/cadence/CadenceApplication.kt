@@ -6,6 +6,7 @@ import com.application.cadence.core.LessonPackageRepository
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.data.local.AppDatabase
+import com.application.cadence.data.local.MIGRATION_1_2
 import com.application.cadence.data.repository.LessonPackageRepositoryImpl
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.StudentRepositoryImpl
@@ -13,7 +14,9 @@ import com.application.cadence.data.repository.StudentRepositoryImpl
 class CadenceApplication : Application() {
 
     private val database: AppDatabase by lazy {
-        Room.databaseBuilder(this, AppDatabase::class.java, "cadence.db").build()
+        Room.databaseBuilder(this, AppDatabase::class.java, "cadence.db")
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     val studentRepository: StudentRepository by lazy { StudentRepositoryImpl(database.studentDao()) }

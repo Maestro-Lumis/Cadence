@@ -40,6 +40,7 @@ data class LessonEntity(
     val studentId: Long,
     val date: String,
     val time: String,
+    val durationMinutes: Int,
     val status: String,
     val lessonNumber: Int?,
     val packageId: Long?,

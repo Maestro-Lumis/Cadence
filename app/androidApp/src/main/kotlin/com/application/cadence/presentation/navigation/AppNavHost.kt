@@ -9,8 +9,6 @@ import androidx.navigation.toRoute
 import com.application.cadence.CadenceApplication
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
-import com.application.cadence.presentation.addpackage.AddPackageScreen
-import com.application.cadence.presentation.addpackage.AddPackageViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
 import com.application.cadence.presentation.students.StudentsScreen
@@ -46,19 +44,9 @@ fun AppNavHost(app: CadenceApplication) {
         }
         composable<StudentProfileRoute> { backStackEntry ->
             val route: StudentProfileRoute = backStackEntry.toRoute()
-            val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository, app.packageRepository)
+            val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository)
             StudentProfileScreen(
                 viewModel = viewModel(factory = factory),
-                onBack = { navController.popBackStack() },
-                onAddPackageClick = { navController.navigate(AddPackageRoute(route.studentId)) }
-            )
-        }
-        composable<AddPackageRoute> { backStackEntry ->
-            val route: AddPackageRoute = backStackEntry.toRoute()
-            val factory = AddPackageViewModelFactory(route.studentId, app.packageRepository)
-            AddPackageScreen(
-                viewModel = viewModel(factory = factory),
-                onSaved = { navController.popBackStack() },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -71,7 +59,7 @@ fun AppNavHost(app: CadenceApplication) {
             )
         }
         composable<AddLessonRoute> {
-            val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository, app.packageRepository)
+            val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository)
             AddLessonScreen(
                 viewModel = viewModel(factory = factory),
                 onSaved = { navController.popBackStack() },

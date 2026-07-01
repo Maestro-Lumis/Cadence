@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.application.cadence.core.LessonPackage
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.presentation.common.ScreenContainer
@@ -41,16 +40,13 @@ import kotlin.time.Clock
 @Composable
 fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: () -> Unit) {
     val students by viewModel.students.collectAsState()
-    val packages by viewModel.packages.collectAsState()
 
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
 
-    var selectedPackage by remember { mutableStateOf<LessonPackage?>(null) }
-    var packageMenuExpanded by remember { mutableStateOf(false) }
-
     var dateText by remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()).toString()) }
     var timeText by remember { mutableStateOf("18:00") }
+    var durationText by remember { mutableStateOf("60") }
 
     var status by remember { mutableStateOf(LessonStatus.SCHEDULED) }
     var statusMenuExpanded by remember { mutableStateOf(false) }
@@ -98,11 +94,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                             DropdownMenuItem(
                                 text = { Text("${student.name} (${student.course})") },
                                 onClick = {
-                                    if (selectedStudent?.id != student.id) {
-                                        selectedPackage = null
-                                    }
                                     selectedStudent = student
-                                    viewModel.selectStudent(student.id)
                                     studentMenuExpanded = false
                                 }
                             )
@@ -126,6 +118,14 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                         modifier = Modifier.weight(1f)
                     )
                 }
+                Spacer(Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = durationText,
+                    onValueChange = { durationText = it.filter { ch -> ch.isDigit() } },
+                    label = { Text("Длительность (мин)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(Modifier.height(8.dp))
 
                 ExposedDropdownMenuBox(
@@ -165,51 +165,11 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                 )
                 Spacer(Modifier.height(8.dp))
 
-                if (packages.isNotEmpty()) {
-                    ExposedDropdownMenuBox(
-                        expanded = packageMenuExpanded,
-                        onExpandedChange = { packageMenuExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedPackage?.label() ?: "Без пакета",
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Пакет (необязательно)") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = packageMenuExpanded) },
-                            modifier = Modifier.fillMaxWidth().menuAnchor()
-                        )
-                        ExposedDropdownMenu(
-                            expanded = packageMenuExpanded,
-                            onDismissRequest = { packageMenuExpanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Без пакета") },
-                                onClick = {
-                                    selectedPackage = null
-                                    packageMenuExpanded = false
-                                }
-                            )
-                            packages.forEach { pkg ->
-                                DropdownMenuItem(
-                                    text = { Text(pkg.label()) },
-                                    onClick = {
-                                        selectedPackage = pkg
-                                        packageMenuExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = paid, onCheckedChange = { paid = it })
+                    Text("Оплачено")
                 }
-
-                if (selectedPackage == null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = paid, onCheckedChange = { paid = it })
-                        Text("Оплачено")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                }
+                Spacer(Modifier.height(8.dp))
 
                 error?.let {
                     Text(it, color = MaterialTheme.colorScheme.error)
@@ -221,22 +181,24 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                         val student = selectedStudent
                         val parsedDate = runCatching { LocalDate.parse(dateText) }.getOrNull()
                         val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
+                        val parsedDuration = durationText.toIntOrNull()
 
                         error = when {
                             student == null -> "Выбери ученика"
                             parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
                             !timeValid -> "Неверное время, формат ЧЧ:MM"
+                            parsedDuration == null || parsedDuration <= 0 -> "Длительность в минутах, больше 0"
                             else -> null
                         }
 
-                        if (error == null && student != null && parsedDate != null) {
+                        if (error == null && student != null && parsedDate != null && parsedDuration != null) {
                             viewModel.save(
                                 studentId = student.id,
                                 date = parsedDate,
                                 time = timeText,
+                                durationMinutes = parsedDuration,
                                 status = status,
                                 lessonNumber = lessonNumberText.toIntOrNull(),
-                                packageId = selectedPackage?.id,
                                 paid = paid,
                                 onSaved = onSaved
                             )
@@ -256,9 +218,4 @@ private fun LessonStatus.label(): String = when (this) {
     LessonStatus.CANCELLED -> "Отменён"
     LessonStatus.SCHEDULED -> "Запланирован"
     LessonStatus.RESCHEDULED -> "Перенесён"
-}
-
-private fun LessonPackage.label(): String {
-    val paidLabel = if (paid) "оплачен" else "не оплачен"
-    return "Пакет на $totalLessons занятий — $paidLabel"
 }

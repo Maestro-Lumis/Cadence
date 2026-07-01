@@ -43,6 +43,7 @@ data class Lesson(
     val studentId: Long,
     val date: LocalDate,
     val time: String,
+    val durationMinutes: Int,
     val status: LessonStatus,
     val lessonNumber: Int? = null,
     val packageId: Long? = null,

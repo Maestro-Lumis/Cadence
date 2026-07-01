@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
+import com.application.cadence.presentation.common.formatDuration
 
 @Composable
 fun TodayScreen(
@@ -99,7 +100,14 @@ private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
             .padding(12.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(lesson.time, modifier = Modifier.width(48.dp))
+            Column(Modifier.width(64.dp)) {
+                Text(lesson.time)
+                Text(
+                    formatDuration(lesson.durationMinutes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             Column(Modifier.weight(1f)) {
                 Text(lesson.studentName, style = MaterialTheme.typography.bodyMedium)
                 Text(

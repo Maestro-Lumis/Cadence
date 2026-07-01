@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,13 +24,10 @@ import androidx.compose.ui.unit.dp
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
+import com.application.cadence.presentation.common.formatDuration
 
 @Composable
-fun StudentProfileScreen(
-    viewModel: StudentProfileViewModel,
-    onBack: () -> Unit,
-    onAddPackageClick: () -> Unit
-) {
+fun StudentProfileScreen(viewModel: StudentProfileViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
 
     ScreenContainer {
@@ -72,29 +68,11 @@ fun StudentProfileScreen(
                 }
                 Spacer(Modifier.height(16.dp))
 
-                Text("Пакеты", style = MaterialTheme.typography.titleSmall)
-                Spacer(Modifier.height(8.dp))
-                if (profile.packages.isEmpty()) {
-                    Text(
-                        "Нет активных пакетов",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        profile.packages.forEach { pkg -> PackageRow(pkg) }
-                    }
-                }
-                TextButton(onClick = onAddPackageClick) {
-                    Text("+ Добавить пакет")
-                }
-                Spacer(Modifier.height(8.dp))
-
                 Text("История", style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(8.dp))
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(profile.history, key = { it.lesson.id }) { item -> HistoryRow(item) }
+                    items(profile.history, key = { it.id }) { lesson -> HistoryRow(lesson) }
                 }
             }
         }
@@ -117,33 +95,7 @@ private fun StatBox(label: String, value: String, modifier: Modifier = Modifier,
 }
 
 @Composable
-private fun PackageRow(pkg: PackageUi) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            Text("Пакет на ${pkg.total} занятий")
-            Text(
-                "Использовано: ${pkg.used} из ${pkg.total}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        if (pkg.paid) {
-            Text("Оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
-        } else {
-            Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
-        }
-    }
-}
-
-@Composable
-private fun HistoryRow(item: HistoryItemUi) {
-    val lesson = item.lesson
+private fun HistoryRow(lesson: Lesson) {
     val statusLabel = when (lesson.status) {
         LessonStatus.HELD -> "Проведён"
         LessonStatus.CANCELLED -> "Отменён"
@@ -153,9 +105,12 @@ private fun HistoryRow(item: HistoryItemUi) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
             Text(lesson.date.toString())
-            Text(statusLabel, style = MaterialTheme.typography.labelSmall)
+            Text(
+                "$statusLabel · ${formatDuration(lesson.durationMinutes)}",
+                style = MaterialTheme.typography.labelSmall
+            )
         }
-        if (item.unpaid) {
+        if (lesson.status != LessonStatus.CANCELLED && !lesson.paid) {
             Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
         }
     }

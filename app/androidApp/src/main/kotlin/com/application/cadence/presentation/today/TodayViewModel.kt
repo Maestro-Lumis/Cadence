@@ -19,6 +19,7 @@ data class TodayLessonUi(
     val studentName: String,
     val course: String,
     val time: String,
+    val durationMinutes: Int,
     val status: LessonStatus,
     val lessonNumber: Int?,
     val paid: Boolean
@@ -44,6 +45,7 @@ class TodayViewModel(
                 studentName = student.name,
                 course = student.course,
                 time = lesson.time,
+                durationMinutes = lesson.durationMinutes,
                 status = lesson.status,
                 lessonNumber = lesson.lessonNumber,
                 paid = lesson.paid
