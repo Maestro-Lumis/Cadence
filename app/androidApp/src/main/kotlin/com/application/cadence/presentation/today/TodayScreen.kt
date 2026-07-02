@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
-import com.application.cadence.presentation.common.formatDuration
 
 @Composable
 fun TodayScreen(
@@ -97,38 +96,51 @@ private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-            .padding(12.dp)
+            .padding(14.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.width(80.dp)) {
-                Text(lesson.time)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column {
+                Text(lesson.time, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    formatDuration(lesson.durationMinutes),
+                    "до ${lesson.endTime}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                lesson.studentLocalTime?.let {
-                    Text(
-                        "у ученика $it",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
-            Column(Modifier.weight(1f)) {
-                Text(lesson.studentName, style = MaterialTheme.typography.bodyMedium)
+            if (lesson.status == LessonStatus.SCHEDULED && !lesson.paid) {
                 Text(
-                    lesson.course,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    "Не оплачен",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFF995A1D)
                 )
             }
-            lesson.lessonNumber?.let { Text("Урок $it", style = MaterialTheme.typography.labelSmall) }
         }
-        Spacer(Modifier.height(4.dp))
-        Text(statusLabel, style = MaterialTheme.typography.labelSmall)
-        if (lesson.status == LessonStatus.SCHEDULED && !lesson.paid) {
-            Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
+        Spacer(Modifier.height(12.dp))
+        Text(lesson.studentName, style = MaterialTheme.typography.titleMedium)
+        Text(
+            buildString {
+                append(lesson.course)
+                lesson.lessonNumber?.let { append(" · Урок $it") }
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        lesson.studentLocalTime?.let {
+            Text(
+                "у ученика $it",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            statusLabel,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

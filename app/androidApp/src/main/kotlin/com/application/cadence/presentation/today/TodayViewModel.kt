@@ -20,6 +20,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import com.application.cadence.presentation.common.timezoneLabel
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 
 data class TodayLessonUi(
     val lessonId: Long,
@@ -27,8 +28,8 @@ data class TodayLessonUi(
     val studentName: String,
     val course: String,
     val time: String,
+    val endTime: String,
     val studentLocalTime: String?,
-    val durationMinutes: Int,
     val status: LessonStatus,
     val lessonNumber: Int?,
     val paid: Boolean
@@ -56,11 +57,14 @@ class TodayViewModel(
             val student = byId[lesson.studentId] ?: return@mapNotNull null
             val studentTz = runCatching { TimeZone.of(student.timezone) }.getOrDefault(tutorTz)
             val lessonTime = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
-            val lessonInstant = LocalDateTime(lesson.date, lessonTime).toInstant(studentTz)
-            if (lessonInstant < startOfToday || lessonInstant >= startOfTomorrow) return@mapNotNull null
+            val lessonStart = LocalDateTime(lesson.date, lessonTime).toInstant(studentTz)
+            if (lessonStart < startOfToday || lessonStart >= startOfTomorrow) return@mapNotNull null
 
-            val tutorLocalDateTime = lessonInstant.toLocalDateTime(tutorTz)
-            val tutorTimeStr = "%02d:%02d".format(tutorLocalDateTime.hour, tutorLocalDateTime.minute)
+            val lessonEnd = lessonStart + lesson.durationMinutes.minutes
+            val tutorStart = lessonStart.toLocalDateTime(tutorTz)
+            val tutorEnd = lessonEnd.toLocalDateTime(tutorTz)
+            val tutorTimeStr = "%02d:%02d".format(tutorStart.hour, tutorStart.minute)
+            val tutorEndStr = "%02d:%02d".format(tutorEnd.hour, tutorEnd.minute)
             val studentTimeStr = if (student.timezone == tutorTz.id) null
                 else "%02d:%02d · ${timezoneLabel(student.timezone)}".format(lessonTime.hour, lessonTime.minute)
 
@@ -70,8 +74,8 @@ class TodayViewModel(
                 studentName = student.name,
                 course = student.course,
                 time = tutorTimeStr,
+                endTime = tutorEndStr,
                 studentLocalTime = studentTimeStr,
-                durationMinutes = lesson.durationMinutes,
                 status = lesson.status,
                 lessonNumber = lesson.lessonNumber,
                 paid = lesson.paid
