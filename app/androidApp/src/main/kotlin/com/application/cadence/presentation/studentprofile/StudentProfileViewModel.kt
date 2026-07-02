@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 data class StudentProfileUi(
     val studentName: String,
     val course: String,
+    val timezone: String,
     val totalLessons: Int,
     val heldLessons: Int,
     val unpaidLessons: Int,
@@ -35,6 +36,7 @@ class StudentProfileViewModel(
             StudentProfileUi(
                 studentName = it.name,
                 course = it.course,
+                timezone = it.timezone,
                 totalLessons = lessons.size,
                 heldLessons = lessons.count { l -> l.status == LessonStatus.HELD },
                 unpaidLessons = lessons.count { l -> l.status != LessonStatus.CANCELLED && !l.paid },

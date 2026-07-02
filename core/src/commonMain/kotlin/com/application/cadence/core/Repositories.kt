@@ -13,6 +13,7 @@ interface StudentRepository {
 
 interface LessonRepository {
     fun observeByDate(date: LocalDate): Flow<List<Lesson>>
+    fun observeInDateRange(from: LocalDate, to: LocalDate): Flow<List<Lesson>>
     fun observeByStudent(studentId: Long): Flow<List<Lesson>>
     suspend fun add(lesson: Lesson): Long
     suspend fun update(lesson: Lesson)

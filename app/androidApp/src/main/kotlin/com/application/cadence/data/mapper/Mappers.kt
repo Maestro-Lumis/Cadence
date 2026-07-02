@@ -17,6 +17,7 @@ fun StudentEntity.toDomain() = Student(
     id = id,
     name = name,
     course = course,
+    timezone = timezone,
     createdAt = Instant.fromEpochMilliseconds(createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
@@ -24,6 +25,7 @@ fun Student.toEntity() = StudentEntity(
     id = id,
     name = name,
     course = course,
+    timezone = timezone,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 )
 

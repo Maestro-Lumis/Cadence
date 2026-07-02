@@ -100,13 +100,20 @@ private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
             .padding(12.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.width(64.dp)) {
+            Column(Modifier.width(80.dp)) {
                 Text(lesson.time)
                 Text(
                     formatDuration(lesson.durationMinutes),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                lesson.studentLocalTime?.let {
+                    Text(
+                        "у ученика $it",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             Column(Modifier.weight(1f)) {
                 Text(lesson.studentName, style = MaterialTheme.typography.bodyMedium)

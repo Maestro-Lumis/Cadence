@@ -10,6 +10,7 @@ data class StudentEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val course: String,
+    val timezone: String,
     val createdAt: Long
 )
 

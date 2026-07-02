@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.presentation.common.ScreenContainer
+import com.application.cadence.presentation.common.timezoneLabel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -158,13 +159,14 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                 }
                 Spacer(Modifier.height(8.dp))
 
+                val tzSuffix = selectedStudent?.let { " (${timezoneLabel(it.timezone)})" }.orEmpty()
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(modifier = Modifier.weight(1f)) {
                         OutlinedTextField(
                             value = dateText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Дата") },
+                            label = { Text("Дата$tzSuffix") },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(
@@ -179,7 +181,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                             value = timeText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Время") },
+                            label = { Text("Время$tzSuffix") },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(

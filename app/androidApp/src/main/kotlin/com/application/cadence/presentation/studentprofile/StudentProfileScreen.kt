@@ -25,6 +25,7 @@ import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
 import com.application.cadence.presentation.common.formatDuration
+import com.application.cadence.presentation.common.timezoneLabel
 
 @Composable
 fun StudentProfileScreen(viewModel: StudentProfileViewModel, onBack: () -> Unit) {
@@ -50,7 +51,7 @@ fun StudentProfileScreen(viewModel: StudentProfileViewModel, onBack: () -> Unit)
             } else {
                 Text(profile.studentName, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    profile.course,
+                    "${profile.course} · ${timezoneLabel(profile.timezone)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

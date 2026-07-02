@@ -32,6 +32,9 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override fun observeByDate(date: LocalDate): Flow<List<Lesson>> =
         dao.observeByDate(date.toString()).map { list -> list.map { it.toDomain() } }
 
+    override fun observeInDateRange(from: LocalDate, to: LocalDate): Flow<List<Lesson>> =
+        dao.observeInDateRange(from.toString(), to.toString()).map { list -> list.map { it.toDomain() } }
+
     override fun observeByStudent(studentId: Long): Flow<List<Lesson>> =
         dao.observeByStudent(studentId).map { list -> list.map { it.toDomain() } }
 

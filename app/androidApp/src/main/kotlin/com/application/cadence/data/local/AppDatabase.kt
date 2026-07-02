@@ -30,6 +30,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE date = :date ORDER BY time")
     fun observeByDate(date: String): Flow<List<LessonEntity>>
 
+    @Query("SELECT * FROM lessons WHERE date >= :from AND date <= :to ORDER BY date, time")
+    fun observeInDateRange(from: String, to: String): Flow<List<LessonEntity>>
+
     @Query("SELECT * FROM lessons WHERE studentId = :studentId ORDER BY date DESC")
     fun observeByStudent(studentId: Long): Flow<List<LessonEntity>>
 
@@ -54,7 +57,7 @@ interface PackageDao {
 
 @Database(
     entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class],
-    version = 2
+    version = 3
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
@@ -65,5 +68,11 @@ abstract class AppDatabase : RoomDatabase() {
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE lessons ADD COLUMN durationMinutes INTEGER NOT NULL DEFAULT 60")
+    }
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE students ADD COLUMN timezone TEXT NOT NULL DEFAULT 'Europe/Moscow'")
     }
 }
