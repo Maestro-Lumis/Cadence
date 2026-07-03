@@ -36,6 +36,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE studentId = :studentId ORDER BY date DESC")
     fun observeByStudent(studentId: Long): Flow<List<LessonEntity>>
 
+    @Query("SELECT * FROM lessons WHERE id = :id")
+    suspend fun getById(id: Long): LessonEntity?
+
     @Insert suspend fun insert(l: LessonEntity): Long
     @Update suspend fun update(l: LessonEntity)
     @Delete suspend fun delete(l: LessonEntity)

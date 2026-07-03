@@ -64,7 +64,7 @@ fun TodayScreen(
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(lessons, key = { it.lessonId }) { lesson ->
-                        LessonCard(lesson, onClick = { onLessonClick(lesson.studentId) })
+                        LessonCard(lesson, onClick = { onLessonClick(lesson.lessonId) })
                     }
                 }
             }

@@ -10,6 +10,8 @@ import com.application.cadence.CadenceApplication
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
+import com.application.cadence.presentation.editlesson.EditLessonScreen
+import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
 import com.application.cadence.presentation.students.StudentsScreen
 import com.application.cadence.presentation.students.StudentsViewModelFactory
@@ -27,7 +29,7 @@ fun AppNavHost(app: CadenceApplication) {
             val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository)
             TodayScreen(
                 viewModel = viewModel(factory = factory),
-                onLessonClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
+                onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
                 onAddStudentClick = { navController.navigate(AddStudentRoute) },
                 onAddLessonClick = { navController.navigate(AddLessonRoute) },
                 onAllStudentsClick = { navController.navigate(StudentsRoute) }
@@ -47,6 +49,18 @@ fun AppNavHost(app: CadenceApplication) {
             val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository)
             StudentProfileScreen(
                 viewModel = viewModel(factory = factory),
+                onBack = { navController.popBackStack() },
+                onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
+                onDeleted = { navController.popBackStack() }
+            )
+        }
+        composable<EditLessonRoute> { backStackEntry ->
+            val route: EditLessonRoute = backStackEntry.toRoute()
+            val factory = EditLessonViewModelFactory(route.lessonId, app.lessonRepository, app.studentRepository)
+            EditLessonScreen(
+                viewModel = viewModel(factory = factory),
+                onSaved = { navController.popBackStack() },
+                onDeleted = { navController.popBackStack() },
                 onBack = { navController.popBackStack() }
             )
         }

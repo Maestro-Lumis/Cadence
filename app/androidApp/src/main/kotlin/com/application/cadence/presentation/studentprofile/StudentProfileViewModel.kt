@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class StudentProfileUi(
     val studentName: String,
@@ -23,8 +24,8 @@ data class StudentProfileUi(
 )
 
 class StudentProfileViewModel(
-    studentId: Long,
-    studentRepository: StudentRepository,
+    private val studentId: Long,
+    private val studentRepository: StudentRepository,
     lessonRepository: LessonRepository
 ) : ViewModel() {
 
@@ -44,6 +45,13 @@ class StudentProfileViewModel(
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun delete(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            studentRepository.delete(studentId)
+            onDeleted()
+        }
+    }
 }
 
 class StudentProfileViewModelFactory(

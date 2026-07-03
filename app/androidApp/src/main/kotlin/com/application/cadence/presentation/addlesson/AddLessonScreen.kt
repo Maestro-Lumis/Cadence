@@ -28,6 +28,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,7 @@ import kotlin.time.Instant
 @Composable
 fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: () -> Unit) {
     val students by viewModel.students.collectAsState()
+    val suggestedNumber by viewModel.suggestedLessonNumber.collectAsState()
 
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
@@ -151,6 +153,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                                 text = { Text("${student.name} (${student.course})") },
                                 onClick = {
                                     selectedStudent = student
+                                    viewModel.selectStudent(student.id)
                                     studentMenuExpanded = false
                                 }
                             )
@@ -230,6 +233,13 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                 }
                 Spacer(Modifier.height(8.dp))
 
+                LaunchedEffect(selectedStudent?.id, suggestedNumber) {
+                    val id = selectedStudent?.id
+                    val s = suggestedNumber
+                    if (id != null && s != null) {
+                        lessonNumberText = s.toString()
+                    }
+                }
                 OutlinedTextField(
                     value = lessonNumberText,
                     onValueChange = { lessonNumberText = it },
@@ -273,6 +283,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                                 status = status,
                                 lessonNumber = lessonNumberText.toIntOrNull(),
                                 paid = paid,
+                                onError = { msg -> error = msg },
                                 onSaved = onSaved
                             )
                         }
