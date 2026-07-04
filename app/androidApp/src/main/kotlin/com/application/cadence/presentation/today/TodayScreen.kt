@@ -129,9 +129,9 @@ private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        lesson.studentLocalTime?.let {
+        lesson.mskTime?.let {
             Text(
-                "у ученика $it",
+                it,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
+import com.application.cadence.presentation.common.MSK
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -18,7 +19,6 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import com.application.cadence.presentation.common.timezoneLabel
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
@@ -29,7 +29,7 @@ data class TodayLessonUi(
     val course: String,
     val time: String,
     val endTime: String,
-    val studentLocalTime: String?,
+    val mskTime: String?,
     val status: LessonStatus,
     val lessonNumber: Int?,
     val paid: Boolean
@@ -55,27 +55,27 @@ class TodayViewModel(
         val byId = students.associateBy { it.id }
         lessons.mapNotNull { lesson ->
             val student = byId[lesson.studentId] ?: return@mapNotNull null
-            val studentTz = runCatching { TimeZone.of(student.timezone) }.getOrDefault(tutorTz)
             val lessonTime = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
-            val lessonStart = LocalDateTime(lesson.date, lessonTime).toInstant(studentTz)
+            val lessonStart = LocalDateTime(lesson.date, lessonTime).toInstant(MSK)
             if (lessonStart < startOfToday || lessonStart >= startOfTomorrow) return@mapNotNull null
 
             val lessonEnd = lessonStart + lesson.durationMinutes.minutes
             val tutorStart = lessonStart.toLocalDateTime(tutorTz)
             val tutorEnd = lessonEnd.toLocalDateTime(tutorTz)
-            val tutorTimeStr = "%02d:%02d".format(tutorStart.hour, tutorStart.minute)
-            val tutorEndStr = "%02d:%02d".format(tutorEnd.hour, tutorEnd.minute)
-            val studentTimeStr = if (student.timezone == tutorTz.id) null
-                else "%02d:%02d · ${timezoneLabel(student.timezone)}".format(lessonTime.hour, lessonTime.minute)
+            val timeStr = "%02d:%02d".format(tutorStart.hour, tutorStart.minute)
+            val endTimeStr = "%02d:%02d".format(tutorEnd.hour, tutorEnd.minute)
+
+            val mskHint = if (tutorTz.id == MSK.id) null
+                else "%02d:%02d МСК".format(lessonTime.hour, lessonTime.minute)
 
             TodayLessonUi(
                 lessonId = lesson.id,
                 studentId = lesson.studentId,
                 studentName = student.name,
                 course = student.course,
-                time = tutorTimeStr,
-                endTime = tutorEndStr,
-                studentLocalTime = studentTimeStr,
+                time = timeStr,
+                endTime = endTimeStr,
+                mskTime = mskHint,
                 status = lesson.status,
                 lessonNumber = lesson.lessonNumber,
                 paid = lesson.paid

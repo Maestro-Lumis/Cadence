@@ -8,6 +8,7 @@ import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
+import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.findOverlappingLesson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,6 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
@@ -71,13 +71,12 @@ class AddLessonViewModel(
                 onError("Ученик не найден")
                 return@launch
             }
-            val studentTz = runCatching { TimeZone.of(student.timezone) }.getOrNull()
             val lessonTime = runCatching { LocalTime.parse(time) }.getOrNull()
-            if (studentTz == null || lessonTime == null) {
+            if (lessonTime == null) {
                 onError("Неверный формат времени")
                 return@launch
             }
-            val newStart = LocalDateTime(date, lessonTime).toInstant(studentTz)
+            val newStart = LocalDateTime(date, lessonTime).toInstant(MSK)
             val newEnd = newStart + durationMinutes.minutes
 
             if (status != LessonStatus.CANCELLED) {
@@ -85,11 +84,10 @@ class AddLessonViewModel(
                     date.minus(1, DateTimeUnit.DAY),
                     date.plus(1, DateTimeUnit.DAY)
                 ).first()
-                val studentsById = studentList.associateBy { it.id }
-                val overlap = findOverlappingLesson(newStart, newEnd, nearby, studentsById)
+                val overlap = findOverlappingLesson(newStart, newEnd, nearby)
                 if (overlap != null) {
                     val ovStudent = studentList.find { it.id == overlap.studentId }
-                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time}")
+                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК")
                     return@launch
                 }
             }

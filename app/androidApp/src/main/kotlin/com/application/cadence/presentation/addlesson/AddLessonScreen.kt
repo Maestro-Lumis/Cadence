@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
+import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.ScreenContainer
-import com.application.cadence.presentation.common.timezoneLabel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -58,7 +58,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
 
-    var dateText by remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()).toString()) }
+    var dateText by remember { mutableStateOf(Clock.System.todayIn(MSK).toString()) }
     var timeText by remember { mutableStateOf("18:00") }
     var durationText by remember { mutableStateOf("60") }
 
@@ -72,7 +72,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        initialSelectedDateMillis = Clock.System.todayIn(MSK)
             .atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
     )
     val timePickerState = rememberTimePickerState(initialHour = 18, initialMinute = 0)
@@ -162,14 +162,13 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                 }
                 Spacer(Modifier.height(8.dp))
 
-                val tzSuffix = selectedStudent?.let { " (${timezoneLabel(it.timezone)})" }.orEmpty()
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(modifier = Modifier.weight(1f)) {
                         OutlinedTextField(
                             value = dateText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Дата$tzSuffix") },
+                            label = { Text("Дата (МСК)") },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(
@@ -184,7 +183,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
                             value = timeText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Время$tzSuffix") },
+                            label = { Text("Время (МСК)") },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(
