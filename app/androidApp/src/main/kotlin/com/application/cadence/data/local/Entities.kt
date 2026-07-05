@@ -29,6 +29,20 @@ data class PackageEntity(
 )
 
 @Entity(
+    tableName = "schedules",
+    foreignKeys = [ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE)],
+    indices = [Index("studentId")]
+)
+data class ScheduleEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val studentId: Long,
+    val dayOfWeek: String,
+    val time: String,
+    val durationMinutes: Int,
+    val active: Boolean
+)
+
+@Entity(
     tableName = "lessons",
     foreignKeys = [
         ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE),

@@ -3,9 +3,12 @@ package com.application.cadence.data.mapper
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonPackage
 import com.application.cadence.core.LessonStatus
+import com.application.cadence.core.Schedule
 import com.application.cadence.core.Student
+import com.application.cadence.core.Weekday
 import com.application.cadence.data.local.LessonEntity
 import com.application.cadence.data.local.PackageEntity
+import com.application.cadence.data.local.ScheduleEntity
 import com.application.cadence.data.local.StudentEntity
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -69,4 +72,22 @@ fun LessonPackage.toEntity() = PackageEntity(
     usedLessons = usedLessons,
     paid = paid,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+)
+
+fun ScheduleEntity.toDomain() = Schedule(
+    id = id,
+    studentId = studentId,
+    dayOfWeek = Weekday.valueOf(dayOfWeek),
+    time = time,
+    durationMinutes = durationMinutes,
+    active = active
+)
+
+fun Schedule.toEntity() = ScheduleEntity(
+    id = id,
+    studentId = studentId,
+    dayOfWeek = dayOfWeek.name,
+    time = time,
+    durationMinutes = durationMinutes,
+    active = active
 )

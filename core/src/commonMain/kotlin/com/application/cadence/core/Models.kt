@@ -22,6 +22,7 @@ data class Schedule(
     val studentId: Long,
     val dayOfWeek: Weekday,
     val time: String,
+    val durationMinutes: Int,
     val active: Boolean
 )
 

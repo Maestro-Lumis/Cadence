@@ -12,6 +12,10 @@ import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
+import com.application.cadence.presentation.editstudent.EditStudentScreen
+import com.application.cadence.presentation.editstudent.EditStudentViewModelFactory
+import com.application.cadence.presentation.schedule.ScheduleScreen
+import com.application.cadence.presentation.schedule.ScheduleViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
 import com.application.cadence.presentation.students.StudentsScreen
 import com.application.cadence.presentation.students.StudentsViewModelFactory
@@ -51,7 +55,27 @@ fun AppNavHost(app: CadenceApplication) {
                 viewModel = viewModel(factory = factory),
                 onBack = { navController.popBackStack() },
                 onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
+                onScheduleClick = { name -> navController.navigate(ScheduleRoute(route.studentId, name)) },
+                onEditClick = { navController.navigate(EditStudentRoute(route.studentId)) },
                 onDeleted = { navController.popBackStack() }
+            )
+        }
+        composable<EditStudentRoute> { backStackEntry ->
+            val route: EditStudentRoute = backStackEntry.toRoute()
+            val factory = EditStudentViewModelFactory(route.studentId, app.studentRepository)
+            EditStudentScreen(
+                viewModel = viewModel(factory = factory),
+                onSaved = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<ScheduleRoute> { backStackEntry ->
+            val route: ScheduleRoute = backStackEntry.toRoute()
+            val factory = ScheduleViewModelFactory(route.studentId, app.scheduleRepository, app.lessonRepository)
+            ScheduleScreen(
+                viewModel = viewModel(factory = factory),
+                studentName = route.studentName,
+                onBack = { navController.popBackStack() }
             )
         }
         composable<EditLessonRoute> { backStackEntry ->

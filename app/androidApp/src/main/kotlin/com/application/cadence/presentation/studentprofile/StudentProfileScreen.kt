@@ -37,6 +37,8 @@ fun StudentProfileScreen(
     viewModel: StudentProfileViewModel,
     onBack: () -> Unit,
     onLessonClick: (Long) -> Unit,
+    onScheduleClick: (String) -> Unit,
+    onEditClick: () -> Unit,
     onDeleted: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -75,12 +77,20 @@ fun StudentProfileScreen(
                     modifier = Modifier.clickable { onBack() },
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    "Удалить",
-                    modifier = Modifier.clickable { showDeleteConfirm = true },
-                    color = Color(0xFFB71C1C),
-                    style = MaterialTheme.typography.labelLarge
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        "Изменить",
+                        modifier = Modifier.clickable { onEditClick() },
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        "Удалить",
+                        modifier = Modifier.clickable { showDeleteConfirm = true },
+                        color = Color(0xFFB71C1C),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
 
@@ -106,7 +116,15 @@ fun StudentProfileScreen(
                         highlight = profile.unpaidLessons > 0
                     )
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    "Расписание →",
+                    modifier = Modifier.clickable { onScheduleClick(profile.studentName) },
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Spacer(Modifier.height(12.dp))
 
                 Text("История", style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(8.dp))

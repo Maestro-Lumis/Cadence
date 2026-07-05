@@ -46,6 +46,15 @@ interface LessonDao {
 }
 
 @Dao
+interface ScheduleDao {
+    @Query("SELECT * FROM schedules WHERE studentId = :studentId")
+    fun observeByStudent(studentId: Long): Flow<List<ScheduleEntity>>
+
+    @Insert suspend fun insert(s: ScheduleEntity): Long
+    @Query("DELETE FROM schedules WHERE id = :id") suspend fun deleteById(id: Long)
+}
+
+@Dao
 interface PackageDao {
     @Query("SELECT * FROM packages WHERE studentId = :studentId ORDER BY createdAt DESC")
     fun observeByStudent(studentId: Long): Flow<List<PackageEntity>>
@@ -59,13 +68,14 @@ interface PackageDao {
 }
 
 @Database(
-    entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class],
-    version = 3
+    entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class, ScheduleEntity::class],
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
     abstract fun lessonDao(): LessonDao
     abstract fun packageDao(): PackageDao
+    abstract fun scheduleDao(): ScheduleDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -77,5 +87,21 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE students ADD COLUMN timezone TEXT NOT NULL DEFAULT 'Europe/Moscow'")
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `schedules` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`studentId` INTEGER NOT NULL, " +
+                "`dayOfWeek` TEXT NOT NULL, " +
+                "`time` TEXT NOT NULL, " +
+                "`durationMinutes` INTEGER NOT NULL, " +
+                "`active` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`studentId`) REFERENCES `students`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE)"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_studentId` ON `schedules` (`studentId`)")
     }
 }

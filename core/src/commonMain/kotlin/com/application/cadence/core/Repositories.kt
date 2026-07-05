@@ -28,3 +28,9 @@ interface LessonPackageRepository {
     suspend fun update(pkg: LessonPackage)
     suspend fun delete(packageId: Long)
 }
+
+interface ScheduleRepository {
+    fun observeByStudent(studentId: Long): Flow<List<Schedule>>
+    suspend fun add(schedule: Schedule): Long
+    suspend fun delete(scheduleId: Long)
+}

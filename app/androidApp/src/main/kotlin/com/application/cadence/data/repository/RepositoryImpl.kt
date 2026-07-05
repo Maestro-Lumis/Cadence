@@ -2,6 +2,7 @@ package com.application.cadence.data.repository
 
 import com.application.cadence.data.local.LessonDao
 import com.application.cadence.data.local.PackageDao
+import com.application.cadence.data.local.ScheduleDao
 import com.application.cadence.data.local.StudentDao
 import com.application.cadence.data.mapper.toDomain
 import com.application.cadence.data.mapper.toEntity
@@ -9,6 +10,8 @@ import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonPackage
 import com.application.cadence.core.LessonPackageRepository
 import com.application.cadence.core.LessonRepository
+import com.application.cadence.core.Schedule
+import com.application.cadence.core.ScheduleRepository
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import kotlinx.coroutines.flow.Flow
@@ -56,4 +59,12 @@ class LessonPackageRepositoryImpl(private val dao: PackageDao) : LessonPackageRe
     override suspend fun add(pkg: LessonPackage) = dao.insert(pkg.toEntity())
     override suspend fun update(pkg: LessonPackage) = dao.update(pkg.toEntity())
     override suspend fun delete(packageId: Long) = dao.deleteById(packageId)
+}
+
+class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository {
+    override fun observeByStudent(studentId: Long): Flow<List<Schedule>> =
+        dao.observeByStudent(studentId).map { list -> list.map { it.toDomain() } }
+
+    override suspend fun add(schedule: Schedule) = dao.insert(schedule.toEntity())
+    override suspend fun delete(scheduleId: Long) = dao.deleteById(scheduleId)
 }
