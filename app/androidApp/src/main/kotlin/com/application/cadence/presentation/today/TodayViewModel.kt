@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.toInstant
@@ -35,6 +37,18 @@ data class TodayLessonUi(
     val paid: Boolean
 )
 
+data class ReviewLessonUi(
+    val lessonId: Long,
+    val studentName: String,
+    val course: String,
+    val whenLabel: String
+)
+
+data class TodayUi(
+    val reviewQueue: List<ReviewLessonUi>,
+    val lessons: List<TodayLessonUi>
+)
+
 class TodayViewModel(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository
@@ -42,18 +56,22 @@ class TodayViewModel(
 
     private val tutorTz = TimeZone.currentSystemDefault()
     private val today = Clock.System.todayIn(tutorTz)
+    private val mskToday = Clock.System.todayIn(MSK)
     private val startOfToday = today.atStartOfDayIn(tutorTz)
     private val startOfTomorrow = today.plus(1, DateTimeUnit.DAY).atStartOfDayIn(tutorTz)
 
-    val uiState: StateFlow<List<TodayLessonUi>> = combine(
+    val uiState: StateFlow<TodayUi> = combine(
         lessonRepository.observeInDateRange(
             today.plus(-1, DateTimeUnit.DAY),
             today.plus(1, DateTimeUnit.DAY)
         ),
+        lessonRepository.observeScheduledUpTo(mskToday),
         studentRepository.observeAll()
-    ) { lessons, students ->
+    ) { rangeLessons, scheduledUpTo, students ->
         val byId = students.associateBy { it.id }
-        lessons.mapNotNull { lesson ->
+        val now = Clock.System.now()
+
+        val lessons = rangeLessons.mapNotNull { lesson ->
             val student = byId[lesson.studentId] ?: return@mapNotNull null
             val lessonTime = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
             val lessonStart = LocalDateTime(lesson.date, lessonTime).toInstant(MSK)
@@ -81,5 +99,37 @@ class TodayViewModel(
                 paid = lesson.paid
             )
         }.sortedBy { it.time }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+        val reviewQueue = scheduledUpTo.mapNotNull { lesson ->
+            val student = byId[lesson.studentId] ?: return@mapNotNull null
+            val lessonTime = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
+            val lessonStart = LocalDateTime(lesson.date, lessonTime).toInstant(MSK)
+            val lessonEnd = lessonStart + lesson.durationMinutes.minutes
+            if (lessonEnd >= now) return@mapNotNull null
+
+            val startLocal = lessonStart.toLocalDateTime(tutorTz)
+            val dayWord = when (startLocal.date) {
+                today -> "Сегодня"
+                today.minus(1, DateTimeUnit.DAY) -> "Вчера"
+                else -> startLocal.date.toString()
+            }
+            val timeStr = "%02d:%02d".format(startLocal.hour, startLocal.minute)
+
+            lessonStart to ReviewLessonUi(
+                lessonId = lesson.id,
+                studentName = student.name,
+                course = student.course,
+                whenLabel = "$dayWord, $timeStr"
+            )
+        }.sortedBy { it.first }.map { it.second }
+
+        TodayUi(reviewQueue = reviewQueue, lessons = lessons)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TodayUi(emptyList(), emptyList()))
+
+    fun resolve(lessonId: Long, status: LessonStatus, paid: Boolean) {
+        viewModelScope.launch {
+            val lesson = lessonRepository.getById(lessonId) ?: return@launch
+            lessonRepository.update(lesson.copy(status = status, paid = paid))
+        }
+    }
 }

@@ -175,7 +175,7 @@ private fun HistoryRow(lesson: Lesson, onClick: () -> Unit) {
                 style = MaterialTheme.typography.labelSmall
             )
         }
-        if (lesson.status != LessonStatus.CANCELLED && !lesson.paid) {
+        if (lesson.status == LessonStatus.HELD && !lesson.paid) {
             Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
         }
     }

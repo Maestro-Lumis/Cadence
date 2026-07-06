@@ -15,6 +15,7 @@ interface LessonRepository {
     fun observeByDate(date: LocalDate): Flow<List<Lesson>>
     fun observeInDateRange(from: LocalDate, to: LocalDate): Flow<List<Lesson>>
     fun observeByStudent(studentId: Long): Flow<List<Lesson>>
+    fun observeScheduledUpTo(date: LocalDate): Flow<List<Lesson>>
     suspend fun getById(lessonId: Long): Lesson?
     suspend fun add(lesson: Lesson): Long
     suspend fun update(lesson: Lesson)

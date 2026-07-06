@@ -40,7 +40,7 @@ class StudentProfileViewModel(
                 timezone = it.timezone,
                 totalLessons = lessons.size,
                 heldLessons = lessons.count { l -> l.status == LessonStatus.HELD },
-                unpaidLessons = lessons.count { l -> l.status != LessonStatus.CANCELLED && !l.paid },
+                unpaidLessons = lessons.count { l -> l.status == LessonStatus.HELD && !l.paid },
                 history = lessons.sortedByDescending { l -> l.date }
             )
         }
