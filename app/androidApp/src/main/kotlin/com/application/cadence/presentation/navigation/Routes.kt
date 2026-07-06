@@ -9,6 +9,9 @@ object TodayRoute
 object StudentsRoute
 
 @Serializable
+object DebtsRoute
+
+@Serializable
 object AddStudentRoute
 
 @Serializable

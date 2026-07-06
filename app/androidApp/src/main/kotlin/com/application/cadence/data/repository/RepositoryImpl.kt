@@ -44,6 +44,9 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override fun observeScheduledUpTo(date: LocalDate): Flow<List<Lesson>> =
         dao.observeScheduledUpTo(date.toString()).map { list -> list.map { it.toDomain() } }
 
+    override fun observeUnpaidHeld(): Flow<List<Lesson>> =
+        dao.observeUnpaidHeld().map { list -> list.map { it.toDomain() } }
+
     override suspend fun getById(lessonId: Long): Lesson? =
         dao.getById(lessonId)?.toDomain()
 

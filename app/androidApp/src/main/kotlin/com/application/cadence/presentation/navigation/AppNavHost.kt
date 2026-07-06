@@ -10,6 +10,8 @@ import com.application.cadence.CadenceApplication
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
+import com.application.cadence.presentation.debts.DebtsScreen
+import com.application.cadence.presentation.debts.DebtsViewModelFactory
 import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.editstudent.EditStudentScreen
@@ -36,7 +38,8 @@ fun AppNavHost(app: CadenceApplication) {
                 onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
                 onAddStudentClick = { navController.navigate(AddStudentRoute) },
                 onAddLessonClick = { navController.navigate(AddLessonRoute) },
-                onAllStudentsClick = { navController.navigate(StudentsRoute) }
+                onAllStudentsClick = { navController.navigate(StudentsRoute) },
+                onDebtsClick = { navController.navigate(DebtsRoute) }
             )
         }
         composable<StudentsRoute> {
@@ -46,6 +49,14 @@ fun AppNavHost(app: CadenceApplication) {
                 onBack = { navController.popBackStack() },
                 onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
                 onAddStudentClick = { navController.navigate(AddStudentRoute) }
+            )
+        }
+        composable<DebtsRoute> {
+            val factory = DebtsViewModelFactory(app.lessonRepository, app.studentRepository)
+            DebtsScreen(
+                viewModel = viewModel(factory = factory),
+                onBack = { navController.popBackStack() },
+                onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) }
             )
         }
         composable<StudentProfileRoute> { backStackEntry ->

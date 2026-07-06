@@ -33,9 +33,11 @@ fun TodayScreen(
     onLessonClick: (Long) -> Unit,
     onAddStudentClick: () -> Unit,
     onAddLessonClick: () -> Unit,
-    onAllStudentsClick: () -> Unit
+    onAllStudentsClick: () -> Unit,
+    onDebtsClick: () -> Unit
 ) {
     val ui by viewModel.uiState.collectAsState()
+    val debt by viewModel.debtSummary.collectAsState()
 
     ScreenContainer {
         Column(
@@ -63,6 +65,12 @@ fun TodayScreen(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                debt?.let { d ->
+                    item(key = "debt") {
+                        DebtCard(d, onClick = onDebtsClick)
+                    }
+                }
+
                 if (ui.reviewQueue.isNotEmpty()) {
                     item(key = "review-header") {
                         Text(
@@ -103,6 +111,49 @@ fun TodayScreen(
                 Text("Добавить ученика")
             }
         }
+    }
+}
+
+@Composable
+private fun DebtCard(debt: DebtSummary, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .background(Color(0xFFFAEEDA), RoundedCornerShape(12.dp))
+            .padding(14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text("Долги", style = MaterialTheme.typography.titleMedium, color = Color(0xFF995A1D))
+            Text(
+                "${debt.lessonCount} ${lessonWord(debt.lessonCount)} у ${debt.studentCount} ${studentWord(debt.studentCount)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF995A1D)
+            )
+        }
+        Text("→", color = Color(0xFF995A1D), style = MaterialTheme.typography.titleMedium)
+    }
+}
+
+private fun lessonWord(n: Int): String {
+    val mod10 = n % 10
+    val mod100 = n % 100
+    return when {
+        mod10 == 1 && mod100 != 11 -> "урок"
+        mod10 in 2..4 && mod100 !in 12..14 -> "урока"
+        else -> "уроков"
+    }
+}
+
+private fun studentWord(n: Int): String {
+    val mod10 = n % 10
+    val mod100 = n % 100
+    return when {
+        mod10 == 1 && mod100 != 11 -> "ученика"
+        mod10 in 2..4 && mod100 !in 12..14 -> "учеников"
+        else -> "учеников"
     }
 }
 

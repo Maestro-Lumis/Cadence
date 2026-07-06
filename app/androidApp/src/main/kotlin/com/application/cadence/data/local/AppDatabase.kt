@@ -39,6 +39,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE status = 'SCHEDULED' AND date <= :date ORDER BY date, time")
     fun observeScheduledUpTo(date: String): Flow<List<LessonEntity>>
 
+    @Query("SELECT * FROM lessons WHERE status = 'HELD' AND paid = 0 ORDER BY date")
+    fun observeUnpaidHeld(): Flow<List<LessonEntity>>
+
     @Query("SELECT * FROM lessons WHERE id = :id")
     suspend fun getById(id: Long): LessonEntity?
 

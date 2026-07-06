@@ -9,6 +9,7 @@ import com.application.cadence.presentation.common.MSK
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
@@ -47,6 +48,11 @@ data class ReviewLessonUi(
 data class TodayUi(
     val reviewQueue: List<ReviewLessonUi>,
     val lessons: List<TodayLessonUi>
+)
+
+data class DebtSummary(
+    val lessonCount: Int,
+    val studentCount: Int
 )
 
 class TodayViewModel(
@@ -125,6 +131,16 @@ class TodayViewModel(
 
         TodayUi(reviewQueue = reviewQueue, lessons = lessons)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TodayUi(emptyList(), emptyList()))
+
+    val debtSummary: StateFlow<DebtSummary?> = lessonRepository.observeUnpaidHeld()
+        .map { lessons ->
+            if (lessons.isEmpty()) null
+            else DebtSummary(
+                lessonCount = lessons.size,
+                studentCount = lessons.map { it.studentId }.distinct().size
+            )
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun resolve(lessonId: Long, status: LessonStatus, paid: Boolean) {
         viewModelScope.launch {
