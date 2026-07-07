@@ -87,9 +87,7 @@ fun AppNavHost(app: CadenceApplication) {
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
-                    onAddStudentClick = { navController.navigate(AddStudentRoute) },
                     onAddLessonClick = { navController.navigate(AddLessonRoute) },
-                    onAllStudentsClick = { switchTab(StudentsRoute) },
                     onDebtsClick = { navController.navigate(DebtsRoute) }
                 )
             }

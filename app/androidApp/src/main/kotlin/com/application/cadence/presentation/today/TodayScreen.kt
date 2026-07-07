@@ -2,7 +2,9 @@ package com.application.cadence.presentation.today
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -21,22 +25,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun TodayScreen(
     viewModel: TodayViewModel,
     onLessonClick: (Long) -> Unit,
-    onAddStudentClick: () -> Unit,
     onAddLessonClick: () -> Unit,
-    onAllStudentsClick: () -> Unit,
     onDebtsClick: () -> Unit
 ) {
-    val ui by viewModel.uiState.collectAsState()
+    val day by viewModel.dayState.collectAsState()
+    val reviewQueue by viewModel.reviewQueue.collectAsState()
     val debt by viewModel.debtSummary.collectAsState()
 
     ScreenContainer {
@@ -46,19 +52,15 @@ fun TodayScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Занятия", style = MaterialTheme.typography.titleLarge)
-                Text(
-                    "Все ученики",
-                    modifier = Modifier.clickable { onAllStudentsClick() },
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
+            Text(day.monthTitle, style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(12.dp))
+
+            WeekStrip(
+                week = day.week,
+                onSelectDate = viewModel::selectDate,
+                onPrevWeek = { viewModel.shiftWeek(-1) },
+                onNextWeek = { viewModel.shiftWeek(1) }
+            )
             Spacer(Modifier.height(16.dp))
 
             LazyColumn(
@@ -66,19 +68,14 @@ fun TodayScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 debt?.let { d ->
-                    item(key = "debt") {
-                        DebtCard(d, onClick = onDebtsClick)
-                    }
+                    item(key = "debt") { DebtCard(d, onClick = onDebtsClick) }
                 }
 
-                if (ui.reviewQueue.isNotEmpty()) {
+                if (reviewQueue.isNotEmpty()) {
                     item(key = "review-header") {
-                        Text(
-                            "Требует внимания",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Text("Требует внимания", style = MaterialTheme.typography.titleMedium)
                     }
-                    items(ui.reviewQueue, key = { "review-${it.lessonId}" }) { review ->
+                    items(reviewQueue, key = { "review-${it.lessonId}" }) { review ->
                         ReviewCard(
                             review = review,
                             onHeldPaid = { viewModel.resolve(review.lessonId, LessonStatus.HELD, true) },
@@ -90,12 +87,20 @@ fun TodayScreen(
                     item(key = "review-gap") { Spacer(Modifier.height(8.dp)) }
                 }
 
-                if (ui.lessons.isEmpty()) {
+                item(key = "day-label") {
+                    Text(
+                        day.selectedLabel,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                if (day.lessons.isEmpty()) {
                     item(key = "empty") {
-                        Text("Сегодня занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("В этот день занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
-                    items(ui.lessons, key = { it.lessonId }) { lesson ->
+                    items(day.lessons, key = { it.lessonId }) { lesson ->
                         LessonCard(lesson, onClick = { onLessonClick(lesson.lessonId) })
                     }
                 }
@@ -106,9 +111,72 @@ fun TodayScreen(
             Button(onClick = onAddLessonClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Добавить занятие")
             }
-            Spacer(Modifier.height(8.dp))
-            Button(onClick = onAddStudentClick, modifier = Modifier.fillMaxWidth()) {
-                Text("Добавить ученика")
+        }
+    }
+}
+
+@Composable
+private fun WeekStrip(
+    week: List<WeekDayUi>,
+    onSelectDate: (LocalDate) -> Unit,
+    onPrevWeek: () -> Unit,
+    onNextWeek: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                var total = 0f
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        if (total > 60f) onPrevWeek() else if (total < -60f) onNextWeek()
+                        total = 0f
+                    },
+                    onHorizontalDrag = { _, delta -> total += delta }
+                )
+            },
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        week.forEach { day ->
+            DayCell(day, Modifier.weight(1f), onClick = { onSelectDate(day.date) })
+        }
+    }
+}
+
+@Composable
+private fun DayCell(day: WeekDayUi, modifier: Modifier, onClick: () -> Unit) {
+    val bg = if (day.isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val labelColor =
+        if (day.isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+    val numberColor = when {
+        day.isSelected -> MaterialTheme.colorScheme.onPrimary
+        day.isToday -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+    val dotColor = if (day.isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick)
+            .background(bg)
+            .padding(vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(day.shortLabel, style = MaterialTheme.typography.labelSmall, color = labelColor)
+        Text(day.dayNumber.toString(), style = MaterialTheme.typography.bodyMedium, color = numberColor)
+        Row(
+            modifier = Modifier.height(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(minOf(day.lessonCount, 3)) {
+                Box(
+                    Modifier
+                        .size(4.dp)
+                        .clip(CircleShape)
+                        .background(dotColor)
+                )
             }
         }
     }
@@ -152,7 +220,6 @@ private fun studentWord(n: Int): String {
     val mod100 = n % 100
     return when {
         mod10 == 1 && mod100 != 11 -> "ученика"
-        mod10 in 2..4 && mod100 !in 12..14 -> "учеников"
         else -> "учеников"
     }
 }
