@@ -13,13 +13,10 @@ import com.application.cadence.presentation.common.monthGenitive
 import com.application.cadence.presentation.common.monthNominative
 import com.application.cadence.presentation.common.weekdayLabel
 import com.application.cadence.presentation.common.weekdayShort
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
@@ -73,12 +70,6 @@ data class DayUi(
     val lessons: List<TodayLessonUi>
 )
 
-data class DebtSummary(
-    val lessonCount: Int,
-    val studentCount: Int
-)
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class TodayViewModel(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository
@@ -98,18 +89,16 @@ class TodayViewModel(
         _selectedDate.value = _selectedDate.value.plus(deltaWeeks * 7, DateTimeUnit.DAY)
     }
 
-    val dayState: StateFlow<DayUi> = _selectedDate.flatMapLatest { selected ->
+    val dayState: StateFlow<DayUi> = combine(
+        _selectedDate,
+        lessonRepository.observeInDateRange(
+            today.minus(60, DateTimeUnit.DAY),
+            today.plus(180, DateTimeUnit.DAY)
+        ),
+        studentRepository.observeAll()
+    ) { selected, lessons, students ->
         val weekStart = selected.minus(selected.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
-        val weekEnd = weekStart.plus(6, DateTimeUnit.DAY)
-        combine(
-            lessonRepository.observeInDateRange(
-                weekStart.minus(1, DateTimeUnit.DAY),
-                weekEnd.plus(1, DateTimeUnit.DAY)
-            ),
-            studentRepository.observeAll()
-        ) { lessons, students ->
-            buildDayUi(selected, weekStart, lessons, students)
-        }
+        buildDayUi(selected, weekStart, lessons, students)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -122,16 +111,6 @@ class TodayViewModel(
     ) { lessons, students ->
         buildReviewQueue(lessons, students)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val debtSummary: StateFlow<DebtSummary?> = lessonRepository.observeUnpaidHeld()
-        .map { lessons ->
-            if (lessons.isEmpty()) null
-            else DebtSummary(
-                lessonCount = lessons.size,
-                studentCount = lessons.map { it.studentId }.distinct().size
-            )
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun resolve(lessonId: Long, status: LessonStatus, paid: Boolean) {
         viewModelScope.launch {

@@ -20,10 +20,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.Lesson
@@ -43,12 +45,13 @@ fun StudentProfileScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = { Text("Удалить ученика?") },
-            text = { Text("Будут удалены и все его занятия (${state?.totalLessons ?: 0}).") },
+            text = { Text("Будут удалены и все его занятия.") },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
@@ -104,18 +107,6 @@ fun StudentProfileScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(16.dp))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    StatBox("Всего", profile.totalLessons.toString(), Modifier.weight(1f))
-                    StatBox("Проведено", profile.heldLessons.toString(), Modifier.weight(1f))
-                    StatBox(
-                        "Долг",
-                        profile.unpaidLessons.toString(),
-                        Modifier.weight(1f),
-                        highlight = profile.unpaidLessons > 0
-                    )
-                }
                 Spacer(Modifier.height(12.dp))
 
                 Text(
@@ -124,14 +115,40 @@ fun StudentProfileScreen(
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge
                 )
+                Spacer(Modifier.height(16.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    TabChip(
+                        label = "Проведено",
+                        count = profile.heldLessons,
+                        selected = selectedTab == 0,
+                        modifier = Modifier.weight(1f),
+                        onClick = { selectedTab = 0 }
+                    )
+                    TabChip(
+                        label = "Долг",
+                        count = profile.unpaidLessons,
+                        selected = selectedTab == 1,
+                        highlight = profile.unpaidLessons > 0,
+                        modifier = Modifier.weight(1f),
+                        onClick = { selectedTab = 1 }
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
 
-                Text("История", style = MaterialTheme.typography.titleSmall)
-                Spacer(Modifier.height(8.dp))
+                val held = profile.history.filter { it.status == LessonStatus.HELD }
+                val list = if (selectedTab == 0) held else held.filter { !it.paid }
 
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(profile.history, key = { it.id }) { lesson ->
-                        HistoryRow(lesson, onClick = { onLessonClick(lesson.id) })
+                if (list.isEmpty()) {
+                    Text(
+                        if (selectedTab == 0) "Проведённых занятий нет" else "Долгов нет",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(list, key = { it.id }) { lesson ->
+                            LessonRow(lesson, onClick = { onLessonClick(lesson.id) })
+                        }
                     }
                 }
             }
@@ -140,28 +157,38 @@ fun StudentProfileScreen(
 }
 
 @Composable
-private fun StatBox(label: String, value: String, modifier: Modifier = Modifier, highlight: Boolean = false) {
+private fun TabChip(
+    label: String,
+    count: Int,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    highlight: Boolean = false,
+    onClick: () -> Unit
+) {
+    val bg = when {
+        selected && highlight -> Color(0xFFFAEEDA)
+        selected -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.surfaceVariant
+    }
+    val fg = when {
+        selected && highlight -> Color(0xFF995A1D)
+        selected -> MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
     Column(
         modifier = modifier
-            .background(
-                if (highlight) Color(0xFFFAEEDA) else MaterialTheme.colorScheme.surfaceVariant,
-                RoundedCornerShape(8.dp)
-            )
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .background(bg)
             .padding(10.dp)
     ) {
-        Text(label, style = MaterialTheme.typography.labelSmall)
-        Text(value, style = MaterialTheme.typography.titleMedium)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = fg)
+        Text(count.toString(), style = MaterialTheme.typography.titleMedium, color = fg)
     }
 }
 
 @Composable
-private fun HistoryRow(lesson: Lesson, onClick: () -> Unit) {
-    val statusLabel = when (lesson.status) {
-        LessonStatus.HELD -> "Проведён"
-        LessonStatus.CANCELLED -> "Отменён"
-        LessonStatus.SCHEDULED -> "Запланирован"
-        LessonStatus.RESCHEDULED -> "Перенесён"
-    }
+private fun LessonRow(lesson: Lesson, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,11 +198,14 @@ private fun HistoryRow(lesson: Lesson, onClick: () -> Unit) {
         Column {
             Text(lesson.date.toString())
             Text(
-                "$statusLabel · ${formatDuration(lesson.durationMinutes)}",
-                style = MaterialTheme.typography.labelSmall
+                "Проведён · ${formatDuration(lesson.durationMinutes)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        if (lesson.status == LessonStatus.HELD && !lesson.paid) {
+        if (lesson.paid) {
+            Text("Оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
+        } else {
             Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
         }
     }

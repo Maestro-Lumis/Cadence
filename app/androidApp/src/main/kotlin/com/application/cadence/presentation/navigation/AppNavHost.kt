@@ -87,16 +87,16 @@ fun AppNavHost(app: CadenceApplication) {
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
-                    onAddLessonClick = { navController.navigate(AddLessonRoute) },
-                    onDebtsClick = { navController.navigate(DebtsRoute) }
+                    onAddLessonClick = { navController.navigate(AddLessonRoute) }
                 )
             }
             composable<StudentsRoute> {
-                val factory = StudentsViewModelFactory(app.studentRepository)
+                val factory = StudentsViewModelFactory(app.studentRepository, app.lessonRepository)
                 StudentsScreen(
                     viewModel = viewModel(factory = factory),
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
-                    onAddStudentClick = { navController.navigate(AddStudentRoute) }
+                    onAddStudentClick = { navController.navigate(AddStudentRoute) },
+                    onDebtsClick = { navController.navigate(DebtsRoute) }
                 )
             }
             composable<DebtsRoute> {
