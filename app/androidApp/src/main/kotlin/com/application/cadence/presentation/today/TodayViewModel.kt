@@ -80,9 +80,14 @@ class TodayViewModel(
     private val mskToday = Clock.System.todayIn(MSK)
 
     private val _selectedDate = MutableStateFlow(today)
+    val selectedDate: StateFlow<LocalDate> = _selectedDate
 
     fun selectDate(date: LocalDate) {
         _selectedDate.value = date
+    }
+
+    fun goToToday() {
+        _selectedDate.value = today
     }
 
     fun shiftWeek(deltaWeeks: Int) {

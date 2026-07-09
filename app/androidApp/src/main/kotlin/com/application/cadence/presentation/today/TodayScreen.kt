@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,12 +41,14 @@ import kotlinx.datetime.LocalDate
 fun TodayScreen(
     viewModel: TodayViewModel,
     onLessonClick: (Long) -> Unit,
-    onAddLessonClick: () -> Unit
+    onAddLessonClick: (LocalDate) -> Unit
 ) {
     val day by viewModel.dayState.collectAsState()
     val reviewQueue by viewModel.reviewQueue.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
 
     ScreenContainer {
+      Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,7 +88,8 @@ fun TodayScreen(
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 if (reviewQueue.isNotEmpty()) {
                     item(key = "review-header") {
@@ -121,13 +125,17 @@ fun TodayScreen(
                     }
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(onClick = onAddLessonClick, modifier = Modifier.fillMaxWidth()) {
-                Text("Добавить занятие")
-            }
         }
+
+        FloatingActionButton(
+            onClick = { onAddLessonClick(selectedDate) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Text("+", style = MaterialTheme.typography.headlineMedium)
+        }
+      }
     }
 }
 

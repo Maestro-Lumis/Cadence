@@ -15,7 +15,7 @@ object DebtsRoute
 object AddStudentRoute
 
 @Serializable
-object AddLessonRoute
+data class AddLessonRoute(val date: String? = null)
 
 @Serializable
 data class EditLessonRoute(val lessonId: Long)

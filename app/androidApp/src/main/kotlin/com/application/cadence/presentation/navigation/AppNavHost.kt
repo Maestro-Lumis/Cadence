@@ -87,7 +87,7 @@ fun AppNavHost(app: CadenceApplication) {
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
-                    onAddLessonClick = { navController.navigate(AddLessonRoute) }
+                    onAddLessonClick = { date -> navController.navigate(AddLessonRoute(date.toString())) }
                 )
             }
             composable<StudentsRoute> {
@@ -155,12 +155,14 @@ fun AppNavHost(app: CadenceApplication) {
                     onBack = { navController.popBackStack() }
                 )
             }
-            composable<AddLessonRoute> {
+            composable<AddLessonRoute> { backStackEntry ->
+                val route: AddLessonRoute = backStackEntry.toRoute()
                 val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository)
                 AddLessonScreen(
                     viewModel = viewModel(factory = factory),
                     onSaved = { navController.popBackStack() },
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    initialDate = route.date
                 )
             }
         }

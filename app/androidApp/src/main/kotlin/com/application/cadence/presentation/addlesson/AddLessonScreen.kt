@@ -51,14 +51,22 @@ import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: () -> Unit) {
+fun AddLessonScreen(
+    viewModel: AddLessonViewModel,
+    onSaved: () -> Unit,
+    onBack: () -> Unit,
+    initialDate: String? = null
+) {
     val students by viewModel.students.collectAsState()
     val suggestedNumber by viewModel.suggestedLessonNumber.collectAsState()
+
+    val defaultDate = initialDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        ?: Clock.System.todayIn(MSK)
 
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
 
-    var dateText by remember { mutableStateOf(Clock.System.todayIn(MSK).toString()) }
+    var dateText by remember { mutableStateOf(defaultDate.toString()) }
     var timeText by remember { mutableStateOf("18:00") }
     var durationText by remember { mutableStateOf("60") }
 
@@ -72,7 +80,7 @@ fun AddLessonScreen(viewModel: AddLessonViewModel, onSaved: () -> Unit, onBack: 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = Clock.System.todayIn(MSK)
+        initialSelectedDateMillis = defaultDate
             .atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
     )
     val timePickerState = rememberTimePickerState(initialHour = 18, initialMinute = 0)
