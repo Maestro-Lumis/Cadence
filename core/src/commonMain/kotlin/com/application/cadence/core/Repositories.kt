@@ -18,6 +18,7 @@ interface LessonRepository {
     fun observeScheduledUpTo(date: LocalDate): Flow<List<Lesson>>
     fun observeUnpaidHeld(): Flow<List<Lesson>>
     suspend fun getById(lessonId: Long): Lesson?
+    suspend fun markStudentDebtsPaid(studentId: Long)
     suspend fun add(lesson: Lesson): Long
     suspend fun update(lesson: Lesson)
     suspend fun delete(lessonId: Long)

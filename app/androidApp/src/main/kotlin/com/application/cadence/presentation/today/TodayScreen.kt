@@ -61,7 +61,19 @@ fun TodayScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(day.monthTitle, style = MaterialTheme.typography.titleLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val onToday = day.week.any { it.isSelected && it.isToday }
+                    if (!onToday) {
+                        Text(
+                            "Сегодня",
+                            modifier = Modifier.clickable { viewModel.goToToday() },
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     Text(
                         "‹",
                         modifier = Modifier.clickable { viewModel.shiftWeek(-1) },

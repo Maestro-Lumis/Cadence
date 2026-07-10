@@ -70,6 +70,13 @@ data class DayUi(
     val lessons: List<TodayLessonUi>
 )
 
+private data class EnrichedLesson(
+    val date: LocalDate,
+    val start: Instant,
+    val inReview: Boolean,
+    val ui: TodayLessonUi
+)
+
 class TodayViewModel(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository
@@ -131,15 +138,21 @@ class TodayViewModel(
         students: List<Student>
     ): DayUi {
         val byId = students.associateBy { it.id }
+        val now = Clock.System.now()
         val enriched = lessons.mapNotNull { lesson ->
             val student = byId[lesson.studentId] ?: return@mapNotNull null
             val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
             val start = LocalDateTime(lesson.date, time).toInstant(MSK)
+            val end = start + lesson.durationMinutes.minutes
             val localDate = start.toLocalDateTime(tutorTz).date
-            Triple(localDate, start, buildLessonUi(lesson, student, start, time))
+            val inReview = lesson.status == LessonStatus.SCHEDULED && end < now
+            EnrichedLesson(localDate, start, inReview, buildLessonUi(lesson, student, start, time))
         }
-        val countByDate = enriched.groupingBy { it.first }.eachCount()
-        val selectedLessons = enriched.filter { it.first == selected }.sortedBy { it.second }.map { it.third }
+        val countByDate = enriched.groupingBy { it.date }.eachCount()
+        val selectedLessons = enriched
+            .filter { it.date == selected && !it.inReview }
+            .sortedBy { it.start }
+            .map { it.ui }
 
         val week = (0..6).map { offset ->
             val date = weekStart.plus(offset, DateTimeUnit.DAY)

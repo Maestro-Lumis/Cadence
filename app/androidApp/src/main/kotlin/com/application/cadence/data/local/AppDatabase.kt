@@ -42,6 +42,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE status = 'HELD' AND paid = 0 ORDER BY date")
     fun observeUnpaidHeld(): Flow<List<LessonEntity>>
 
+    @Query("UPDATE lessons SET paid = 1 WHERE studentId = :studentId AND status = 'HELD' AND paid = 0")
+    suspend fun markStudentDebtsPaid(studentId: Long)
+
     @Query("SELECT * FROM lessons WHERE id = :id")
     suspend fun getById(id: Long): LessonEntity?
 

@@ -50,6 +50,9 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override suspend fun getById(lessonId: Long): Lesson? =
         dao.getById(lessonId)?.toDomain()
 
+    override suspend fun markStudentDebtsPaid(studentId: Long) =
+        dao.markStudentDebtsPaid(studentId)
+
     override suspend fun add(lesson: Lesson) = dao.insert(lesson.toEntity())
     override suspend fun update(lesson: Lesson) = dao.update(lesson.toEntity())
     override suspend fun delete(lessonId: Long) = dao.deleteById(lessonId)
