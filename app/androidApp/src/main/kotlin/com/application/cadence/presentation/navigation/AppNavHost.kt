@@ -27,6 +27,8 @@ import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.editstudent.EditStudentScreen
 import com.application.cadence.presentation.editstudent.EditStudentViewModelFactory
+import com.application.cadence.presentation.report.ReportScreen
+import com.application.cadence.presentation.report.ReportViewModelFactory
 import com.application.cadence.presentation.schedule.ScheduleScreen
 import com.application.cadence.presentation.schedule.ScheduleViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentViewModelFactory
@@ -115,6 +117,7 @@ fun AppNavHost(app: CadenceApplication) {
                     onBack = { navController.popBackStack() },
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
                     onScheduleClick = { name -> navController.navigate(ScheduleRoute(route.studentId, name)) },
+                    onReportClick = { navController.navigate(ReportRoute(route.studentId)) },
                     onEditClick = { navController.navigate(EditStudentRoute(route.studentId)) },
                     onDeleted = { navController.popBackStack() }
                 )
@@ -134,6 +137,14 @@ fun AppNavHost(app: CadenceApplication) {
                 ScheduleScreen(
                     viewModel = viewModel(factory = factory),
                     studentName = route.studentName,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable<ReportRoute> { backStackEntry ->
+                val route: ReportRoute = backStackEntry.toRoute()
+                val factory = ReportViewModelFactory(route.studentId, app.studentRepository, app.lessonRepository)
+                ReportScreen(
+                    viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() }
                 )
             }

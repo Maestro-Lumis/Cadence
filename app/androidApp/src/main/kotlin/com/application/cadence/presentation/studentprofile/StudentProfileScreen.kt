@@ -40,6 +40,7 @@ fun StudentProfileScreen(
     onBack: () -> Unit,
     onLessonClick: (Long) -> Unit,
     onScheduleClick: (String) -> Unit,
+    onReportClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleted: () -> Unit
 ) {
@@ -109,12 +110,20 @@ fun StudentProfileScreen(
                 )
                 Spacer(Modifier.height(12.dp))
 
-                Text(
-                    "Расписание →",
-                    modifier = Modifier.clickable { onScheduleClick(profile.studentName) },
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    Text(
+                        "Расписание →",
+                        modifier = Modifier.clickable { onScheduleClick(profile.studentName) },
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        "Отчёт →",
+                        modifier = Modifier.clickable { onReportClick() },
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
                 Spacer(Modifier.height(16.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
