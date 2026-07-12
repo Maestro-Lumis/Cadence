@@ -36,6 +36,7 @@ fun StudentsScreen(
 ) {
     val students by viewModel.uiState.collectAsState()
     val debtCount by viewModel.debtCount.collectAsState()
+    val lost by viewModel.lostStudents.collectAsState()
 
     ScreenContainer {
         Column(
@@ -71,6 +72,31 @@ fun StudentsScreen(
                 )
             }
             Spacer(Modifier.height(16.dp))
+
+            if (lost.isNotEmpty()) {
+                Text("Пропали", style = MaterialTheme.typography.titleSmall, color = Color(0xFF995A1D))
+                Spacer(Modifier.height(8.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    lost.forEach { student ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { onStudentClick(student.id) }
+                                .background(Color(0xFFFAEEDA))
+                                .padding(12.dp)
+                        ) {
+                            Text(student.name, style = MaterialTheme.typography.bodyMedium, color = Color(0xFF995A1D))
+                            Text(
+                                student.detail,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFF995A1D)
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
 
             if (students.isEmpty()) {
                 Text("Учеников пока нет", color = MaterialTheme.colorScheme.onSurfaceVariant)

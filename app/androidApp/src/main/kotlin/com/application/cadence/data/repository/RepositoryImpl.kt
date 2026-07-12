@@ -50,6 +50,9 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override suspend fun getById(lessonId: Long): Lesson? =
         dao.getById(lessonId)?.toDomain()
 
+    override fun observeAll(): Flow<List<Lesson>> =
+        dao.observeAll().map { list -> list.map { it.toDomain() } }
+
     override suspend fun markStudentDebtsPaid(studentId: Long) =
         dao.markStudentDebtsPaid(studentId)
 
