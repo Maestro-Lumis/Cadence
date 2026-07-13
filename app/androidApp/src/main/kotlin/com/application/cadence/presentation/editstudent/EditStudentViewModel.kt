@@ -18,7 +18,7 @@ class EditStudentViewModel(
     val student: StateFlow<Student?> = studentRepository.observeById(studentId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    fun save(name: String, course: String, timezone: String, onSaved: () -> Unit) {
+    fun save(name: String, course: String, timezone: String, hourlyRate: Int, onSaved: () -> Unit) {
         if (name.isBlank()) return
         val current = student.value ?: return
         viewModelScope.launch {
@@ -26,7 +26,8 @@ class EditStudentViewModel(
                 current.copy(
                     name = name.trim(),
                     course = course.trim().ifBlank { "Без курса" },
-                    timezone = timezone
+                    timezone = timezone,
+                    hourlyRate = hourlyRate
                 )
             )
             onSaved()

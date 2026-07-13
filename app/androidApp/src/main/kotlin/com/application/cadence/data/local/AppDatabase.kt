@@ -81,7 +81,7 @@ interface PackageDao {
 
 @Database(
     entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class, ScheduleEntity::class],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
@@ -115,5 +115,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 "FOREIGN KEY(`studentId`) REFERENCES `students`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE)"
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_studentId` ON `schedules` (`studentId`)")
+    }
+}
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE students ADD COLUMN hourlyRate INTEGER NOT NULL DEFAULT 0")
     }
 }

@@ -10,6 +10,7 @@ data class Student(
     val name: String,
     val course: String,
     val timezone: String,
+    val hourlyRate: Int,
     val createdAt: LocalDateTime
 )
 

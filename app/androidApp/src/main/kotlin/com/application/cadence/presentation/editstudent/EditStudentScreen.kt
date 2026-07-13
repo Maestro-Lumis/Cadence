@@ -38,6 +38,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
     var course by remember { mutableStateOf("") }
     var timezone by remember { mutableStateOf(TIMEZONE_PRESETS.first().first) }
     var timezoneMenuExpanded by remember { mutableStateOf(false) }
+    var rateText by remember { mutableStateOf("") }
     var initialized by remember { mutableStateOf(false) }
 
     LaunchedEffect(student) {
@@ -46,6 +47,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
             name = s.name
             course = s.course
             timezone = s.timezone
+            rateText = if (s.hourlyRate > 0) s.hourlyRate.toString() else ""
             initialized = true
         }
     }
@@ -106,10 +108,18 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                     }
                 }
             }
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = rateText,
+                onValueChange = { rateText = it.filter { ch -> ch.isDigit() } },
+                label = { Text("Ставка ₽/час") },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = { viewModel.save(name, course, timezone, onSaved) },
+                onClick = { viewModel.save(name, course, timezone, rateText.toIntOrNull() ?: 0, onSaved) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Сохранить")

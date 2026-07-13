@@ -32,7 +32,8 @@ fun StudentsScreen(
     viewModel: StudentsViewModel,
     onStudentClick: (Long) -> Unit,
     onAddStudentClick: () -> Unit,
-    onDebtsClick: () -> Unit
+    onDebtsClick: () -> Unit,
+    onEarningsClick: () -> Unit
 ) {
     val students by viewModel.uiState.collectAsState()
     val debtCount by viewModel.debtCount.collectAsState()
@@ -70,6 +71,21 @@ fun StudentsScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (debtCount > 0) Color(0xFF995A1D) else MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { onEarningsClick() }
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Заработок", style = MaterialTheme.typography.bodyMedium)
+                Text("→", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(Modifier.height(16.dp))
 

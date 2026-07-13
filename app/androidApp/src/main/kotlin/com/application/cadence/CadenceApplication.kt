@@ -10,6 +10,7 @@ import com.application.cadence.data.local.AppDatabase
 import com.application.cadence.data.local.MIGRATION_1_2
 import com.application.cadence.data.local.MIGRATION_2_3
 import com.application.cadence.data.local.MIGRATION_3_4
+import com.application.cadence.data.local.MIGRATION_4_5
 import com.application.cadence.data.repository.LessonPackageRepositoryImpl
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.ScheduleRepositoryImpl
@@ -19,7 +20,7 @@ class CadenceApplication : Application() {
 
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(this, AppDatabase::class.java, "cadence.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
 

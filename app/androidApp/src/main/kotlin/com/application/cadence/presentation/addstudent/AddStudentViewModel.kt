@@ -14,7 +14,7 @@ class AddStudentViewModel(
     private val studentRepository: StudentRepository
 ) : ViewModel() {
 
-    fun save(name: String, course: String, timezone: String, onSaved: () -> Unit) {
+    fun save(name: String, course: String, timezone: String, hourlyRate: Int, onSaved: () -> Unit) {
         if (name.isBlank()) return
         viewModelScope.launch {
             studentRepository.add(
@@ -23,6 +23,7 @@ class AddStudentViewModel(
                     name = name.trim(),
                     course = course.trim().ifBlank { "Без курса" },
                     timezone = timezone,
+                    hourlyRate = hourlyRate,
                     createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             )

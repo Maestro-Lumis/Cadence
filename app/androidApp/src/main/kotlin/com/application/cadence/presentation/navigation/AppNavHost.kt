@@ -23,6 +23,8 @@ import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.debts.DebtsScreen
 import com.application.cadence.presentation.debts.DebtsViewModelFactory
+import com.application.cadence.presentation.earnings.EarningsScreen
+import com.application.cadence.presentation.earnings.EarningsViewModelFactory
 import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.editstudent.EditStudentScreen
@@ -98,12 +100,21 @@ fun AppNavHost(app: CadenceApplication) {
                     viewModel = viewModel(factory = factory),
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
                     onAddStudentClick = { navController.navigate(AddStudentRoute) },
-                    onDebtsClick = { navController.navigate(DebtsRoute) }
+                    onDebtsClick = { navController.navigate(DebtsRoute) },
+                    onEarningsClick = { navController.navigate(EarningsRoute) }
                 )
             }
             composable<DebtsRoute> {
                 val factory = DebtsViewModelFactory(app.lessonRepository, app.studentRepository)
                 DebtsScreen(
+                    viewModel = viewModel(factory = factory),
+                    onBack = { navController.popBackStack() },
+                    onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) }
+                )
+            }
+            composable<EarningsRoute> {
+                val factory = EarningsViewModelFactory(app.studentRepository, app.lessonRepository)
+                EarningsScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) }
