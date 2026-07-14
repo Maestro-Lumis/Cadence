@@ -21,6 +21,7 @@ import com.application.cadence.CadenceApplication
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
+import com.application.cadence.presentation.backup.BackupScreen
 import com.application.cadence.presentation.debts.DebtsScreen
 import com.application.cadence.presentation.debts.DebtsViewModelFactory
 import com.application.cadence.presentation.earnings.EarningsScreen
@@ -101,7 +102,8 @@ fun AppNavHost(app: CadenceApplication) {
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
                     onAddStudentClick = { navController.navigate(AddStudentRoute) },
                     onDebtsClick = { navController.navigate(DebtsRoute) },
-                    onEarningsClick = { navController.navigate(EarningsRoute) }
+                    onEarningsClick = { navController.navigate(EarningsRoute) },
+                    onBackupClick = { navController.navigate(BackupRoute) }
                 )
             }
             composable<DebtsRoute> {
@@ -118,6 +120,12 @@ fun AppNavHost(app: CadenceApplication) {
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) }
+                )
+            }
+            composable<BackupRoute> {
+                BackupScreen(
+                    backupManager = app.backupManager,
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable<StudentProfileRoute> { backStackEntry ->

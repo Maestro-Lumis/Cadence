@@ -28,6 +28,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.compose.runtime)
     implementation(libs.compose.foundation)

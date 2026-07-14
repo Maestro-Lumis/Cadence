@@ -19,6 +19,9 @@ interface StudentDao {
     @Query("SELECT * FROM students WHERE id = :id")
     fun observeById(id: Long): Flow<StudentEntity?>
 
+    @Query("SELECT * FROM students") suspend fun getAll(): List<StudentEntity>
+    @Query("DELETE FROM students") suspend fun deleteAll()
+
     @Insert suspend fun insert(s: StudentEntity): Long
     @Update suspend fun update(s: StudentEntity)
     @Delete suspend fun delete(s: StudentEntity)
@@ -48,6 +51,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons")
     fun observeAll(): Flow<List<LessonEntity>>
 
+    @Query("SELECT * FROM lessons")
+    suspend fun getAll(): List<LessonEntity>
+
     @Query("SELECT * FROM lessons WHERE id = :id")
     suspend fun getById(id: Long): LessonEntity?
 
@@ -61,6 +67,8 @@ interface LessonDao {
 interface ScheduleDao {
     @Query("SELECT * FROM schedules WHERE studentId = :studentId")
     fun observeByStudent(studentId: Long): Flow<List<ScheduleEntity>>
+
+    @Query("SELECT * FROM schedules") suspend fun getAll(): List<ScheduleEntity>
 
     @Insert suspend fun insert(s: ScheduleEntity): Long
     @Query("DELETE FROM schedules WHERE id = :id") suspend fun deleteById(id: Long)

@@ -4,7 +4,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "students")
 data class StudentEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -29,6 +31,7 @@ data class PackageEntity(
     val createdAt: Long
 )
 
+@Serializable
 @Entity(
     tableName = "schedules",
     foreignKeys = [ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE)],
@@ -43,6 +46,7 @@ data class ScheduleEntity(
     val active: Boolean
 )
 
+@Serializable
 @Entity(
     tableName = "lessons",
     foreignKeys = [

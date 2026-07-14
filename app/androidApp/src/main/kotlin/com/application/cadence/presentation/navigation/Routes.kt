@@ -15,6 +15,9 @@ object DebtsRoute
 object EarningsRoute
 
 @Serializable
+object BackupRoute
+
+@Serializable
 object AddStudentRoute
 
 @Serializable

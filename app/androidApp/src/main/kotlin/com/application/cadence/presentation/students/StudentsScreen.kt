@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.application.cadence.presentation.common.ScreenContainer
 import com.application.cadence.presentation.common.timezoneLabel
@@ -33,7 +34,8 @@ fun StudentsScreen(
     onStudentClick: (Long) -> Unit,
     onAddStudentClick: () -> Unit,
     onDebtsClick: () -> Unit,
-    onEarningsClick: () -> Unit
+    onEarningsClick: () -> Unit,
+    onBackupClick: () -> Unit
 ) {
     val students by viewModel.uiState.collectAsState()
     val debtCount by viewModel.debtCount.collectAsState()
@@ -132,6 +134,17 @@ fun StudentsScreen(
             Button(onClick = onAddStudentClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Добавить ученика")
             }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Резервная копия",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onBackupClick() }
+                    .padding(vertical = 4.dp),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
