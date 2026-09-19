@@ -31,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
@@ -62,30 +64,23 @@ fun TodayScreen(
             ) {
                 Text(day.monthTitle, style = MaterialTheme.typography.titleLarge)
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val onToday = day.week.any { it.isSelected && it.isToday }
                     if (!onToday) {
                         Text(
                             "Сегодня",
-                            modifier = Modifier.clickable { viewModel.goToToday() },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable { viewModel.goToToday() }
+                                .padding(horizontal = 8.dp, vertical = 10.dp),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Text(
-                        "‹",
-                        modifier = Modifier.clickable { viewModel.shiftWeek(-1) },
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        "›",
-                        modifier = Modifier.clickable { viewModel.shiftWeek(1) },
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    WeekArrow("‹") { viewModel.shiftWeek(-1) }
+                    WeekArrow("›") { viewModel.shiftWeek(1) }
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -148,6 +143,24 @@ fun TodayScreen(
             Text("+", style = MaterialTheme.typography.headlineMedium)
         }
       }
+    }
+}
+
+@Composable
+private fun WeekArrow(symbol: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            symbol,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
