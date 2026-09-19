@@ -28,16 +28,6 @@ data class Schedule(
 )
 
 @Serializable
-data class LessonPackage(
-    val id: Long,
-    val studentId: Long,
-    val totalLessons: Int,
-    val usedLessons: Int,
-    val paid: Boolean,
-    val createdAt: LocalDateTime
-)
-
-@Serializable
 enum class LessonStatus { SCHEDULED, HELD, CANCELLED, RESCHEDULED }
 
 @Serializable

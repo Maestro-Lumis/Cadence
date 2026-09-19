@@ -1,14 +1,11 @@
 package com.application.cadence.data.repository
 
 import com.application.cadence.data.local.LessonDao
-import com.application.cadence.data.local.PackageDao
 import com.application.cadence.data.local.ScheduleDao
 import com.application.cadence.data.local.StudentDao
 import com.application.cadence.data.mapper.toDomain
 import com.application.cadence.data.mapper.toEntity
 import com.application.cadence.core.Lesson
-import com.application.cadence.core.LessonPackage
-import com.application.cadence.core.LessonPackageRepository
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.Schedule
 import com.application.cadence.core.ScheduleRepository
@@ -59,18 +56,6 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override suspend fun add(lesson: Lesson) = dao.insert(lesson.toEntity())
     override suspend fun update(lesson: Lesson) = dao.update(lesson.toEntity())
     override suspend fun delete(lessonId: Long) = dao.deleteById(lessonId)
-}
-
-class LessonPackageRepositoryImpl(private val dao: PackageDao) : LessonPackageRepository {
-    override fun observeByStudent(studentId: Long): Flow<List<LessonPackage>> =
-        dao.observeByStudent(studentId).map { list -> list.map { it.toDomain() } }
-
-    override fun observeById(packageId: Long): Flow<LessonPackage?> =
-        dao.observeById(packageId).map { it?.toDomain() }
-
-    override suspend fun add(pkg: LessonPackage) = dao.insert(pkg.toEntity())
-    override suspend fun update(pkg: LessonPackage) = dao.update(pkg.toEntity())
-    override suspend fun delete(packageId: Long) = dao.deleteById(packageId)
 }
 
 class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository {

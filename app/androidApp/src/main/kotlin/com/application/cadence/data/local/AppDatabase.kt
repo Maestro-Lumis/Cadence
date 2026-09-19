@@ -74,19 +74,6 @@ interface ScheduleDao {
     @Query("DELETE FROM schedules WHERE id = :id") suspend fun deleteById(id: Long)
 }
 
-@Dao
-interface PackageDao {
-    @Query("SELECT * FROM packages WHERE studentId = :studentId ORDER BY createdAt DESC")
-    fun observeByStudent(studentId: Long): Flow<List<PackageEntity>>
-
-    @Query("SELECT * FROM packages WHERE id = :id")
-    fun observeById(id: Long): Flow<PackageEntity?>
-
-    @Insert suspend fun insert(p: PackageEntity): Long
-    @Update suspend fun update(p: PackageEntity)
-    @Query("DELETE FROM packages WHERE id = :id") suspend fun deleteById(id: Long)
-}
-
 @Database(
     entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class, ScheduleEntity::class],
     version = 5
@@ -94,7 +81,6 @@ interface PackageDao {
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
     abstract fun lessonDao(): LessonDao
-    abstract fun packageDao(): PackageDao
     abstract fun scheduleDao(): ScheduleDao
 }
 
