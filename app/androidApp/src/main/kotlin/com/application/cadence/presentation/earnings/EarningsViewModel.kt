@@ -7,6 +7,7 @@ import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.presentation.common.MSK
+import com.application.cadence.presentation.common.PeriodPreset
 import com.application.cadence.presentation.common.monthGenitive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,6 +54,12 @@ class EarningsViewModel(
 
     fun setTo(date: LocalDate) {
         _to.value = date
+    }
+
+    fun applyPreset(preset: PeriodPreset) {
+        val (from, to) = preset.range(mskToday)
+        _from.value = from
+        _to.value = to
     }
 
     val uiState: StateFlow<EarningsUi> = combine(

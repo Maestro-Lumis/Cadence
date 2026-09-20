@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.application.cadence.presentation.common.PeriodPresetChips
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -97,6 +98,14 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
                 )
             }
             Spacer(Modifier.height(16.dp))
+
+            PeriodPresetChips(
+                from = from,
+                to = to,
+                onSelect = { viewModel.applyPreset(it) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 PeriodField("С", from.toString(), Modifier.weight(1f)) { picker = "from" }
