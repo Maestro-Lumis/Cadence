@@ -47,6 +47,7 @@ fun TodayScreen(
 ) {
     val day by viewModel.dayState.collectAsState()
     val reviewQueue by viewModel.reviewQueue.collectAsState()
+    val paymentQueue by viewModel.paymentQueue.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
 
     ScreenContainer {
@@ -112,6 +113,16 @@ fun TodayScreen(
                         )
                     }
                     item(key = "review-gap") { Spacer(Modifier.height(8.dp)) }
+                }
+
+                if (paymentQueue.isNotEmpty()) {
+                    item(key = "pay-header") {
+                        Text("Ждут оплаты", style = MaterialTheme.typography.titleMedium)
+                    }
+                    items(paymentQueue, key = { "pay-${it.lessonId}" }) { unpaid ->
+                        PaymentCard(unpaid, onPaid = { viewModel.markPaid(unpaid.lessonId) })
+                    }
+                    item(key = "pay-gap") { Spacer(Modifier.height(8.dp)) }
                 }
 
                 item(key = "day-label") {
@@ -273,6 +284,33 @@ private fun ReviewCard(
                 onReschedule
             )
         }
+    }
+}
+
+@Composable
+private fun PaymentCard(unpaid: UnpaidLessonUi, onPaid: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(unpaid.studentName, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                buildString {
+                    append(unpaid.whenLabel)
+                    append(" · ")
+                    append(unpaid.course)
+                    unpaid.amountLabel?.let { append(" · "); append(it) }
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        ActionChip("Оплачено", Color(0xFF2E7D32), Color(0xFFE6F3E9), onClick = onPaid)
     }
 }
 

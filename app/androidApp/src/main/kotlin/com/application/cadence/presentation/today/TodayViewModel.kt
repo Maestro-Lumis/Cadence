@@ -54,6 +54,14 @@ data class ReviewLessonUi(
     val whenLabel: String
 )
 
+data class UnpaidLessonUi(
+    val lessonId: Long,
+    val studentName: String,
+    val course: String,
+    val whenLabel: String,
+    val amountLabel: String?
+)
+
 data class WeekDayUi(
     val date: LocalDate,
     val shortLabel: String,
@@ -124,10 +132,24 @@ class TodayViewModel(
         buildReviewQueue(lessons, students)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val paymentQueue: StateFlow<List<UnpaidLessonUi>> = combine(
+        lessonRepository.observeUnpaidHeld(),
+        studentRepository.observeAll()
+    ) { lessons, students ->
+        buildPaymentQueue(lessons, students)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun resolve(lessonId: Long, status: LessonStatus, paid: Boolean) {
         viewModelScope.launch {
             val lesson = lessonRepository.getById(lessonId) ?: return@launch
             lessonRepository.update(lesson.copy(status = status, paid = paid))
+        }
+    }
+
+    fun markPaid(lessonId: Long) {
+        viewModelScope.launch {
+            val lesson = lessonRepository.getById(lessonId) ?: return@launch
+            lessonRepository.update(lesson.copy(paid = true))
         }
     }
 
@@ -216,5 +238,20 @@ class TodayViewModel(
                 whenLabel = "$dayWord, $timeStr"
             )
         }.sortedBy { it.first }.map { it.second }
+    }
+
+    private fun buildPaymentQueue(lessons: List<Lesson>, students: List<Student>): List<UnpaidLessonUi> {
+        val byId = students.associateBy { it.id }
+        return lessons.mapNotNull { lesson ->
+            val student = byId[lesson.studentId] ?: return@mapNotNull null
+            val amount = (student.hourlyRate * lesson.durationMinutes) / 60
+            UnpaidLessonUi(
+                lessonId = lesson.id,
+                studentName = student.name,
+                course = student.course,
+                whenLabel = "${lesson.date.dayOfMonth} ${monthGenitive(lesson.date.monthNumber)}",
+                amountLabel = if (amount > 0) "$amount ₽" else null
+            )
+        }
     }
 }
