@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.androidx.navigation.compose)
 
+    implementation(libs.androidx.work.runtime)
+
 }
 
 android {

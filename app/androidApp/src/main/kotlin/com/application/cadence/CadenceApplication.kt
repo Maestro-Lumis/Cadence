@@ -11,9 +11,15 @@ import com.application.cadence.data.local.MIGRATION_1_2
 import com.application.cadence.data.local.MIGRATION_2_3
 import com.application.cadence.data.local.MIGRATION_3_4
 import com.application.cadence.data.local.MIGRATION_4_5
+import com.application.cadence.data.notifications.NotificationScheduler
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.ScheduleRepositoryImpl
 import com.application.cadence.data.repository.StudentRepositoryImpl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class CadenceApplication : Application() {
 
@@ -27,4 +33,16 @@ class CadenceApplication : Application() {
     val lessonRepository: LessonRepository by lazy { LessonRepositoryImpl(database.lessonDao()) }
     val scheduleRepository: ScheduleRepository by lazy { ScheduleRepositoryImpl(database.scheduleDao()) }
     val backupManager: BackupManager by lazy { BackupManager(database) }
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    override fun onCreate() {
+        super.onCreate()
+        NotificationScheduler.ensureChannel(this)
+        appScope.launch {
+            lessonRepository.observeAll().collectLatest { lessons ->
+                NotificationScheduler.sync(this@CadenceApplication, lessons)
+            }
+        }
+    }
 }
