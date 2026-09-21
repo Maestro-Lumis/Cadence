@@ -30,30 +30,38 @@ class LessonReminderWorker(
     override suspend fun doWork(): Result {
         val lessonId = inputData.getLong(NotificationScheduler.LESSON_ID_KEY, -1L)
         if (lessonId < 0) return Result.success()
+        val kind = inputData.getString(NotificationScheduler.KIND_KEY) ?: NotificationScheduler.KIND_REMINDER
 
         val app = applicationContext as CadenceApplication
         val lesson = app.lessonRepository.getById(lessonId) ?: return Result.success()
-        // The lesson may have been cancelled, held or rescheduled since we planned this.
+        // Stale job: the lesson was cancelled, held or already reviewed since we planned this.
         if (lesson.status != LessonStatus.SCHEDULED) return Result.success()
 
         val student = app.studentRepository.observeById(lesson.studentId).first()
             ?: return Result.success()
 
-        val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return Result.success()
-        val startLocal = LocalDateTime(lesson.date, time)
-            .toInstant(MSK)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-        val timeStr = "%02d:%02d".format(startLocal.hour, startLocal.minute)
+        val title: String
+        if (kind == NotificationScheduler.KIND_REVIEW) {
+            title = "Как прошёл урок?"
+        } else {
+            val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull()
+                ?: return Result.success()
+            val startLocal = LocalDateTime(lesson.date, time)
+                .toInstant(MSK)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+            title = "Скоро урок в %02d:%02d".format(startLocal.hour, startLocal.minute)
+        }
 
         showNotification(
+            tag = kind,
             id = lessonId.toInt(),
-            title = "Скоро урок в $timeStr",
+            title = title,
             text = "${student.name} · ${student.course}"
         )
         return Result.success()
     }
 
-    private fun showNotification(id: Int, title: String, text: String) {
+    private fun showNotification(tag: String, id: Int, title: String, text: String) {
         val context = applicationContext
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
@@ -66,7 +74,7 @@ class LessonReminderWorker(
             .apply { flags = Intent.FLAG_ACTIVITY_SINGLE_TOP }
         val pendingIntent = PendingIntent.getActivity(
             context,
-            id,
+            (tag + id).hashCode(),
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -80,6 +88,6 @@ class LessonReminderWorker(
             .setContentIntent(pendingIntent)
             .build()
 
-        NotificationManagerCompat.from(context).notify(id, notification)
+        NotificationManagerCompat.from(context).notify(tag, id, notification)
     }
 }
