@@ -49,7 +49,6 @@ class EditLessonViewModel(
         time: String,
         durationMinutes: Int,
         status: LessonStatus,
-        lessonNumber: Int?,
         paid: Boolean,
         onError: (String) -> Unit,
         onSaved: () -> Unit
@@ -90,7 +89,7 @@ class EditLessonViewModel(
                     time = time,
                     durationMinutes = durationMinutes,
                     status = status,
-                    lessonNumber = lessonNumber,
+                    lessonNumber = null,
                     packageId = _initialLesson.value?.packageId,
                     paid = paid
                 )

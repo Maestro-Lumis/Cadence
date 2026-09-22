@@ -70,8 +70,6 @@ class ScheduleViewModel(
             val today = Clock.System.todayIn(MSK)
             val horizon = today.plus(28, DateTimeUnit.DAY)
             val existing = lessonRepository.observeInDateRange(today, horizon).first().toMutableList()
-            var nextNumber = (lessonRepository.observeByStudent(studentId).first()
-                .mapNotNull { it.lessonNumber }.maxOrNull() ?: 0) + 1
 
             var created = 0
             var skipped = 0
@@ -98,7 +96,7 @@ class ScheduleViewModel(
                         time = slot.time,
                         durationMinutes = slot.durationMinutes,
                         status = LessonStatus.SCHEDULED,
-                        lessonNumber = nextNumber++,
+                        lessonNumber = null,
                         packageId = null,
                         paid = false
                     )

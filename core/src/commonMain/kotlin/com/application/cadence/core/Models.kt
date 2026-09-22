@@ -11,6 +11,7 @@ data class Student(
     val course: String,
     val timezone: String,
     val hourlyRate: Int,
+    val lessonDurationMinutes: Int = 60,
     val createdAt: LocalDateTime
 )
 

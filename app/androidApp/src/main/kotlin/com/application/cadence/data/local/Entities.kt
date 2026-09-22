@@ -14,6 +14,7 @@ data class StudentEntity(
     val course: String,
     val timezone: String,
     val hourlyRate: Int,
+    val lessonDurationMinutes: Int = 60,
     val createdAt: Long
 )
 

@@ -10,14 +10,9 @@ import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.findOverlappingLesson
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
@@ -29,7 +24,6 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlin.time.Duration.Companion.minutes
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AddLessonViewModel(
     private val lessonRepository: LessonRepository,
     studentRepository: StudentRepository
@@ -38,28 +32,12 @@ class AddLessonViewModel(
     val students: StateFlow<List<Student>> = studentRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val selectedStudentId = MutableStateFlow<Long?>(null)
-
-    val suggestedLessonNumber: StateFlow<Int?> = selectedStudentId
-        .flatMapLatest { id ->
-            if (id == null) flowOf(null)
-            else lessonRepository.observeByStudent(id).map { list ->
-                (list.mapNotNull { it.lessonNumber }.maxOrNull() ?: 0) + 1
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    fun selectStudent(studentId: Long?) {
-        selectedStudentId.value = studentId
-    }
-
     fun save(
         studentId: Long,
         date: LocalDate,
         time: String,
         durationMinutes: Int,
         status: LessonStatus,
-        lessonNumber: Int?,
         paid: Boolean,
         onError: (String) -> Unit,
         onSaved: () -> Unit
@@ -100,7 +78,7 @@ class AddLessonViewModel(
                     time = time,
                     durationMinutes = durationMinutes,
                     status = status,
-                    lessonNumber = lessonNumber,
+                    lessonNumber = null,
                     packageId = null,
                     paid = paid
                 )

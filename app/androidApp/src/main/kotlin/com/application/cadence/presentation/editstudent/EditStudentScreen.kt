@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.ScreenContainer
 import com.application.cadence.presentation.common.TIMEZONE_PRESETS
 import com.application.cadence.presentation.common.timezoneLabel
@@ -39,6 +40,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
     var timezone by remember { mutableStateOf(TIMEZONE_PRESETS.first().first) }
     var timezoneMenuExpanded by remember { mutableStateOf(false) }
     var rateText by remember { mutableStateOf("") }
+    var durationMinutes by remember { mutableStateOf(60) }
     var initialized by remember { mutableStateOf(false) }
 
     LaunchedEffect(student) {
@@ -48,6 +50,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
             course = s.course
             timezone = s.timezone
             rateText = if (s.hourlyRate > 0) s.hourlyRate.toString() else ""
+            durationMinutes = s.lessonDurationMinutes
             initialized = true
         }
     }
@@ -116,10 +119,21 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                 label = { Text("Ставка ₽/час") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
+
+            Text("Обычная длительность", style = MaterialTheme.typography.labelLarge)
+            Spacer(Modifier.height(4.dp))
+            DurationPicker(
+                minutes = durationMinutes,
+                onMinutesChange = { durationMinutes = it },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = { viewModel.save(name, course, timezone, rateText.toIntOrNull() ?: 0, onSaved) },
+                onClick = {
+                    viewModel.save(name, course, timezone, rateText.toIntOrNull() ?: 0, durationMinutes, onSaved)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Сохранить")

@@ -28,7 +28,6 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
+import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
@@ -58,7 +58,6 @@ fun AddLessonScreen(
     initialDate: String? = null
 ) {
     val students by viewModel.students.collectAsState()
-    val suggestedNumber by viewModel.suggestedLessonNumber.collectAsState()
 
     val defaultDate = initialDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
         ?: Clock.System.todayIn(MSK)
@@ -68,12 +67,11 @@ fun AddLessonScreen(
 
     var dateText by remember { mutableStateOf(defaultDate.toString()) }
     var timeText by remember { mutableStateOf("18:00") }
-    var durationText by remember { mutableStateOf("60") }
+    var durationMinutes by remember { mutableStateOf(60) }
 
     var status by remember { mutableStateOf(LessonStatus.SCHEDULED) }
     var statusMenuExpanded by remember { mutableStateOf(false) }
 
-    var lessonNumberText by remember { mutableStateOf("") }
     var paid by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -161,7 +159,7 @@ fun AddLessonScreen(
                                 text = { Text("${student.name} (${student.course})") },
                                 onClick = {
                                     selectedStudent = student
-                                    viewModel.selectStudent(student.id)
+                                    durationMinutes = student.lessonDurationMinutes
                                     studentMenuExpanded = false
                                 }
                             )
@@ -203,10 +201,9 @@ fun AddLessonScreen(
                 }
                 Spacer(Modifier.height(8.dp))
 
-                OutlinedTextField(
-                    value = durationText,
-                    onValueChange = { durationText = it.filter { ch -> ch.isDigit() } },
-                    label = { Text("Длительность (мин)") },
+                DurationPicker(
+                    minutes = durationMinutes,
+                    onMinutesChange = { durationMinutes = it },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
@@ -240,21 +237,6 @@ fun AddLessonScreen(
                 }
                 Spacer(Modifier.height(8.dp))
 
-                LaunchedEffect(selectedStudent?.id, suggestedNumber) {
-                    val id = selectedStudent?.id
-                    val s = suggestedNumber
-                    if (id != null && s != null) {
-                        lessonNumberText = s.toString()
-                    }
-                }
-                OutlinedTextField(
-                    value = lessonNumberText,
-                    onValueChange = { lessonNumberText = it },
-                    label = { Text("Номер урока (необязательно)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = paid, onCheckedChange = { paid = it })
                     Text("Оплачено")
@@ -271,24 +253,22 @@ fun AddLessonScreen(
                         val student = selectedStudent
                         val parsedDate = runCatching { LocalDate.parse(dateText) }.getOrNull()
                         val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
-                        val parsedDuration = durationText.toIntOrNull()
 
                         error = when {
                             student == null -> "Выбери ученика"
                             parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
                             !timeValid -> "Неверное время, формат ЧЧ:MM"
-                            parsedDuration == null || parsedDuration <= 0 -> "Длительность в минутах, больше 0"
+                            durationMinutes <= 0 -> "Длительность в минутах, больше 0"
                             else -> null
                         }
 
-                        if (error == null && student != null && parsedDate != null && parsedDuration != null) {
+                        if (error == null && student != null && parsedDate != null) {
                             viewModel.save(
                                 studentId = student.id,
                                 date = parsedDate,
                                 time = timeText,
-                                durationMinutes = parsedDuration,
+                                durationMinutes = durationMinutes,
                                 status = status,
-                                lessonNumber = lessonNumberText.toIntOrNull(),
                                 paid = paid,
                                 onError = { msg -> error = msg },
                                 onSaved = onSaved

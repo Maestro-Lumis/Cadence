@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
+import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -105,12 +106,11 @@ private fun EditLessonForm(
 
     var dateText by remember { mutableStateOf(initial.date.toString()) }
     var timeText by remember { mutableStateOf(initial.time) }
-    var durationText by remember { mutableStateOf(initial.durationMinutes.toString()) }
+    var durationMinutes by remember { mutableStateOf(initial.durationMinutes) }
 
     var status by remember { mutableStateOf(initial.status) }
     var statusMenuExpanded by remember { mutableStateOf(false) }
 
-    var lessonNumberText by remember { mutableStateOf(initial.lessonNumber?.toString().orEmpty()) }
     var paid by remember { mutableStateOf(initial.paid) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -258,10 +258,9 @@ private fun EditLessonForm(
             }
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = durationText,
-                onValueChange = { durationText = it.filter { ch -> ch.isDigit() } },
-                label = { Text("Длительность (мин)") },
+            DurationPicker(
+                minutes = durationMinutes,
+                onMinutesChange = { durationMinutes = it },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -295,14 +294,6 @@ private fun EditLessonForm(
             }
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = lessonNumberText,
-                onValueChange = { lessonNumberText = it },
-                label = { Text("Номер урока (необязательно)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = paid, onCheckedChange = { paid = it })
                 Text("Оплачено")
@@ -319,24 +310,22 @@ private fun EditLessonForm(
                     val student = selectedStudent
                     val parsedDate = runCatching { LocalDate.parse(dateText) }.getOrNull()
                     val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
-                    val parsedDuration = durationText.toIntOrNull()
 
                     error = when {
                         student == null -> "Выбери ученика"
                         parsedDate == null -> "Неверная дата"
                         !timeValid -> "Неверное время, формат ЧЧ:MM"
-                        parsedDuration == null || parsedDuration <= 0 -> "Длительность в минутах, больше 0"
+                        durationMinutes <= 0 -> "Длительность в минутах, больше 0"
                         else -> null
                     }
 
-                    if (error == null && student != null && parsedDate != null && parsedDuration != null) {
+                    if (error == null && student != null && parsedDate != null) {
                         viewModel.save(
                             studentId = student.id,
                             date = parsedDate,
                             time = timeText,
-                            durationMinutes = parsedDuration,
+                            durationMinutes = durationMinutes,
                             status = status,
-                            lessonNumber = lessonNumberText.toIntOrNull(),
                             paid = paid,
                             onError = { msg -> error = msg },
                             onSaved = onSaved

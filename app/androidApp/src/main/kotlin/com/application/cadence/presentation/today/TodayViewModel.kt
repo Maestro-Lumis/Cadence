@@ -111,10 +111,7 @@ class TodayViewModel(
 
     val dayState: StateFlow<DayUi> = combine(
         _selectedDate,
-        lessonRepository.observeInDateRange(
-            today.minus(60, DateTimeUnit.DAY),
-            today.plus(180, DateTimeUnit.DAY)
-        ),
+        lessonRepository.observeAll(),
         studentRepository.observeAll()
     ) { selected, lessons, students ->
         val weekStart = selected.minus(selected.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
@@ -160,6 +157,7 @@ class TodayViewModel(
         students: List<Student>
     ): DayUi {
         val byId = students.associateBy { it.id }
+        val numberByLessonId = numberLessons(lessons)
         val now = Clock.System.now()
         val enriched = lessons.mapNotNull { lesson ->
             val student = byId[lesson.studentId] ?: return@mapNotNull null
@@ -168,7 +166,12 @@ class TodayViewModel(
             val end = start + lesson.durationMinutes.minutes
             val localDate = start.toLocalDateTime(tutorTz).date
             val inReview = lesson.status == LessonStatus.SCHEDULED && end < now
-            EnrichedLesson(localDate, start, inReview, buildLessonUi(lesson, student, start, time))
+            EnrichedLesson(
+                localDate,
+                start,
+                inReview,
+                buildLessonUi(lesson, student, start, time, numberByLessonId[lesson.id])
+            )
         }
         val countByDate = enriched.groupingBy { it.date }.eachCount()
         val selectedLessons = enriched
@@ -196,7 +199,13 @@ class TodayViewModel(
         return DayUi(monthNominative(selected.monthNumber), week, selectedLabel, selectedLessons)
     }
 
-    private fun buildLessonUi(lesson: Lesson, student: Student, start: Instant, time: LocalTime): TodayLessonUi {
+    private fun buildLessonUi(
+        lesson: Lesson,
+        student: Student,
+        start: Instant,
+        time: LocalTime,
+        number: Int?
+    ): TodayLessonUi {
         val end = start + lesson.durationMinutes.minutes
         val startLocal = start.toLocalDateTime(tutorTz)
         val endLocal = end.toLocalDateTime(tutorTz)
@@ -209,10 +218,25 @@ class TodayViewModel(
             endTime = "%02d:%02d".format(endLocal.hour, endLocal.minute),
             mskTime = if (tutorTz.id == MSK.id) null else "%02d:%02d МСК".format(time.hour, time.minute),
             status = lesson.status,
-            lessonNumber = lesson.lessonNumber,
+            lessonNumber = number,
             paid = lesson.paid
         )
     }
+
+    /**
+     * Derives each lesson's display number: its 1-based position by date/time among the
+     * student's non-cancelled lessons. Deleting or cancelling a lesson renumbers the rest.
+     */
+    private fun numberLessons(lessons: List<Lesson>): Map<Long, Int> =
+        lessons
+            .filter { it.status != LessonStatus.CANCELLED }
+            .groupBy { it.studentId }
+            .flatMap { (_, group) ->
+                group
+                    .sortedWith(compareBy({ it.date }, { it.time }))
+                    .mapIndexed { index, lesson -> lesson.id to (index + 1) }
+            }
+            .toMap()
 
     private fun buildReviewQueue(lessons: List<Lesson>, students: List<Student>): List<ReviewLessonUi> {
         val byId = students.associateBy { it.id }
