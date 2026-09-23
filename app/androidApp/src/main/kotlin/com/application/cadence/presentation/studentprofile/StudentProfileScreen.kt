@@ -145,6 +145,27 @@ fun StudentProfileScreen(
                 }
                 Spacer(Modifier.height(12.dp))
 
+                if (selectedTab == 1 && profile.unpaidLessons > 0) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Ждут оплаты · ${profile.unpaidTotal} ₽",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            "Оплатить всё",
+                            modifier = Modifier.clickable { viewModel.markAllPaid() },
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(Modifier.height(10.dp))
+                }
+
                 val held = profile.history.filter { it.status == LessonStatus.HELD }
                 val list = if (selectedTab == 0) held else held.filter { !it.paid }
 
@@ -156,7 +177,11 @@ fun StudentProfileScreen(
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         items(list, key = { it.id }) { lesson ->
-                            LessonRow(lesson, onClick = { onLessonClick(lesson.id) })
+                            LessonRow(
+                                lesson,
+                                onClick = { onLessonClick(lesson.id) },
+                                onPay = { viewModel.markPaid(lesson.id) }
+                            )
                         }
                     }
                 }
@@ -197,12 +222,14 @@ private fun TabChip(
 }
 
 @Composable
-private fun LessonRow(lesson: Lesson, onClick: () -> Unit) {
+private fun LessonRow(lesson: Lesson, onClick: () -> Unit, onPay: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
     ) {
         Column {
             Text(lesson.date.toString())
@@ -215,7 +242,16 @@ private fun LessonRow(lesson: Lesson, onClick: () -> Unit) {
         if (lesson.paid) {
             Text("Оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
         } else {
-            Text("Не оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF995A1D))
+            Text(
+                "Оплачено",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onPay)
+                    .background(Color(0xFFE6F3E9))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.labelLarge,
+                color = Color(0xFF2E7D32)
+            )
         }
     }
 }

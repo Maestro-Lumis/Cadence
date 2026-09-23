@@ -20,13 +20,14 @@ data class StudentProfileUi(
     val totalLessons: Int,
     val heldLessons: Int,
     val unpaidLessons: Int,
+    val unpaidTotal: Int,
     val history: List<Lesson>
 )
 
 class StudentProfileViewModel(
     private val studentId: Long,
     private val studentRepository: StudentRepository,
-    lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<StudentProfileUi?> = combine(
@@ -34,17 +35,32 @@ class StudentProfileViewModel(
         lessonRepository.observeByStudent(studentId)
     ) { student, lessons ->
         student?.let {
+            val unpaid = lessons.filter { l -> l.status == LessonStatus.HELD && !l.paid }
             StudentProfileUi(
                 studentName = it.name,
                 course = it.course,
                 timezone = it.timezone,
                 totalLessons = lessons.size,
                 heldLessons = lessons.count { l -> l.status == LessonStatus.HELD },
-                unpaidLessons = lessons.count { l -> l.status == LessonStatus.HELD && !l.paid },
+                unpaidLessons = unpaid.size,
+                unpaidTotal = unpaid.sumOf { l -> (it.hourlyRate * l.durationMinutes) / 60 },
                 history = lessons.sortedByDescending { l -> l.date }
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun markPaid(lessonId: Long) {
+        viewModelScope.launch {
+            val lesson = lessonRepository.getById(lessonId) ?: return@launch
+            lessonRepository.update(lesson.copy(paid = true))
+        }
+    }
+
+    fun markAllPaid() {
+        viewModelScope.launch {
+            lessonRepository.markStudentDebtsPaid(studentId)
+        }
+    }
 
     fun delete(onDeleted: () -> Unit) {
         viewModelScope.launch {
