@@ -199,7 +199,7 @@ fun ScheduleScreen(
                         resultText = if (result.created == 0 && result.skipped == 0) {
                             "Нет слотов для генерации"
                         } else {
-                            "Создано ${result.created}, пропущено ${result.skipped}"
+                            "Создано ${result.created}, Создано ранее  ${result.skipped}"
                         }
                     }
                 },

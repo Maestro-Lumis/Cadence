@@ -91,7 +91,8 @@ class EditLessonViewModel(
                     status = status,
                     lessonNumber = null,
                     packageId = _initialLesson.value?.packageId,
-                    paid = paid
+                    paid = paid,
+                    groupId = _initialLesson.value?.groupId
                 )
             )
             onSaved()

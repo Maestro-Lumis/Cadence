@@ -52,11 +52,12 @@ class LessonReminderWorker(
             title = "Скоро урок в %02d:%02d".format(startLocal.hour, startLocal.minute)
         }
 
+        val text = if (lesson.groupId != null) "Групповое занятие" else "${student.name} · ${student.course}"
         showNotification(
             tag = kind,
             id = lessonId.toInt(),
             title = title,
-            text = "${student.name} · ${student.course}"
+            text = text
         )
         return Result.success()
     }

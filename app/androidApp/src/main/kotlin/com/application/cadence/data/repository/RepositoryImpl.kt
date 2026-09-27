@@ -38,6 +38,9 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override fun observeByStudent(studentId: Long): Flow<List<Lesson>> =
         dao.observeByStudent(studentId).map { list -> list.map { it.toDomain() } }
 
+    override fun observeByGroup(groupId: Long): Flow<List<Lesson>> =
+        dao.observeByGroup(groupId).map { list -> list.map { it.toDomain() } }
+
     override fun observeScheduledUpTo(date: LocalDate): Flow<List<Lesson>> =
         dao.observeScheduledUpTo(date.toString()).map { list -> list.map { it.toDomain() } }
 

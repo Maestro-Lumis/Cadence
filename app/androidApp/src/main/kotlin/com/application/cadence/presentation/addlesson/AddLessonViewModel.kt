@@ -86,6 +86,62 @@ class AddLessonViewModel(
             onSaved()
         }
     }
+
+    fun saveGroup(
+        studentIds: List<Long>,
+        date: LocalDate,
+        time: String,
+        durationMinutes: Int,
+        status: LessonStatus,
+        onError: (String) -> Unit,
+        onSaved: () -> Unit
+    ) {
+        viewModelScope.launch {
+            if (studentIds.size < 2) {
+                onError("Выберите хотя бы двух учеников")
+                return@launch
+            }
+            val lessonTime = runCatching { LocalTime.parse(time) }.getOrNull()
+            if (lessonTime == null) {
+                onError("Неверный формат времени")
+                return@launch
+            }
+            val newStart = LocalDateTime(date, lessonTime).toInstant(MSK)
+            val newEnd = newStart + durationMinutes.minutes
+
+            if (status != LessonStatus.CANCELLED) {
+                val nearby = lessonRepository.observeInDateRange(
+                    date.minus(1, DateTimeUnit.DAY),
+                    date.plus(1, DateTimeUnit.DAY)
+                ).first()
+                val overlap = findOverlappingLesson(newStart, newEnd, nearby)
+                if (overlap != null) {
+                    val ovStudent = students.value.find { it.id == overlap.studentId }
+                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК")
+                    return@launch
+                }
+            }
+
+            val groupId = System.currentTimeMillis()
+            studentIds.forEach { sid ->
+                lessonRepository.add(
+                    Lesson(
+                        id = 0,
+                        studentId = sid,
+                        date = date,
+                        time = time,
+                        durationMinutes = durationMinutes,
+                        status = status,
+                        lessonNumber = null,
+                        packageId = null,
+                        paid = false,
+                        groupId = groupId
+                    )
+                )
+            }
+            onSaved()
+        }
+    }
 }
 
 class AddLessonViewModelFactory(

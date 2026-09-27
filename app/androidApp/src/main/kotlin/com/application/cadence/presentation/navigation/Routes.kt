@@ -27,6 +27,9 @@ data class AddLessonRoute(val date: String? = null)
 data class EditLessonRoute(val lessonId: Long)
 
 @Serializable
+data class GroupLessonRoute(val groupId: Long)
+
+@Serializable
 data class StudentProfileRoute(val studentId: Long)
 
 @Serializable

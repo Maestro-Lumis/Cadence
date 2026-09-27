@@ -39,6 +39,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE studentId = :studentId ORDER BY date DESC")
     fun observeByStudent(studentId: Long): Flow<List<LessonEntity>>
 
+    @Query("SELECT * FROM lessons WHERE groupId = :groupId ORDER BY id")
+    fun observeByGroup(groupId: Long): Flow<List<LessonEntity>>
+
     @Query("SELECT * FROM lessons WHERE status = 'SCHEDULED' AND date <= :date ORDER BY date, time")
     fun observeScheduledUpTo(date: String): Flow<List<LessonEntity>>
 
@@ -76,7 +79,7 @@ interface ScheduleDao {
 
 @Database(
     entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class, ScheduleEntity::class],
-    version = 6
+    version = 7
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
@@ -121,5 +124,11 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
 val MIGRATION_5_6 = object : Migration(5, 6) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE students ADD COLUMN lessonDurationMinutes INTEGER NOT NULL DEFAULT 60")
+    }
+}
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE lessons ADD COLUMN groupId INTEGER")
     }
 }

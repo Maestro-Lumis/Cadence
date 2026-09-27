@@ -41,5 +41,6 @@ data class Lesson(
     val status: LessonStatus,
     val lessonNumber: Int? = null,
     val packageId: Long? = null,
-    val paid: Boolean = false
+    val paid: Boolean = false,
+    val groupId: Long? = null
 )

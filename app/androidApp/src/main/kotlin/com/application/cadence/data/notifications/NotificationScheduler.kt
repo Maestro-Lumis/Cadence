@@ -59,8 +59,16 @@ object NotificationScheduler {
         val wm = WorkManager.getInstance(context)
         val now = Clock.System.now()
         val horizon = now + HORIZON_DAYS.days
+        val seenGroups = mutableSetOf<Long>()
 
         lessons.forEach { lesson ->
+            val gid = lesson.groupId
+            if (gid != null && !seenGroups.add(gid)) {
+                // Another member of this group already carries the notifications for the slot.
+                wm.cancelUniqueWork(REMINDER_PREFIX + lesson.id)
+                wm.cancelUniqueWork(REVIEW_PREFIX + lesson.id)
+                return@forEach
+            }
             val scheduled = lesson.status == LessonStatus.SCHEDULED
             val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull()
             val start = time?.let { LocalDateTime(lesson.date, it).toInstant(MSK) }

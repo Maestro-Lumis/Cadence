@@ -43,6 +43,7 @@ import kotlinx.datetime.LocalDate
 fun TodayScreen(
     viewModel: TodayViewModel,
     onLessonClick: (Long) -> Unit,
+    onGroupClick: (Long) -> Unit,
     onAddLessonClick: (LocalDate) -> Unit
 ) {
     val day by viewModel.dayState.collectAsState()
@@ -108,7 +109,10 @@ fun TodayScreen(
                             onHeldPaid = { viewModel.resolve(review.lessonId, LessonStatus.HELD, true) },
                             onHeldUnpaid = { viewModel.resolve(review.lessonId, LessonStatus.HELD, false) },
                             onCancelled = { viewModel.resolve(review.lessonId, LessonStatus.CANCELLED, false) },
-                            onReschedule = { onLessonClick(review.lessonId) }
+                            onReschedule = { onLessonClick(review.lessonId) },
+                            onGroupHeld = { viewModel.resolveAll(review.lessonIds, LessonStatus.HELD) },
+                            onGroupCancelled = { viewModel.resolveAll(review.lessonIds, LessonStatus.CANCELLED) },
+                            onOpenGroup = { review.groupId?.let { onGroupClick(it) } }
                         )
                     }
                     item(key = "review-gap") { Spacer(Modifier.height(8.dp)) }
@@ -127,8 +131,14 @@ fun TodayScreen(
                         Text("В этот день занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
-                    items(day.lessons, key = { it.lessonId }) { lesson ->
-                        LessonCard(lesson, onClick = { onLessonClick(lesson.lessonId) })
+                    items(day.lessons, key = { it.groupId ?: it.lessonId }) { lesson ->
+                        LessonCard(
+                            lesson,
+                            onClick = {
+                                val g = lesson.groupId
+                                if (g != null) onGroupClick(g) else onLessonClick(lesson.lessonId)
+                            }
+                        )
                     }
                 }
             }
@@ -237,15 +247,22 @@ private fun ReviewCard(
     onHeldPaid: () -> Unit,
     onHeldUnpaid: () -> Unit,
     onCancelled: () -> Unit,
-    onReschedule: () -> Unit
+    onReschedule: () -> Unit,
+    onGroupHeld: () -> Unit,
+    onGroupCancelled: () -> Unit,
+    onOpenGroup: () -> Unit
 ) {
+    val isGroup = review.groupId != null
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
             .padding(14.dp)
     ) {
-        Text("Что с этим уроком?", style = MaterialTheme.typography.bodyMedium)
+        Text(
+            if (isGroup) "Как прошло групповое занятие?" else "Что с этим уроком?",
+            style = MaterialTheme.typography.bodyMedium
+        )
         Text(
             "${review.whenLabel} · ${review.studentName} · ${review.course}",
             style = MaterialTheme.typography.labelSmall,
@@ -253,25 +270,46 @@ private fun ReviewCard(
         )
         Spacer(Modifier.height(12.dp))
 
-        ActionChip("Проведён и оплачен", Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onHeldPaid)
-        Spacer(Modifier.height(6.dp))
-        ActionChip("Проведён, не оплачен", Color(0xFF995A1D), Color(0xFFFAEEDA), Modifier.fillMaxWidth(), onHeldUnpaid)
-        Spacer(Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ActionChip(
-                "Отменён",
-                MaterialTheme.colorScheme.onSurfaceVariant,
-                MaterialTheme.colorScheme.surface,
-                Modifier.weight(1f),
-                onCancelled
-            )
-            ActionChip(
-                "Перенесён",
-                MaterialTheme.colorScheme.onSurfaceVariant,
-                MaterialTheme.colorScheme.surface,
-                Modifier.weight(1f),
-                onReschedule
-            )
+        if (isGroup) {
+            ActionChip("Провести всем", Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onGroupHeld)
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                ActionChip(
+                    "Отменить всем",
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                    MaterialTheme.colorScheme.surface,
+                    Modifier.weight(1f),
+                    onGroupCancelled
+                )
+                ActionChip(
+                    "Отметить по одному →",
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.surface,
+                    Modifier.weight(1f),
+                    onOpenGroup
+                )
+            }
+        } else {
+            ActionChip("Проведён и оплачен", Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onHeldPaid)
+            Spacer(Modifier.height(6.dp))
+            ActionChip("Проведён, не оплачен", Color(0xFF995A1D), Color(0xFFFAEEDA), Modifier.fillMaxWidth(), onHeldUnpaid)
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                ActionChip(
+                    "Отменён",
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                    MaterialTheme.colorScheme.surface,
+                    Modifier.weight(1f),
+                    onCancelled
+                )
+                ActionChip(
+                    "Перенесён",
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                    MaterialTheme.colorScheme.surface,
+                    Modifier.weight(1f),
+                    onReschedule
+                )
+            }
         }
     }
 }

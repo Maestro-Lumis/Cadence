@@ -43,7 +43,8 @@ fun LessonEntity.toDomain() = Lesson(
     status = LessonStatus.valueOf(status),
     lessonNumber = lessonNumber,
     packageId = packageId,
-    paid = paid
+    paid = paid,
+    groupId = groupId
 )
 
 fun Lesson.toEntity() = LessonEntity(
@@ -55,7 +56,8 @@ fun Lesson.toEntity() = LessonEntity(
     status = status.name,
     lessonNumber = lessonNumber,
     packageId = packageId,
-    paid = paid
+    paid = paid,
+    groupId = groupId
 )
 
 fun ScheduleEntity.toDomain() = Schedule(

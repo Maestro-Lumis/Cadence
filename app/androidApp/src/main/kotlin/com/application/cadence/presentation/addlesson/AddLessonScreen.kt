@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Switch
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -30,6 +34,7 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,6 +69,8 @@ fun AddLessonScreen(
 
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
+    var groupMode by remember { mutableStateOf(false) }
+    val selectedIds = remember { mutableStateListOf<Long>() }
 
     var dateText by remember { mutableStateOf(defaultDate.toString()) }
     var timeText by remember { mutableStateOf("18:00") }
@@ -138,31 +145,69 @@ fun AddLessonScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
-                ExposedDropdownMenuBox(
-                    expanded = studentMenuExpanded,
-                    onExpandedChange = { studentMenuExpanded = it }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        value = selectedStudent?.name ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Ученик") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentMenuExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = studentMenuExpanded,
-                        onDismissRequest = { studentMenuExpanded = false }
+                    Text("Групповое занятие", modifier = Modifier.weight(1f))
+                    Switch(checked = groupMode, onCheckedChange = { groupMode = it })
+                }
+                Spacer(Modifier.height(8.dp))
+
+                if (groupMode) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 220.dp)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         students.forEach { student ->
-                            DropdownMenuItem(
-                                text = { Text("${student.name} (${student.course})") },
-                                onClick = {
-                                    selectedStudent = student
-                                    durationMinutes = student.lessonDurationMinutes
-                                    studentMenuExpanded = false
-                                }
-                            )
+                            val checked = selectedIds.contains(student.id)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        if (checked) selectedIds.remove(student.id) else selectedIds.add(student.id)
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = {
+                                        if (it) selectedIds.add(student.id) else selectedIds.remove(student.id)
+                                    }
+                                )
+                                Text("${student.name} (${student.course})")
+                            }
+                        }
+                    }
+                } else {
+                    ExposedDropdownMenuBox(
+                        expanded = studentMenuExpanded,
+                        onExpandedChange = { studentMenuExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = selectedStudent?.name ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Ученик") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentMenuExpanded) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = studentMenuExpanded,
+                            onDismissRequest = { studentMenuExpanded = false }
+                        ) {
+                            students.forEach { student ->
+                                DropdownMenuItem(
+                                    text = { Text("${student.name} (${student.course})") },
+                                    onClick = {
+                                        selectedStudent = student
+                                        durationMinutes = student.lessonDurationMinutes
+                                        studentMenuExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -237,11 +282,13 @@ fun AddLessonScreen(
                 }
                 Spacer(Modifier.height(8.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = paid, onCheckedChange = { paid = it })
-                    Text("Оплачено")
+                if (!groupMode) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = paid, onCheckedChange = { paid = it })
+                        Text("Оплачено")
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
-                Spacer(Modifier.height(8.dp))
 
                 error?.let {
                     Text(it, color = MaterialTheme.colorScheme.error)
@@ -250,29 +297,49 @@ fun AddLessonScreen(
 
                 Button(
                     onClick = {
-                        val student = selectedStudent
                         val parsedDate = runCatching { LocalDate.parse(dateText) }.getOrNull()
                         val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
 
-                        error = when {
-                            student == null -> "Выбери ученика"
-                            parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
-                            !timeValid -> "Неверное время, формат ЧЧ:MM"
-                            durationMinutes <= 0 -> "Длительность в минутах, больше 0"
-                            else -> null
-                        }
-
-                        if (error == null && student != null && parsedDate != null) {
-                            viewModel.save(
-                                studentId = student.id,
-                                date = parsedDate,
-                                time = timeText,
-                                durationMinutes = durationMinutes,
-                                status = status,
-                                paid = paid,
-                                onError = { msg -> error = msg },
-                                onSaved = onSaved
-                            )
+                        if (groupMode) {
+                            error = when {
+                                selectedIds.size < 2 -> "Выберите хотя бы двух учеников"
+                                parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
+                                !timeValid -> "Неверное время, формат ЧЧ:MM"
+                                durationMinutes <= 0 -> "Длительность в минутах, больше 0"
+                                else -> null
+                            }
+                            if (error == null && parsedDate != null) {
+                                viewModel.saveGroup(
+                                    studentIds = selectedIds.toList(),
+                                    date = parsedDate,
+                                    time = timeText,
+                                    durationMinutes = durationMinutes,
+                                    status = status,
+                                    onError = { msg -> error = msg },
+                                    onSaved = onSaved
+                                )
+                            }
+                        } else {
+                            val student = selectedStudent
+                            error = when {
+                                student == null -> "Выбери ученика"
+                                parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
+                                !timeValid -> "Неверное время, формат ЧЧ:MM"
+                                durationMinutes <= 0 -> "Длительность в минутах, больше 0"
+                                else -> null
+                            }
+                            if (error == null && student != null && parsedDate != null) {
+                                viewModel.save(
+                                    studentId = student.id,
+                                    date = parsedDate,
+                                    time = timeText,
+                                    durationMinutes = durationMinutes,
+                                    status = status,
+                                    paid = paid,
+                                    onError = { msg -> error = msg },
+                                    onSaved = onSaved
+                                )
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

@@ -30,6 +30,8 @@ import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.editstudent.EditStudentScreen
 import com.application.cadence.presentation.editstudent.EditStudentViewModelFactory
+import com.application.cadence.presentation.grouplesson.GroupLessonScreen
+import com.application.cadence.presentation.grouplesson.GroupLessonViewModelFactory
 import com.application.cadence.presentation.report.ReportScreen
 import com.application.cadence.presentation.report.ReportViewModelFactory
 import com.application.cadence.presentation.schedule.ScheduleScreen
@@ -92,6 +94,7 @@ fun AppNavHost(app: CadenceApplication) {
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
+                    onGroupClick = { groupId -> navController.navigate(GroupLessonRoute(groupId)) },
                     onAddLessonClick = { date -> navController.navigate(AddLessonRoute(date.toString())) }
                 )
             }
@@ -165,6 +168,15 @@ fun AppNavHost(app: CadenceApplication) {
                 ReportScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() }
+                )
+            }
+            composable<GroupLessonRoute> { backStackEntry ->
+                val route: GroupLessonRoute = backStackEntry.toRoute()
+                val factory = GroupLessonViewModelFactory(route.groupId, app.studentRepository, app.lessonRepository)
+                GroupLessonScreen(
+                    viewModel = viewModel(factory = factory),
+                    onBack = { navController.popBackStack() },
+                    onDeleted = { navController.popBackStack() }
                 )
             }
             composable<EditLessonRoute> { backStackEntry ->

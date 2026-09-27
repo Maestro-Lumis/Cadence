@@ -65,5 +65,6 @@ data class LessonEntity(
     val status: String,
     val lessonNumber: Int?,
     val packageId: Long?,
-    val paid: Boolean
+    val paid: Boolean,
+    val groupId: Long? = null
 )
