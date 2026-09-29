@@ -234,7 +234,11 @@ private fun LessonRow(lesson: Lesson, onClick: () -> Unit, onPay: () -> Unit) {
         Column {
             Text(lesson.date.toString())
             Text(
-                "Проведён · ${formatDuration(lesson.durationMinutes)}",
+                buildString {
+                    append("Проведён · ")
+                    append(formatDuration(lesson.durationMinutes))
+                    if (lesson.groupId != null) append(" · групповое")
+                },
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

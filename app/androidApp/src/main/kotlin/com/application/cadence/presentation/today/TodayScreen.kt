@@ -357,7 +357,7 @@ private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
                 .padding(14.dp)
         ) {
             Text(
-                "${lesson.time} – ${lesson.endTime}",
+                "${lesson.time} – ${lesson.endTime} · ${lesson.durationLabel}",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(Modifier.height(6.dp))

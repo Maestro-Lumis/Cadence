@@ -9,6 +9,7 @@ import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.MSK
+import com.application.cadence.presentation.common.formatDuration
 import com.application.cadence.presentation.common.monthGenitive
 import com.application.cadence.presentation.common.monthNominative
 import com.application.cadence.presentation.common.weekdayLabel
@@ -41,6 +42,7 @@ data class TodayLessonUi(
     val course: String,
     val time: String,
     val endTime: String,
+    val durationLabel: String,
     val mskTime: String?,
     val status: LessonStatus,
     val lessonNumber: Int?,
@@ -160,7 +162,9 @@ class TodayViewModel(
             val inReview = lesson.status == LessonStatus.SCHEDULED && end < now
             EnrichedLesson(localDate, start, time, inReview, lesson, student)
         }
-        val countByDate = enriched.groupingBy { it.date }.eachCount()
+        val countByDate = enriched
+            .groupBy { it.date }
+            .mapValues { (_, rows) -> rows.map { it.lesson.groupId ?: -it.lesson.id - 1 }.distinct().size }
         val selectedLessons = enriched
             .filter { it.date == selected && !it.inReview }
             .sortedBy { it.start }
@@ -214,15 +218,26 @@ class TodayViewModel(
             lessonId = lesson.id,
             studentId = lesson.studentId,
             studentName = if (isGroup) rows.joinToString(", ") { it.student.name } else first.student.name,
-            course = if (isGroup) "Группа · ${rows.size}" else first.student.course,
+            course = if (isGroup) "Группа · ${rows.size} ${peopleWord(rows.size)}" else first.student.course,
             time = "%02d:%02d".format(startLocal.hour, startLocal.minute),
             endTime = "%02d:%02d".format(endLocal.hour, endLocal.minute),
+            durationLabel = formatDuration(lesson.durationMinutes),
             mskTime = if (tutorTz.id == MSK.id) null else "%02d:%02d МСК".format(time.hour, time.minute),
             status = status,
             lessonNumber = if (isGroup) null else numberByLessonId[lesson.id],
             paid = paid,
             groupId = if (isGroup) lesson.groupId else null
         )
+    }
+
+    private fun peopleWord(n: Int): String {
+        val mod10 = n % 10
+        val mod100 = n % 100
+        return when {
+            mod10 == 1 && mod100 != 11 -> "человек"
+            mod10 in 2..4 && mod100 !in 12..14 -> "человека"
+            else -> "человек"
+        }
     }
 
     /**
