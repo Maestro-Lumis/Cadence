@@ -41,11 +41,17 @@ data class CalDayUi(
     val isToday: Boolean
 )
 
+data class AgendaDayUi(
+    val label: String,
+    val lessons: List<AgendaCardUi>
+)
+
 data class CalendarUi(
     val monthTitle: String,
     val weeks: List<List<CalDayUi>>,
     val selectedLabel: String,
-    val lessons: List<AgendaCardUi>
+    val lessons: List<AgendaCardUi>,
+    val agenda: List<AgendaDayUi>
 )
 
 class CalendarViewModel(
@@ -101,17 +107,34 @@ class CalendarViewModel(
         }
         val cards = buildLessonCards(dayLessons, byId, tutorTz, numberByLessonId)
 
+        val agenda = lessons
+            .mapNotNull { lesson ->
+                val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
+                val date = LocalDateTime(lesson.date, time).toInstant(MSK).toLocalDateTime(tutorTz).date
+                if (date.year == selected.year && date.monthNumber == selected.monthNumber) date to lesson else null
+            }
+            .groupBy({ it.first }, { it.second })
+            .toSortedMap()
+            .map { (date, dayLessons) ->
+                val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
+                AgendaDayUi(
+                    label = "${weekdayLabel(weekday)}, ${date.dayOfMonth} ${monthGenitive(date.monthNumber)}",
+                    lessons = buildLessonCards(dayLessons, byId, tutorTz, numberByLessonId)
+                )
+            }
+
         val selectedWeekday = Weekday.entries[selected.dayOfWeek.isoDayNumber - 1]
         CalendarUi(
             monthTitle = "${monthNominative(selected.monthNumber)} ${selected.year}",
             weeks = weeks,
             selectedLabel = "${weekdayLabel(selectedWeekday)}, ${selected.dayOfMonth} ${monthGenitive(selected.monthNumber)}",
-            lessons = cards
+            lessons = cards,
+            agenda = agenda
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        CalendarUi("", emptyList(), "", emptyList())
+        CalendarUi("", emptyList(), "", emptyList(), emptyList())
     )
 }
 
