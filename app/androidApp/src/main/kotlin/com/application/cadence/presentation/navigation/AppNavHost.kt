@@ -22,6 +22,8 @@ import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
 import com.application.cadence.presentation.backup.BackupScreen
+import com.application.cadence.presentation.calendar.CalendarScreen
+import com.application.cadence.presentation.calendar.CalendarViewModelFactory
 import com.application.cadence.presentation.debts.DebtsScreen
 import com.application.cadence.presentation.debts.DebtsViewModelFactory
 import com.application.cadence.presentation.earnings.EarningsScreen
@@ -53,7 +55,7 @@ fun AppNavHost(app: CadenceApplication) {
     fun onRoute(suffix: String): Boolean =
         currentRoute?.substringBefore("?")?.substringBefore("/")?.endsWith(suffix) == true
 
-    val showBottomBar = onRoute("TodayRoute") || onRoute("StudentsRoute")
+    val showBottomBar = onRoute("TodayRoute") || onRoute("CalendarRoute") || onRoute("StudentsRoute")
 
     fun switchTab(destination: Any) {
         navController.navigate(destination) {
@@ -75,6 +77,12 @@ fun AppNavHost(app: CadenceApplication) {
                         label = { Text("Главная") }
                     )
                     NavigationBarItem(
+                        selected = onRoute("CalendarRoute"),
+                        onClick = { switchTab(CalendarRoute) },
+                        icon = { Text("📅", fontSize = 18.sp) },
+                        label = { Text("Календарь") }
+                    )
+                    NavigationBarItem(
                         selected = onRoute("StudentsRoute"),
                         onClick = { switchTab(StudentsRoute) },
                         icon = { Text("👥", fontSize = 18.sp) },
@@ -92,6 +100,15 @@ fun AppNavHost(app: CadenceApplication) {
             composable<TodayRoute> {
                 val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository)
                 TodayScreen(
+                    viewModel = viewModel(factory = factory),
+                    onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
+                    onGroupClick = { groupId -> navController.navigate(GroupLessonRoute(groupId)) },
+                    onAddLessonClick = { date -> navController.navigate(AddLessonRoute(date.toString())) }
+                )
+            }
+            composable<CalendarRoute> {
+                val factory = CalendarViewModelFactory(app.lessonRepository, app.studentRepository)
+                CalendarScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
                     onGroupClick = { groupId -> navController.navigate(GroupLessonRoute(groupId)) },

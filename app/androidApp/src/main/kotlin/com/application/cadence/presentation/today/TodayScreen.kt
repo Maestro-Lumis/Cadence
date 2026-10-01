@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.application.cadence.core.LessonStatus
+import com.application.cadence.presentation.common.AgendaLessonCard
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
 
@@ -132,7 +133,7 @@ fun TodayScreen(
                     }
                 } else {
                     items(day.lessons, key = { it.groupId ?: it.lessonId }) { lesson ->
-                        LessonCard(
+                        AgendaLessonCard(
                             lesson,
                             onClick = {
                                 val g = lesson.groupId
@@ -334,55 +335,3 @@ private fun ActionChip(
     )
 }
 
-@Composable
-private fun LessonCard(lesson: TodayLessonUi, onClick: () -> Unit) {
-    val statusColor = when {
-        lesson.status == LessonStatus.SCHEDULED -> Color(0xFF3B82F6)
-        lesson.status == LessonStatus.HELD && !lesson.paid -> Color(0xFFE0A400)
-        lesson.status == LessonStatus.HELD && lesson.paid -> Color(0xFF2E7D32)
-        else -> Color(0xFF9E9E9E)
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(14.dp)
-        ) {
-            Text(
-                "${lesson.time} – ${lesson.endTime} · ${lesson.durationLabel}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(Modifier.height(6.dp))
-            Text(lesson.studentName, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                buildString {
-                    append(lesson.course)
-                    lesson.lessonNumber?.let { append(" · Урок $it") }
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            lesson.mskTime?.let {
-                Text(
-                    it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        Box(
-            modifier = Modifier
-                .weight(0.1f)
-                .fillMaxHeight()
-                .background(statusColor)
-        )
-    }
-}

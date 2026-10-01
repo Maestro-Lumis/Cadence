@@ -8,8 +8,12 @@ import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
+import com.application.cadence.presentation.common.AgendaCardUi
 import com.application.cadence.presentation.common.MSK
-import com.application.cadence.presentation.common.formatDuration
+import com.application.cadence.presentation.common.buildLessonCards
+import com.application.cadence.presentation.common.lessonCountByDate
+import com.application.cadence.presentation.common.numberLessons
+import com.application.cadence.presentation.common.peopleWord
 import com.application.cadence.presentation.common.monthGenitive
 import com.application.cadence.presentation.common.monthNominative
 import com.application.cadence.presentation.common.weekdayLabel
@@ -35,21 +39,6 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
-data class TodayLessonUi(
-    val lessonId: Long,
-    val studentId: Long,
-    val studentName: String,
-    val course: String,
-    val time: String,
-    val endTime: String,
-    val durationLabel: String,
-    val mskTime: String?,
-    val status: LessonStatus,
-    val lessonNumber: Int?,
-    val paid: Boolean,
-    val groupId: Long? = null
-)
-
 data class ReviewLessonUi(
     val lessonId: Long,
     val studentName: String,
@@ -72,7 +61,7 @@ data class DayUi(
     val monthTitle: String,
     val week: List<WeekDayUi>,
     val selectedLabel: String,
-    val lessons: List<TodayLessonUi>
+    val lessons: List<AgendaCardUi>
 )
 
 private data class EnrichedLesson(
@@ -162,15 +151,11 @@ class TodayViewModel(
             val inReview = lesson.status == LessonStatus.SCHEDULED && end < now
             EnrichedLesson(localDate, start, time, inReview, lesson, student)
         }
-        val countByDate = enriched
-            .groupBy { it.date }
-            .mapValues { (_, rows) -> rows.map { it.lesson.groupId ?: -it.lesson.id - 1 }.distinct().size }
-        val selectedLessons = enriched
+        val countByDate = lessonCountByDate(lessons, tutorTz)
+        val selectedDayLessons = enriched
             .filter { it.date == selected && !it.inReview }
-            .sortedBy { it.start }
-            .groupBy { it.lesson.groupId ?: -it.lesson.id - 1 }
-            .values
-            .map { rows -> buildCardUi(rows, numberByLessonId) }
+            .map { it.lesson }
+        val selectedLessons = buildLessonCards(selectedDayLessons, byId, tutorTz, numberByLessonId)
 
         val week = (0..6).map { offset ->
             val date = weekStart.plus(offset, DateTimeUnit.DAY)
@@ -191,69 +176,6 @@ class TodayViewModel(
 
         return DayUi(monthNominative(selected.monthNumber), week, selectedLabel, selectedLessons)
     }
-
-    private fun buildCardUi(rows: List<EnrichedLesson>, numberByLessonId: Map<Long, Int>): TodayLessonUi {
-        val first = rows.first()
-        val lesson = first.lesson
-        val start = first.start
-        val time = first.time
-        val end = start + lesson.durationMinutes.minutes
-        val startLocal = start.toLocalDateTime(tutorTz)
-        val endLocal = end.toLocalDateTime(tutorTz)
-        val isGroup = rows.size > 1
-
-        val statuses = rows.map { it.lesson.status }
-        val status = when {
-            statuses.any { it == LessonStatus.SCHEDULED } -> LessonStatus.SCHEDULED
-            statuses.all { it == LessonStatus.CANCELLED } -> LessonStatus.CANCELLED
-            else -> LessonStatus.HELD
-        }
-        val paid = if (isGroup) {
-            rows.filter { it.lesson.status == LessonStatus.HELD }.all { it.lesson.paid }
-        } else {
-            lesson.paid
-        }
-
-        return TodayLessonUi(
-            lessonId = lesson.id,
-            studentId = lesson.studentId,
-            studentName = if (isGroup) rows.joinToString(", ") { it.student.name } else first.student.name,
-            course = if (isGroup) "Группа · ${rows.size} ${peopleWord(rows.size)}" else first.student.course,
-            time = "%02d:%02d".format(startLocal.hour, startLocal.minute),
-            endTime = "%02d:%02d".format(endLocal.hour, endLocal.minute),
-            durationLabel = formatDuration(lesson.durationMinutes),
-            mskTime = if (tutorTz.id == MSK.id) null else "%02d:%02d МСК".format(time.hour, time.minute),
-            status = status,
-            lessonNumber = if (isGroup) null else numberByLessonId[lesson.id],
-            paid = paid,
-            groupId = if (isGroup) lesson.groupId else null
-        )
-    }
-
-    private fun peopleWord(n: Int): String {
-        val mod10 = n % 10
-        val mod100 = n % 100
-        return when {
-            mod10 == 1 && mod100 != 11 -> "человек"
-            mod10 in 2..4 && mod100 !in 12..14 -> "человека"
-            else -> "человек"
-        }
-    }
-
-    /**
-     * Derives each lesson's display number: its 1-based position by date/time among the
-     * student's non-cancelled lessons. Deleting or cancelling a lesson renumbers the rest.
-     */
-    private fun numberLessons(lessons: List<Lesson>): Map<Long, Int> =
-        lessons
-            .filter { it.status != LessonStatus.CANCELLED }
-            .groupBy { it.studentId }
-            .flatMap { (_, group) ->
-                group
-                    .sortedWith(compareBy({ it.date }, { it.time }))
-                    .mapIndexed { index, lesson -> lesson.id to (index + 1) }
-            }
-            .toMap()
 
     private fun buildReviewQueue(lessons: List<Lesson>, students: List<Student>): List<ReviewLessonUi> {
         val byId = students.associateBy { it.id }
@@ -285,7 +207,7 @@ class TodayViewModel(
         return ReviewLessonUi(
             lessonId = first.lesson.id,
             studentName = if (isGroup) rows.joinToString(", ") { it.student.name } else first.student.name,
-            course = if (isGroup) "Группа · ${rows.size}" else first.student.course,
+            course = if (isGroup) "Группа · ${rows.size} ${peopleWord(rows.size)}" else first.student.course,
             whenLabel = "$dayWord, $timeStr",
             groupId = if (isGroup) first.lesson.groupId else null,
             lessonIds = rows.map { it.lesson.id }
