@@ -33,7 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.application.cadence.presentation.common.PeriodPresetChips
+import com.application.cadence.presentation.common.MonthPeriodSelector
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -93,10 +93,9 @@ fun EarningsScreen(
             Text("Заработок", style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
-            PeriodPresetChips(
+            MonthPeriodSelector(
                 from = from,
-                to = to,
-                onSelect = { viewModel.applyPreset(it) },
+                onMonthSelected = { year, month -> viewModel.setMonth(year, month) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))

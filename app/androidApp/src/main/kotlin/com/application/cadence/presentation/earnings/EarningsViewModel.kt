@@ -7,8 +7,9 @@ import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.presentation.common.MSK
-import com.application.cadence.presentation.common.PeriodPreset
+import com.application.cadence.presentation.common.monthBounds
 import com.application.cadence.presentation.common.monthGenitive
+import com.application.cadence.presentation.common.previousMonthOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,9 +42,10 @@ class EarningsViewModel(
 ) : ViewModel() {
 
     private val mskToday = Clock.System.todayIn(MSK)
+    private val defaultBounds = previousMonthOf(mskToday).let { (y, m) -> monthBounds(y, m) }
 
-    private val _from = MutableStateFlow(LocalDate(mskToday.year, mskToday.monthNumber, 1))
-    private val _to = MutableStateFlow(mskToday)
+    private val _from = MutableStateFlow(defaultBounds.first)
+    private val _to = MutableStateFlow(defaultBounds.second)
 
     val from: StateFlow<LocalDate> = _from
     val to: StateFlow<LocalDate> = _to
@@ -56,8 +58,8 @@ class EarningsViewModel(
         _to.value = date
     }
 
-    fun applyPreset(preset: PeriodPreset) {
-        val (from, to) = preset.range(mskToday)
+    fun setMonth(year: Int, month: Int) {
+        val (from, to) = monthBounds(year, month)
         _from.value = from
         _to.value = to
     }
