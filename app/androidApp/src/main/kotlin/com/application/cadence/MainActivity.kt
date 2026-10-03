@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.application.cadence.presentation.navigation.AppNavHost
+import com.application.cadence.presentation.whatsnew.WhatsNewGate
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme(typography = AppTypography) {
                 RequestNotificationPermission()
+                WhatsNewGate()
                 AppNavHost(app)
             }
         }
