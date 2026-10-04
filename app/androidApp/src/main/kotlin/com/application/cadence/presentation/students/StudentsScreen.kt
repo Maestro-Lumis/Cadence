@@ -32,13 +32,9 @@ import com.application.cadence.presentation.common.timezoneLabel
 fun StudentsScreen(
     viewModel: StudentsViewModel,
     onStudentClick: (Long) -> Unit,
-    onAddStudentClick: () -> Unit,
-    onDebtsClick: () -> Unit,
-    onEarningsClick: () -> Unit,
-    onBackupClick: () -> Unit
+    onAddStudentClick: () -> Unit
 ) {
     val students by viewModel.uiState.collectAsState()
-    val debtCount by viewModel.debtCount.collectAsState()
     val lost by viewModel.lostStudents.collectAsState()
 
     ScreenContainer {
@@ -49,46 +45,6 @@ fun StudentsScreen(
                 .padding(16.dp)
         ) {
             Text("Ученики", style = MaterialTheme.typography.titleLarge)
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable { onDebtsClick() }
-                    .background(
-                        if (debtCount > 0) Color(0xFFFAEEDA) else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                    .padding(14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Долги",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (debtCount > 0) Color(0xFF995A1D) else MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    if (debtCount > 0) "$debtCount ${lessonWord(debtCount)} →" else "нет →",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (debtCount > 0) Color(0xFF995A1D) else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable { onEarningsClick() }
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Заработок", style = MaterialTheme.typography.bodyMedium)
-                Text("→", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
             Spacer(Modifier.height(16.dp))
 
             if (lost.isNotEmpty()) {
@@ -134,17 +90,6 @@ fun StudentsScreen(
             Button(onClick = onAddStudentClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Добавить ученика")
             }
-            Spacer(Modifier.height(12.dp))
-            Text(
-                "Резервная копия",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onBackupClick() }
-                    .padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
@@ -167,12 +112,3 @@ private fun StudentRow(student: StudentRowUi, onClick: () -> Unit) {
     }
 }
 
-private fun lessonWord(n: Int): String {
-    val mod10 = n % 10
-    val mod100 = n % 100
-    return when {
-        mod10 == 1 && mod100 != 11 -> "урок"
-        mod10 in 2..4 && mod100 !in 12..14 -> "урока"
-        else -> "уроков"
-    }
-}

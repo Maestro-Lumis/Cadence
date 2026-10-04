@@ -32,6 +32,9 @@ import com.application.cadence.presentation.editlesson.EditLessonScreen
 import com.application.cadence.presentation.editlesson.EditLessonViewModelFactory
 import com.application.cadence.presentation.editstudent.EditStudentScreen
 import com.application.cadence.presentation.editstudent.EditStudentViewModelFactory
+import com.application.cadence.presentation.profile.ProfileScreen
+import com.application.cadence.presentation.profile.ProfileViewModelFactory
+import com.application.cadence.presentation.settings.SettingsScreen
 import com.application.cadence.presentation.grouplesson.GroupLessonScreen
 import com.application.cadence.presentation.grouplesson.GroupLessonViewModelFactory
 import com.application.cadence.presentation.report.ReportScreen
@@ -55,7 +58,8 @@ fun AppNavHost(app: CadenceApplication) {
     fun onRoute(suffix: String): Boolean =
         currentRoute?.substringBefore("?")?.substringBefore("/")?.endsWith(suffix) == true
 
-    val showBottomBar = onRoute("TodayRoute") || onRoute("CalendarRoute") || onRoute("StudentsRoute")
+    val showBottomBar = onRoute("TodayRoute") || onRoute("CalendarRoute") ||
+        onRoute("StudentsRoute") || onRoute("ProfileRoute")
 
     fun switchTab(destination: Any) {
         navController.navigate(destination) {
@@ -87,6 +91,12 @@ fun AppNavHost(app: CadenceApplication) {
                         onClick = { switchTab(StudentsRoute) },
                         icon = { Text("👥", fontSize = 18.sp) },
                         label = { Text("Ученики") }
+                    )
+                    NavigationBarItem(
+                        selected = onRoute("ProfileRoute"),
+                        onClick = { switchTab(ProfileRoute) },
+                        icon = { Text("👤", fontSize = 18.sp) },
+                        label = { Text("Профиль") }
                     )
                 }
             }
@@ -120,11 +130,21 @@ fun AppNavHost(app: CadenceApplication) {
                 StudentsScreen(
                     viewModel = viewModel(factory = factory),
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
-                    onAddStudentClick = { navController.navigate(AddStudentRoute) },
-                    onDebtsClick = { navController.navigate(DebtsRoute) },
-                    onEarningsClick = { navController.navigate(EarningsRoute) },
-                    onBackupClick = { navController.navigate(BackupRoute) }
+                    onAddStudentClick = { navController.navigate(AddStudentRoute) }
                 )
+            }
+            composable<ProfileRoute> {
+                val factory = ProfileViewModelFactory(app.studentRepository, app.lessonRepository)
+                ProfileScreen(
+                    viewModel = viewModel(factory = factory),
+                    onDebts = { navController.navigate(DebtsRoute) },
+                    onEarnings = { navController.navigate(EarningsRoute) },
+                    onBackup = { navController.navigate(BackupRoute) },
+                    onSettings = { navController.navigate(SettingsRoute) }
+                )
+            }
+            composable<SettingsRoute> {
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
             composable<DebtsRoute> {
                 val factory = DebtsViewModelFactory(app.lessonRepository, app.studentRepository)

@@ -25,8 +25,16 @@ data class ReleaseNote(
 /** Newest first. Add an entry (with a bumped versionCode) for each release. */
 val RELEASE_NOTES: List<ReleaseNote> = listOf(
     ReleaseNote(
+        versionCode = 3,
+        title = "Версия 1.2.0",
+        changes = listOf(
+            "Вкладка «Профиль»: долги, заработок, данные и настройки в одном месте",
+            "Долги, заработок и резервные копии переехали из «Учеников» в «Профиль»"
+        )
+    ),
+    ReleaseNote(
         versionCode = 2,
-        title = "Версия 1.1",
+        title = "Версия 1.1.0",
         changes = listOf(
             "Групповые занятия: одно занятие на несколько учеников",
             "Вкладка «Календарь»: месяц и список",

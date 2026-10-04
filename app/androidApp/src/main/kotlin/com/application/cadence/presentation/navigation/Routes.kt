@@ -12,6 +12,12 @@ object CalendarRoute
 object StudentsRoute
 
 @Serializable
+object ProfileRoute
+
+@Serializable
+object SettingsRoute
+
+@Serializable
 object DebtsRoute
 
 @Serializable
