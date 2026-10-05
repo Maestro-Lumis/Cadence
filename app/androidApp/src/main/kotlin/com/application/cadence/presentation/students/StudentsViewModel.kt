@@ -1,8 +1,10 @@
 package com.application.cadence.presentation.students
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
@@ -34,6 +36,7 @@ data class LostStudentUi(
 private const val LOST_THRESHOLD_DAYS = 14
 
 class StudentsViewModel(
+    private val ctx: Context,
     studentRepository: StudentRepository,
     lessonRepository: LessonRepository
 ) : ViewModel() {
@@ -71,18 +74,19 @@ class StudentsViewModel(
             LostStudentUi(
                 id = student.id,
                 name = student.name,
-                detail = "Последнее занятие $lastDate"
+                detail = ctx.getString(R.string.students_last_lesson, lastDate)
             ) to daysSince
         }.sortedByDescending { it.second }.map { it.first }
     }
 }
 
 class StudentsViewModelFactory(
+    private val ctx: Context,
     private val studentRepository: StudentRepository,
     private val lessonRepository: LessonRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return StudentsViewModel(studentRepository, lessonRepository) as T
+        return StudentsViewModel(ctx, studentRepository, lessonRepository) as T
     }
 }

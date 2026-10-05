@@ -40,12 +40,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.ScreenContainer
+import com.application.cadence.presentation.common.statusLabel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -62,6 +66,7 @@ fun AddLessonScreen(
     onBack: () -> Unit,
     initialDate: String? = null
 ) {
+    val context = LocalContext.current
     val students by viewModel.students.collectAsState()
 
     val defaultDate = initialDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
@@ -103,7 +108,7 @@ fun AddLessonScreen(
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -120,7 +125,7 @@ fun AddLessonScreen(
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) { Text("Отмена") }
+                TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
             },
             text = { TimePicker(state = timePickerState) }
         )
@@ -133,15 +138,15 @@ fun AddLessonScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Text("← Назад", modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.back), modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
 
-            Text("Новое занятие", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.lesson_new_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             if (students.isEmpty()) {
                 Text(
-                    "Сначала добавьте хотя бы одного ученика",
+                    stringResource(R.string.lesson_no_students),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
@@ -149,7 +154,7 @@ fun AddLessonScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Групповое занятие", modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.lesson_group_toggle), modifier = Modifier.weight(1f))
                     Switch(checked = groupMode, onCheckedChange = { groupMode = it })
                 }
                 Spacer(Modifier.height(8.dp))
@@ -190,7 +195,7 @@ fun AddLessonScreen(
                             value = selectedStudent?.name ?: "",
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Ученик") },
+                            label = { Text(stringResource(R.string.lesson_student_label)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentMenuExpanded) },
                             modifier = Modifier.fillMaxWidth().menuAnchor()
                         )
@@ -219,7 +224,7 @@ fun AddLessonScreen(
                             value = dateText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Дата (МСК)") },
+                            label = { Text(stringResource(R.string.lesson_date_label)) },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(
@@ -234,7 +239,7 @@ fun AddLessonScreen(
                             value = timeText,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Время (МСК)") },
+                            label = { Text(stringResource(R.string.lesson_time_label)) },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Box(
@@ -258,10 +263,10 @@ fun AddLessonScreen(
                     onExpandedChange = { statusMenuExpanded = it }
                 ) {
                     OutlinedTextField(
-                        value = status.label(),
+                        value = statusLabel(context, status),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Статус") },
+                        label = { Text(stringResource(R.string.lesson_status_label)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusMenuExpanded) },
                         modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
@@ -271,7 +276,7 @@ fun AddLessonScreen(
                     ) {
                         LessonStatus.entries.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option.label()) },
+                                text = { Text(statusLabel(context, option)) },
                                 onClick = {
                                     status = option
                                     statusMenuExpanded = false
@@ -285,7 +290,7 @@ fun AddLessonScreen(
                 if (!groupMode) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = paid, onCheckedChange = { paid = it })
-                        Text("Оплачено")
+                        Text(stringResource(R.string.lesson_paid_label))
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -302,10 +307,10 @@ fun AddLessonScreen(
 
                         if (groupMode) {
                             error = when {
-                                selectedIds.size < 2 -> "Выберите хотя бы двух учеников"
-                                parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
-                                !timeValid -> "Неверное время, формат ЧЧ:MM"
-                                durationMinutes <= 0 -> "Длительность в минутах, больше 0"
+                                selectedIds.size < 2 -> context.getString(R.string.lesson_err_min_group)
+                                parsedDate == null -> context.getString(R.string.lesson_err_bad_date)
+                                !timeValid -> context.getString(R.string.lesson_err_bad_time)
+                                durationMinutes <= 0 -> context.getString(R.string.lesson_err_bad_duration)
                                 else -> null
                             }
                             if (error == null && parsedDate != null) {
@@ -322,10 +327,10 @@ fun AddLessonScreen(
                         } else {
                             val student = selectedStudent
                             error = when {
-                                student == null -> "Выбери ученика"
-                                parsedDate == null -> "Неверная дата, формат ГГГГ-ММ-ДД"
-                                !timeValid -> "Неверное время, формат ЧЧ:MM"
-                                durationMinutes <= 0 -> "Длительность в минутах, больше 0"
+                                student == null -> context.getString(R.string.lesson_err_pick_student)
+                                parsedDate == null -> context.getString(R.string.lesson_err_bad_date)
+                                !timeValid -> context.getString(R.string.lesson_err_bad_time)
+                                durationMinutes <= 0 -> context.getString(R.string.lesson_err_bad_duration)
                                 else -> null
                             }
                             if (error == null && student != null && parsedDate != null) {
@@ -344,16 +349,9 @@ fun AddLessonScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Сохранить")
+                    Text(stringResource(R.string.save))
                 }
             }
         }
     }
-}
-
-private fun LessonStatus.label(): String = when (this) {
-    LessonStatus.HELD -> "Проведён"
-    LessonStatus.CANCELLED -> "Отменён"
-    LessonStatus.SCHEDULED -> "Запланирован"
-    LessonStatus.RESCHEDULED -> "Перенесён"
 }

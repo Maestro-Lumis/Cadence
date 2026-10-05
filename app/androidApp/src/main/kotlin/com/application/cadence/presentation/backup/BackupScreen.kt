@@ -27,7 +27,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import androidx.core.content.FileProvider
 import com.application.cadence.data.backup.BackupManager
 import com.application.cadence.presentation.common.MSK
@@ -51,7 +53,7 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
                 context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             }.getOrNull()
             if (text.isNullOrBlank()) {
-                Toast.makeText(context, "Не удалось прочитать файл", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.backup_read_error), Toast.LENGTH_SHORT).show()
             } else {
                 pendingImport = text
             }
@@ -61,8 +63,8 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
     pendingImport?.let { text ->
         AlertDialog(
             onDismissRequest = { pendingImport = null },
-            title = { Text("Импортировать копию?") },
-            text = { Text("Все текущие данные будут заменены данными из файла. Отменить это будет нельзя.") },
+            title = { Text(stringResource(R.string.backup_import_title)) },
+            text = { Text(stringResource(R.string.backup_import_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     pendingImport = null
@@ -70,14 +72,14 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
                         val ok = runCatching { backupManager.importJson(text) }.isSuccess
                         Toast.makeText(
                             context,
-                            if (ok) "Данные восстановлены" else "Файл повреждён или не подходит",
+                            if (ok) context.getString(R.string.backup_import_ok) else context.getString(R.string.backup_import_fail),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                }) { Text("Заменить", color = Color(0xFFB71C1C)) }
+                }) { Text(stringResource(R.string.backup_import_confirm), color = Color(0xFFB71C1C)) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingImport = null }) { Text("Отмена") }
+                TextButton(onClick = { pendingImport = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -90,16 +92,16 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Резервная копия", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.backup_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Экспорт сохранит всех учеников, занятия и расписания в файл — отправь его себе (в облако или мессенджер). Импорт восстановит данные из такого файла, заменив текущие.",
+                stringResource(R.string.backup_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -114,14 +116,14 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Экспорт")
+                Text(stringResource(R.string.backup_export))
             }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = { importLauncher.launch(arrayOf("*/*")) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Импорт")
+                Text(stringResource(R.string.backup_import))
             }
         }
     }
@@ -138,5 +140,5 @@ private fun shareBackup(context: android.content.Context, json: String) {
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(intent, "Резервная копия"))
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.backup_share_chooser)))
 }

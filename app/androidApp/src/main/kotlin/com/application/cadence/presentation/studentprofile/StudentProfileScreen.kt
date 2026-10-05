@@ -27,7 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
@@ -44,6 +47,7 @@ fun StudentProfileScreen(
     onEditClick: () -> Unit,
     onDeleted: () -> Unit
 ) {
+    val ctx = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -51,16 +55,16 @@ fun StudentProfileScreen(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Удалить ученика?") },
-            text = { Text("Будут удалены и все его занятия.") },
+            title = { Text(stringResource(R.string.sprofile_delete_title)) },
+            text = { Text(stringResource(R.string.sprofile_delete_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     viewModel.delete(onDeleted)
-                }) { Text("Удалить", color = Color(0xFFB71C1C)) }
+                }) { Text(stringResource(R.string.delete), color = Color(0xFFB71C1C)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Отмена") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -77,19 +81,19 @@ fun StudentProfileScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "← Назад",
+                    stringResource(R.string.back),
                     modifier = Modifier.clickable { onBack() },
                     color = MaterialTheme.colorScheme.primary
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(
-                        "Изменить",
+                        stringResource(R.string.edit),
                         modifier = Modifier.clickable { onEditClick() },
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge
                     )
                     Text(
-                        "Удалить",
+                        stringResource(R.string.delete),
                         modifier = Modifier.clickable { showDeleteConfirm = true },
                         color = Color(0xFFB71C1C),
                         style = MaterialTheme.typography.labelLarge
@@ -100,11 +104,11 @@ fun StudentProfileScreen(
 
             val profile = state
             if (profile == null) {
-                Text("Загрузка...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 Text(profile.studentName, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    "${profile.course} · ${timezoneLabel(profile.timezone)}",
+                    "${profile.course} · ${timezoneLabel(ctx, profile.timezone)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -112,13 +116,13 @@ fun StudentProfileScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                     Text(
-                        "Расписание →",
+                        stringResource(R.string.sprofile_schedule),
                         modifier = Modifier.clickable { onScheduleClick(profile.studentName) },
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge
                     )
                     Text(
-                        "Отчёт →",
+                        stringResource(R.string.sprofile_report),
                         modifier = Modifier.clickable { onReportClick() },
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge
@@ -128,14 +132,14 @@ fun StudentProfileScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     TabChip(
-                        label = "Проведено",
+                        label = stringResource(R.string.sprofile_tab_held),
                         count = profile.heldLessons,
                         selected = selectedTab == 0,
                         modifier = Modifier.weight(1f),
                         onClick = { selectedTab = 0 }
                     )
                     TabChip(
-                        label = "Долг",
+                        label = stringResource(R.string.sprofile_tab_debt),
                         count = profile.unpaidLessons,
                         selected = selectedTab == 1,
                         highlight = profile.unpaidLessons > 0,
@@ -152,12 +156,12 @@ fun StudentProfileScreen(
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         Text(
-                            "Ждут оплаты · ${profile.unpaidTotal} ₽",
+                            stringResource(R.string.sprofile_unpaid, profile.unpaidTotal),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            "Оплатить всё",
+                            stringResource(R.string.sprofile_pay_all),
                             modifier = Modifier.clickable { viewModel.markAllPaid() },
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary
@@ -171,7 +175,7 @@ fun StudentProfileScreen(
 
                 if (list.isEmpty()) {
                     Text(
-                        if (selectedTab == 0) "Проведённых занятий нет" else "Долгов нет",
+                        if (selectedTab == 0) stringResource(R.string.sprofile_no_held) else stringResource(R.string.sprofile_no_debts),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
@@ -223,6 +227,7 @@ private fun TabChip(
 
 @Composable
 private fun LessonRow(lesson: Lesson, onClick: () -> Unit, onPay: () -> Unit) {
+    val ctx = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,19 +240,19 @@ private fun LessonRow(lesson: Lesson, onClick: () -> Unit, onPay: () -> Unit) {
             Text(lesson.date.toString())
             Text(
                 buildString {
-                    append("Проведён · ")
-                    append(formatDuration(lesson.durationMinutes))
-                    if (lesson.groupId != null) append(" · групповое")
+                    append(stringResource(R.string.sprofile_held_prefix))
+                    append(formatDuration(ctx, lesson.durationMinutes))
+                    if (lesson.groupId != null) append(stringResource(R.string.sprofile_group_tag))
                 },
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         if (lesson.paid) {
-            Text("Оплачен", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
+            Text(stringResource(R.string.sprofile_paid), style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32))
         } else {
             Text(
-                "Оплачено",
+                stringResource(R.string.paid_label),
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable(onClick = onPay)

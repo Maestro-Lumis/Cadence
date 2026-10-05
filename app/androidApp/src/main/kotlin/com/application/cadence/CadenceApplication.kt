@@ -1,6 +1,7 @@
 package com.application.cadence
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.ScheduleRepository
@@ -14,6 +15,7 @@ import com.application.cadence.data.local.MIGRATION_4_5
 import com.application.cadence.data.local.MIGRATION_5_6
 import com.application.cadence.data.local.MIGRATION_6_7
 import com.application.cadence.data.notifications.NotificationScheduler
+import com.application.cadence.presentation.common.LocaleHelper
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.ScheduleRepositoryImpl
 import com.application.cadence.data.repository.StudentRepositoryImpl
@@ -40,6 +42,10 @@ class CadenceApplication : Application() {
     val backupManager: BackupManager by lazy { BackupManager(database) }
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(base))
+    }
 
     override fun onCreate() {
         super.onCreate()

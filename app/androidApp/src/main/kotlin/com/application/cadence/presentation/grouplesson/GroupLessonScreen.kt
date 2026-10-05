@@ -31,8 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.ScreenContainer
 
@@ -50,15 +52,15 @@ fun GroupLessonScreen(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Удалить занятие?") },
-            text = { Text("Удалится у всех участников группы.") },
+            title = { Text(stringResource(R.string.group_delete_title)) },
+            text = { Text(stringResource(R.string.group_delete_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     viewModel.deleteGroup(onDeleted)
-                }) { Text("Удалить", color = Color(0xFFB71C1C)) }
+                }) { Text(stringResource(R.string.delete), color = Color(0xFFB71C1C)) }
             },
-            dismissButton = { TextButton(onClick = { showDeleteConfirm = false }) { Text("Отмена") } }
+            dismissButton = { TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(R.string.cancel)) } }
         )
     }
 
@@ -73,9 +75,9 @@ fun GroupLessonScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("← Назад", modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.back), modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
                 Text(
-                    "Удалить",
+                    stringResource(R.string.delete),
                     modifier = Modifier.clickable { showDeleteConfirm = true },
                     color = Color(0xFFB71C1C),
                     style = MaterialTheme.typography.labelLarge
@@ -85,9 +87,9 @@ fun GroupLessonScreen(
 
             val group = state
             if (group == null) {
-                Text("Загрузка...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                Text("Групповое занятие", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.group_title), style = MaterialTheme.typography.titleLarge)
                 Text(
                     "${group.dateLabel} · ${group.timeLabel} · ${group.durationLabel}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -104,7 +106,7 @@ fun GroupLessonScreen(
                             value = "",
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Добавить ученика") },
+                            label = { Text(stringResource(R.string.group_add_student)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = addMenuExpanded) },
                             modifier = Modifier.fillMaxWidth().menuAnchor()
                         )
@@ -164,7 +166,7 @@ private fun ParticipantCard(
                 )
             }
             Text(
-                "Убрать",
+                stringResource(R.string.group_remove),
                 modifier = Modifier.clickable { onRemove() },
                 style = MaterialTheme.typography.labelSmall,
                 color = Color(0xFFB71C1C)
@@ -173,11 +175,11 @@ private fun ParticipantCard(
         Spacer(Modifier.height(10.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ToggleChip("Был", participant.status == LessonStatus.HELD) { onAttended(true) }
-            ToggleChip("Не пришёл", participant.status == LessonStatus.CANCELLED) { onAttended(false) }
+            ToggleChip(stringResource(R.string.group_attended), participant.status == LessonStatus.HELD) { onAttended(true) }
+            ToggleChip(stringResource(R.string.group_absent), participant.status == LessonStatus.CANCELLED) { onAttended(false) }
             if (participant.status == LessonStatus.HELD) {
                 ToggleChip(
-                    if (participant.paid) "Оплачен" else "Оплатить",
+                    if (participant.paid) stringResource(R.string.group_paid) else stringResource(R.string.group_pay),
                     participant.paid
                 ) { onPaid(!participant.paid) }
             }

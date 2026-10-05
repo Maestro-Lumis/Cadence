@@ -1,0 +1,302 @@
+<resources>
+    <!-- Common -->
+    <string name="back">← Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="loading">Loading…</string>
+    <string name="paid_label">Paid</string>
+    <string name="edit">Edit</string>
+    <string name="ok">Got it</string>
+    <string name="msk">MSK</string>
+    <string name="duration_min">%d min</string>
+    <string name="duration_hr">%d hr</string>
+    <string name="duration_hr_min">%1$d hr %2$d min</string>
+    <string name="duration_label">Duration (min)</string>
+    <string name="lesson_prefix">Lesson %d</string>
+    <string name="group_label">Group · %1$d %2$s</string>
+    <string name="msk_time">%1$02d:%2$02d MSK</string>
+    <string name="period_from">From</string>
+    <string name="period_to">To</string>
+
+    <plurals name="people">
+        <item quantity="one">person</item>
+        <item quantity="other">people</item>
+    </plurals>
+
+    <plurals name="lessons_count">
+        <item quantity="one">lesson</item>
+        <item quantity="other">lessons</item>
+    </plurals>
+
+    <!-- Lesson statuses -->
+    <string name="status_held">Held</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_rescheduled">Rescheduled</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_students">Students</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Today -->
+    <string name="today_jump">Today</string>
+    <string name="today_review_header">Needs attention</string>
+    <string name="today_no_lessons">No lessons on this day</string>
+    <string name="today_group_question">How did the group lesson go?</string>
+    <string name="today_lesson_question">How did this lesson go?</string>
+    <string name="today_held_all">Mark all held</string>
+    <string name="today_cancel_all">Cancel all</string>
+    <string name="today_mark_each">Mark individually →</string>
+    <string name="today_held_paid">Held &amp; paid</string>
+    <string name="today_held_unpaid">Held, not paid</string>
+    <string name="today_word">Today</string>
+    <string name="yesterday_word">Yesterday</string>
+
+    <!-- Calendar -->
+    <string name="cal_mode_month">Month</string>
+    <string name="cal_mode_list">List</string>
+    <string name="cal_no_lessons_day">No lessons on this day</string>
+    <string name="cal_no_lessons_month">No lessons this month</string>
+
+    <!-- Students -->
+    <string name="students_title">Students</string>
+    <string name="students_lost">Lost</string>
+    <string name="students_empty">No students yet</string>
+    <string name="students_add">Add student</string>
+    <string name="students_last_lesson">Last lesson %s</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_debts">Debts</string>
+    <string name="profile_no_debts">no debts</string>
+    <string name="profile_debts_summary">%1$d %2$s · %3$d ₽</string>
+    <string name="profile_earnings">Earnings</string>
+    <string name="profile_earnings_summary">%1$s · %2$d ₽</string>
+    <string name="profile_data">Data management</string>
+    <string name="profile_data_subtitle">backup, export &amp; import</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_settings_subtitle">language, what\'s new</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_whats_new">What\'s new</string>
+    <string name="settings_whats_new_subtitle">recent changes</string>
+    <string name="settings_language">Language</string>
+
+    <!-- What\'s New -->
+    <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v130_title">Version 1.3.0</string>
+    <string name="whatsnew_v130_1">Language selection: Russian, English, Spanish</string>
+    <string name="whatsnew_v130_2">Switch language in profile settings</string>
+
+    <string name="whatsnew_v120_title">Version 1.2.0</string>
+    <string name="whatsnew_v120_1">Profile tab: debts, earnings, data and settings in one place</string>
+    <string name="whatsnew_v120_2">Debts, earnings and backups moved from Students to Profile</string>
+    <string name="whatsnew_v110_title">Version 1.1.0</string>
+    <string name="whatsnew_v110_1">Group lessons: one lesson for multiple students</string>
+    <string name="whatsnew_v110_2">Calendar tab: month and list views</string>
+    <string name="whatsnew_v110_3">Reports and earnings now by month</string>
+    <string name="whatsnew_v110_4">Pre-lesson reminders and post-lesson follow-up</string>
+    <string name="whatsnew_v110_5">Custom lesson duration per student</string>
+    <string name="whatsnew_v110_6">New app icon</string>
+
+    <!-- Add / Edit Lesson -->
+    <string name="lesson_new_title">New lesson</string>
+    <string name="lesson_edit_title">Edit lesson</string>
+    <string name="lesson_group_toggle">Group lesson</string>
+    <string name="lesson_student_label">Student</string>
+    <string name="lesson_date_label">Date (MSK)</string>
+    <string name="lesson_time_label">Time (MSK)</string>
+    <string name="lesson_status_label">Status</string>
+    <string name="lesson_paid_label">Paid</string>
+    <string name="lesson_no_students">Add at least one student first</string>
+    <string name="lesson_err_pick_student">Pick a student</string>
+    <string name="lesson_err_bad_date">Invalid date, format YYYY-MM-DD</string>
+    <string name="lesson_err_bad_time">Invalid time, format HH:MM</string>
+    <string name="lesson_err_bad_duration">Duration in minutes, must be > 0</string>
+    <string name="lesson_err_min_group">Select at least two students</string>
+    <string name="lesson_err_student_missing">Student not found</string>
+    <string name="lesson_err_time_format">Invalid time format</string>
+    <string name="lesson_err_overlap">Overlaps with lesson: %s</string>
+    <string name="lesson_delete_title">Delete lesson?</string>
+    <string name="lesson_delete_body">Delete lesson</string>
+    <string name="lesson_usual_duration">Default duration</string>
+
+    <!-- Add / Edit Student -->
+    <string name="student_new_title">New student</string>
+    <string name="student_edit_title">Edit student</string>
+    <string name="student_name_label">Name</string>
+    <string name="student_course_label">Course</string>
+    <string name="student_tz_label">Timezone</string>
+    <string name="student_rate_label">Rate ₽/hr</string>
+    <string name="student_default_course">No course</string>
+
+    <!-- Student Profile -->
+    <string name="sprofile_delete_title">Delete student?</string>
+    <string name="sprofile_delete_body">All their lessons will be deleted too.</string>
+    <string name="sprofile_schedule">Schedule →</string>
+    <string name="sprofile_report">Report →</string>
+    <string name="sprofile_tab_held">Held</string>
+    <string name="sprofile_tab_debt">Debt</string>
+    <string name="sprofile_unpaid">Unpaid · %d ₽</string>
+    <string name="sprofile_pay_all">Pay all</string>
+    <string name="sprofile_no_held">No held lessons</string>
+    <string name="sprofile_no_debts">No debts</string>
+    <string name="sprofile_held_prefix">Held · </string>
+    <string name="sprofile_group_tag"> · group</string>
+    <string name="sprofile_paid">Paid</string>
+
+    <!-- Debts -->
+    <string name="debts_title">Debts</string>
+    <string name="debts_empty">No debts</string>
+    <string name="debts_confirm_title">Mark as paid?</string>
+    <string name="debts_confirm_body">%1$d %2$s will be marked paid.</string>
+
+    <!-- Earnings -->
+    <string name="earnings_title">Earnings</string>
+    <string name="earnings_earned">Earned</string>
+    <string name="earnings_paid">Paid</string>
+    <string name="earnings_debt">Debt</string>
+    <string name="earnings_empty">No lessons in this period</string>
+    <string name="earnings_lessons">%d les.</string>
+    <string name="earnings_debt_label">debt %d ₽</string>
+
+    <!-- Report -->
+    <string name="report_title">Report</string>
+    <string name="report_total">Held: %1$d · Total: %2$s</string>
+    <string name="report_open">Open</string>
+    <string name="report_share">Share</string>
+    <string name="report_pdf_title">Held lessons</string>
+    <string name="report_pdf_empty">No lessons in this period</string>
+    <string name="report_pdf_total">Lessons: %1$d · Total: %2$s</string>
+    <string name="report_share_chooser">Report</string>
+    <string name="report_no_pdf_viewer">No PDF viewer app found</string>
+
+    <!-- Backup -->
+    <string name="backup_title">Backup</string>
+    <string name="backup_description">Export saves all students, lessons and schedules to a file — send it to yourself (cloud or messenger). Import restores data from such a file, replacing current data.</string>
+    <string name="backup_export">Export</string>
+    <string name="backup_import">Import</string>
+    <string name="backup_share_chooser">Backup</string>
+    <string name="backup_import_title">Import backup?</string>
+    <string name="backup_import_body">All current data will be replaced with data from the file. This cannot be undone.</string>
+    <string name="backup_import_confirm">Replace</string>
+    <string name="backup_import_ok">Data restored</string>
+    <string name="backup_import_fail">File is corrupted or incompatible</string>
+    <string name="backup_read_error">Could not read the file</string>
+
+    <!-- Schedule -->
+    <string name="schedule_title">Schedule</string>
+    <string name="schedule_empty">No slots yet</string>
+    <string name="schedule_add_slot">Add slot</string>
+    <string name="schedule_day_label">Day of week</string>
+    <string name="schedule_time_label">Time (MSK)</string>
+    <string name="schedule_min_label">Min</string>
+    <string name="schedule_bad_time">Invalid time</string>
+    <string name="schedule_bad_duration">Duration must be > 0</string>
+    <string name="schedule_generate">Generate lessons for 4 weeks</string>
+    <string name="schedule_no_slots">No slots to generate from</string>
+    <string name="schedule_result">Created %1$d, Already existed %2$d</string>
+    <string name="schedule_slot_msk">%1$s MSK · %2$s</string>
+
+    <!-- Group Lesson -->
+    <string name="group_title">Group lesson</string>
+    <string name="group_delete_title">Delete lesson?</string>
+    <string name="group_delete_body">Will be deleted for all group members.</string>
+    <string name="group_add_student">Add student</string>
+    <string name="group_remove">Remove</string>
+    <string name="group_attended">Attended</string>
+    <string name="group_absent">Absent</string>
+    <string name="group_paid">Paid</string>
+    <string name="group_pay">Pay</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">Lesson reminders</string>
+    <string name="notif_channel_desc">Reminders before and after lessons</string>
+    <string name="notif_reminder_title">Lesson coming up at %1$02d:%2$02d</string>
+    <string name="notif_review_title">How did the lesson go?</string>
+    <string name="notif_group_text">Group lesson</string>
+
+    <!-- Weekday names -->
+    <string-array name="weekdays_full">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+    <string-array name="weekdays_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+
+    <!-- Month names -->
+    <string-array name="months_nominative">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="months_genitive">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="months_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
+    <!-- Timezone labels -->
+    <string name="tz_moscow">Moscow</string>
+    <string name="tz_yekaterinburg">Yekaterinburg</string>
+    <string name="tz_tbilisi">Tbilisi</string>
+    <string name="tz_montevideo">Montevideo</string>
+    <string name="tz_kaliningrad">Kaliningrad</string>
+    <string name="tz_novosibirsk">Novosibirsk</string>
+
+    <!-- Date format: "Monday, October 5" -->
+    <string name="date_full">%1$s, %3$s %2$d</string>
+
+    <!-- Language names -->
+    <string name="lang_ru">Русский</string>
+    <string name="lang_en">English</string>
+    <string name="lang_es">Español</string>
+</resources>

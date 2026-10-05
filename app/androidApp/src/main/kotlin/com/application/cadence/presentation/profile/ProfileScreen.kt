@@ -21,11 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.ScreenContainer
-import com.application.cadence.presentation.common.peopleWord
 
 @Composable
 fun ProfileScreen(
@@ -48,9 +50,9 @@ fun ProfileScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Text("Профиль", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.profile_title), style = MaterialTheme.typography.titleLarge)
             Text(
-                "${state.studentCount} ${peopleWord(state.studentCount)}",
+                "${state.studentCount} ${pluralStringResource(R.plurals.people, state.studentCount)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -58,31 +60,31 @@ fun ProfileScreen(
 
             HubRow(
                 emoji = "💰",
-                title = "Долги",
+                title = stringResource(R.string.profile_debts),
                 subtitle = if (state.debtTotal > 0)
-                    "${state.debtorCount} ${peopleWord(state.debtorCount)} · ${state.debtTotal} ₽"
-                else "нет долгов",
+                    stringResource(R.string.profile_debts_summary, state.debtorCount, pluralStringResource(R.plurals.people, state.debtorCount), state.debtTotal)
+                else stringResource(R.string.profile_no_debts),
                 onClick = onDebts
             )
             Spacer(Modifier.height(8.dp))
             HubRow(
                 emoji = "📊",
-                title = "Заработок",
-                subtitle = "${state.earningsMonthLabel} · ${state.earningsMonthTotal} ₽",
+                title = stringResource(R.string.profile_earnings),
+                subtitle = stringResource(R.string.profile_earnings_summary, state.earningsMonthLabel, state.earningsMonthTotal),
                 onClick = onEarnings
             )
             Spacer(Modifier.height(8.dp))
             HubRow(
                 emoji = "💾",
-                title = "Управление данными",
-                subtitle = "бэкап, экспорт и импорт",
+                title = stringResource(R.string.profile_data),
+                subtitle = stringResource(R.string.profile_data_subtitle),
                 onClick = onBackup
             )
             Spacer(Modifier.height(8.dp))
             HubRow(
                 emoji = "⚙️",
-                title = "Настройки",
-                subtitle = "что нового",
+                title = stringResource(R.string.profile_settings),
+                subtitle = stringResource(R.string.profile_settings_subtitle),
                 onClick = onSettings
             )
 

@@ -1,5 +1,6 @@
 package com.application.cadence.presentation.calendar
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -56,7 +57,8 @@ data class CalendarUi(
 
 class CalendarViewModel(
     lessonRepository: LessonRepository,
-    studentRepository: StudentRepository
+    studentRepository: StudentRepository,
+    private val ctx: Context
 ) : ViewModel() {
 
     private val tutorTz = TimeZone.currentSystemDefault()
@@ -105,7 +107,7 @@ class CalendarViewModel(
             val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@filter false
             LocalDateTime(lesson.date, time).toInstant(MSK).toLocalDateTime(tutorTz).date == selected
         }
-        val cards = buildLessonCards(dayLessons, byId, tutorTz, numberByLessonId)
+        val cards = buildLessonCards(ctx, dayLessons, byId, tutorTz, numberByLessonId)
 
         val agenda = lessons
             .mapNotNull { lesson ->
@@ -118,16 +120,16 @@ class CalendarViewModel(
             .map { (date, dayLessons) ->
                 val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
                 AgendaDayUi(
-                    label = "${weekdayLabel(weekday)}, ${date.dayOfMonth} ${monthGenitive(date.monthNumber)}",
-                    lessons = buildLessonCards(dayLessons, byId, tutorTz, numberByLessonId)
+                    label = "${weekdayLabel(ctx, weekday)}, ${date.dayOfMonth} ${monthGenitive(ctx, date.monthNumber)}",
+                    lessons = buildLessonCards(ctx, dayLessons, byId, tutorTz, numberByLessonId)
                 )
             }
 
         val selectedWeekday = Weekday.entries[selected.dayOfWeek.isoDayNumber - 1]
         CalendarUi(
-            monthTitle = "${monthNominative(selected.monthNumber)} ${selected.year}",
+            monthTitle = "${monthNominative(ctx, selected.monthNumber)} ${selected.year}",
             weeks = weeks,
-            selectedLabel = "${weekdayLabel(selectedWeekday)}, ${selected.dayOfMonth} ${monthGenitive(selected.monthNumber)}",
+            selectedLabel = "${weekdayLabel(ctx, selectedWeekday)}, ${selected.dayOfMonth} ${monthGenitive(ctx, selected.monthNumber)}",
             lessons = cards,
             agenda = agenda
         )
@@ -140,10 +142,11 @@ class CalendarViewModel(
 
 class CalendarViewModelFactory(
     private val lessonRepository: LessonRepository,
-    private val studentRepository: StudentRepository
+    private val studentRepository: StudentRepository,
+    private val ctx: Context
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CalendarViewModel(lessonRepository, studentRepository) as T
+        return CalendarViewModel(lessonRepository, studentRepository, ctx) as T
     }
 }

@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.LessonStatus
 
 @Composable
@@ -49,10 +51,11 @@ fun AgendaLessonCard(card: AgendaCardUi, onClick: () -> Unit) {
             )
             Spacer(Modifier.height(6.dp))
             Text(card.studentName, style = MaterialTheme.typography.bodyMedium)
+            val lessonLabel = card.lessonNumber?.let { stringResource(R.string.lesson_prefix, it) }
             Text(
                 buildString {
                     append(card.course)
-                    card.lessonNumber?.let { append(" · Урок $it") }
+                    lessonLabel?.let { append(" · $it") }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

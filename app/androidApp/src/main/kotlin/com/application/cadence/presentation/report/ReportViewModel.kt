@@ -1,5 +1,6 @@
 package com.application.cadence.presentation.report
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -36,6 +37,7 @@ data class ReportUi(
 )
 
 class ReportViewModel(
+    private val ctx: Context,
     studentId: Long,
     studentRepository: StudentRepository,
     lessonRepository: LessonRepository
@@ -76,8 +78,8 @@ class ReportViewModel(
                 .sortedBy { it.date }
             val rows = held.map { lesson ->
                 ReportRowUi(
-                    dateLabel = "${lesson.date.dayOfMonth} ${monthGenitive(lesson.date.monthNumber)}",
-                    durationLabel = formatDuration(lesson.durationMinutes)
+                    dateLabel = "${lesson.date.dayOfMonth} ${monthGenitive(ctx, lesson.date.monthNumber)}",
+                    durationLabel = formatDuration(ctx, lesson.durationMinutes)
                 )
             }
             val totalMinutes = held.sumOf { it.durationMinutes }
@@ -87,7 +89,7 @@ class ReportViewModel(
                 periodLabel = periodLabel(from, to),
                 rows = rows,
                 totalCount = held.size,
-                totalLabel = formatDuration(totalMinutes),
+                totalLabel = formatDuration(ctx, totalMinutes),
                 fileName = "${sanitizeFileName(s.name)}_${from}_$to.pdf"
             )
         }
@@ -97,19 +99,20 @@ class ReportViewModel(
         name.trim().replace(Regex("""[\\/:*?"<>|\s]+"""), "_").ifBlank { "otchet" }
 
     private fun periodLabel(from: LocalDate, to: LocalDate): String {
-        val fromStr = "${from.dayOfMonth} ${monthGenitive(from.monthNumber)}"
-        val toStr = "${to.dayOfMonth} ${monthGenitive(to.monthNumber)} ${to.year}"
+        val fromStr = "${from.dayOfMonth} ${monthGenitive(ctx, from.monthNumber)}"
+        val toStr = "${to.dayOfMonth} ${monthGenitive(ctx, to.monthNumber)} ${to.year}"
         return "$fromStr – $toStr"
     }
 }
 
 class ReportViewModelFactory(
+    private val ctx: Context,
     private val studentId: Long,
     private val studentRepository: StudentRepository,
     private val lessonRepository: LessonRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ReportViewModel(studentId, studentRepository, lessonRepository) as T
+        return ReportViewModel(ctx, studentId, studentRepository, lessonRepository) as T
     }
 }

@@ -1,8 +1,10 @@
 package com.application.cadence.presentation.editlesson
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
@@ -28,7 +30,8 @@ import kotlin.time.Duration.Companion.minutes
 class EditLessonViewModel(
     private val lessonId: Long,
     private val lessonRepository: LessonRepository,
-    studentRepository: StudentRepository
+    studentRepository: StudentRepository,
+    private val ctx: Context
 ) : ViewModel() {
 
     val students: StateFlow<List<Student>> = studentRepository.observeAll()
@@ -57,12 +60,12 @@ class EditLessonViewModel(
             val studentList = students.value
             val student = studentList.find { it.id == studentId }
             if (student == null) {
-                onError("Ученик не найден")
+                onError(ctx.getString(R.string.lesson_err_student_missing))
                 return@launch
             }
             val lessonTime = runCatching { LocalTime.parse(time) }.getOrNull()
             if (lessonTime == null) {
-                onError("Неверный формат времени")
+                onError(ctx.getString(R.string.lesson_err_time_format))
                 return@launch
             }
             val newStart = LocalDateTime(date, lessonTime).toInstant(MSK)
@@ -76,7 +79,7 @@ class EditLessonViewModel(
                 val overlap = findOverlappingLesson(newStart, newEnd, nearby, excludeLessonId = lessonId)
                 if (overlap != null) {
                     val ovStudent = studentList.find { it.id == overlap.studentId }
-                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК")
+                    onError(ctx.getString(R.string.lesson_err_overlap, "${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time}"))
                     return@launch
                 }
             }
@@ -110,10 +113,11 @@ class EditLessonViewModel(
 class EditLessonViewModelFactory(
     private val lessonId: Long,
     private val lessonRepository: LessonRepository,
-    private val studentRepository: StudentRepository
+    private val studentRepository: StudentRepository,
+    private val ctx: Context
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return EditLessonViewModel(lessonId, lessonRepository, studentRepository) as T
+        return EditLessonViewModel(lessonId, lessonRepository, studentRepository, ctx) as T
     }
 }

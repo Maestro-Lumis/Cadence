@@ -7,6 +7,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.MSK
@@ -19,14 +20,6 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
-/**
- * Schedules two local notifications per lesson via WorkManager:
- *  - a reminder [LEAD_MINUTES] before the lesson starts, and
- *  - a "how did it go?" nudge right after it ends.
- * WorkManager persists jobs across reboots, so no boot receiver is needed, and the
- * worker re-reads the lesson before showing anything, so stale jobs (deleted /
- * cancelled / held / rescheduled lessons) simply do nothing.
- */
 object NotificationScheduler {
 
     const val CHANNEL_ID = "lesson_reminders"
@@ -46,15 +39,14 @@ object NotificationScheduler {
         if (manager.getNotificationChannel(CHANNEL_ID) != null) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Напоминания об уроках",
+            context.getString(R.string.notif_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Напоминания до и после занятия"
+            description = context.getString(R.string.notif_channel_desc)
         }
         manager.createNotificationChannel(channel)
     }
 
-    /** Re-plans reminder + review notifications for scheduled lessons in the next [HORIZON_DAYS]. Idempotent. */
     fun sync(context: Context, lessons: List<Lesson>) {
         val wm = WorkManager.getInstance(context)
         val now = Clock.System.now()
@@ -64,7 +56,6 @@ object NotificationScheduler {
         lessons.forEach { lesson ->
             val gid = lesson.groupId
             if (gid != null && !seenGroups.add(gid)) {
-                // Another member of this group already carries the notifications for the slot.
                 wm.cancelUniqueWork(REMINDER_PREFIX + lesson.id)
                 wm.cancelUniqueWork(REVIEW_PREFIX + lesson.id)
                 return@forEach

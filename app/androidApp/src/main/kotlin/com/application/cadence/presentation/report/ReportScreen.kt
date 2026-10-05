@@ -33,7 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.MonthPeriodSelector
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.LocalDate
@@ -69,7 +71,7 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
                     picker = null
                 }) { Text("OK") }
             },
-            dismissButton = { TextButton(onClick = { picker = null }) { Text("Отмена") } }
+            dismissButton = { TextButton(onClick = { picker = null }) { Text(stringResource(R.string.cancel)) } }
         ) {
             DatePicker(state = state)
         }
@@ -83,13 +85,13 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Отчёт", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.report_title), style = MaterialTheme.typography.titleLarge)
             report?.let {
                 Text(
                     "${it.studentName} · ${it.course}",
@@ -107,16 +109,16 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
             Spacer(Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                PeriodField("С", from.toString(), Modifier.weight(1f)) { picker = "from" }
+                PeriodField(stringResource(R.string.period_from), from.toString(), Modifier.weight(1f)) { picker = "from" }
                 Spacer(Modifier.width(8.dp))
-                PeriodField("По", to.toString(), Modifier.weight(1f)) { picker = "to" }
+                PeriodField(stringResource(R.string.period_to), to.toString(), Modifier.weight(1f)) { picker = "to" }
             }
             Spacer(Modifier.height(16.dp))
 
             val data = report
             if (data != null) {
                 Text(
-                    "Проведено: ${data.totalCount} · Всего: ${data.totalLabel}",
+                    stringResource(R.string.report_total, data.totalCount, data.totalLabel),
                     style = MaterialTheme.typography.titleSmall
                 )
                 Spacer(Modifier.height(8.dp))
@@ -144,7 +146,7 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = data.rows.isNotEmpty()
                     ) {
-                        Text("Открыть")
+                        Text(stringResource(R.string.report_open))
                     }
                     Spacer(Modifier.width(8.dp))
                     Button(
@@ -152,11 +154,11 @@ fun ReportScreen(viewModel: ReportViewModel, onBack: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = data.rows.isNotEmpty()
                     ) {
-                        Text("Поделиться")
+                        Text(stringResource(R.string.report_share))
                     }
                 }
             } else {
-                Text("Загрузка...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

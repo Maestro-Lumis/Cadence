@@ -21,25 +21,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.application.cadence.R
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
-private val MONTHS_SHORT =
-    listOf("Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек")
-
-/** First and last calendar day of the given month. */
 fun monthBounds(year: Int, month: Int): Pair<LocalDate, LocalDate> {
     val first = LocalDate(year, month, 1)
     val last = first.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
     return first to last
 }
 
-/** The (year, month) of the month before the one containing [ref]. */
 fun previousMonthOf(ref: LocalDate): Pair<Int, Int> {
     val lastPrev = LocalDate(ref.year, ref.monthNumber, 1).minus(1, DateTimeUnit.DAY)
     return lastPrev.year to lastPrev.monthNumber
@@ -50,16 +48,13 @@ private fun shiftMonth(year: Int, month: Int, delta: Int): Pair<Int, Int> {
     return d.year to d.monthNumber
 }
 
-/**
- * Month selector: ‹ month year › where arrows jump whole months and tapping the title
- * opens a month/year picker. Every choice reports the selected (year, month).
- */
 @Composable
 fun MonthPeriodSelector(
     from: LocalDate,
     onMonthSelected: (year: Int, month: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val ctx = LocalContext.current
     val year = from.year
     val month = from.monthNumber
     var showPicker by remember { mutableStateOf(false) }
@@ -76,7 +71,7 @@ fun MonthPeriodSelector(
             onMonthSelected(y, m)
         }
         Text(
-            "${monthNominative(month)} $year",
+            "${monthNominative(ctx, month)} $year",
             modifier = Modifier
                 .weight(1f)
                 .clip(RoundedCornerShape(8.dp))
@@ -124,12 +119,13 @@ private fun MonthYearPickerDialog(
     onDismiss: () -> Unit,
     onPick: (Int, Int) -> Unit
 ) {
+    val ctx = LocalContext.current
     var pickedYear by remember { mutableIntStateOf(year) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Отмена") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
         title = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -152,7 +148,7 @@ private fun MonthYearPickerDialog(
                             val m = rowIndex * 3 + colIndex + 1
                             val selected = pickedYear == year && m == month
                             Text(
-                                MONTHS_SHORT[m - 1],
+                                monthShort(ctx, m),
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(8.dp))

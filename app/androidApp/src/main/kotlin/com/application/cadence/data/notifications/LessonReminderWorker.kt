@@ -13,6 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.application.cadence.CadenceApplication
 import com.application.cadence.MainActivity
+import com.application.cadence.R
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.MSK
 import kotlinx.coroutines.flow.first
@@ -34,25 +35,25 @@ class LessonReminderWorker(
 
         val app = applicationContext as CadenceApplication
         val lesson = app.lessonRepository.getById(lessonId) ?: return Result.success()
-        // Stale job: the lesson was cancelled, held or already reviewed since we planned this.
         if (lesson.status != LessonStatus.SCHEDULED) return Result.success()
 
         val student = app.studentRepository.observeById(lesson.studentId).first()
             ?: return Result.success()
 
+        val ctx = applicationContext
         val title: String
         if (kind == NotificationScheduler.KIND_REVIEW) {
-            title = "Как прошёл урок?"
+            title = ctx.getString(R.string.notif_review_title)
         } else {
             val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull()
                 ?: return Result.success()
             val startLocal = LocalDateTime(lesson.date, time)
                 .toInstant(MSK)
                 .toLocalDateTime(TimeZone.currentSystemDefault())
-            title = "Скоро урок в %02d:%02d".format(startLocal.hour, startLocal.minute)
+            title = ctx.getString(R.string.notif_reminder_title, startLocal.hour, startLocal.minute)
         }
 
-        val text = if (lesson.groupId != null) "Групповое занятие" else "${student.name} · ${student.course}"
+        val text = if (lesson.groupId != null) ctx.getString(R.string.notif_group_text) else "${student.name} · ${student.course}"
         showNotification(
             tag = kind,
             id = lessonId.toInt(),

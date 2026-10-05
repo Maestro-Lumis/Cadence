@@ -1,3 +1,308 @@
 <resources>
     <string name="app_name">Cadence</string>
+
+    <!-- Common -->
+    <string name="back">← Назад</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="loading">Загрузка…</string>
+    <string name="paid_label">Оплачено</string>
+    <string name="edit">Изменить</string>
+    <string name="ok">Понятно</string>
+    <string name="msk">МСК</string>
+    <string name="duration_min">%d мин</string>
+    <string name="duration_hr">%d ч</string>
+    <string name="duration_hr_min">%1$d ч %2$d мин</string>
+    <string name="duration_label">Длительность (мин)</string>
+    <string name="lesson_prefix">Урок %d</string>
+    <string name="group_label">Группа · %1$d %2$s</string>
+    <string name="msk_time">%1$02d:%2$02d МСК</string>
+    <string name="period_from">С</string>
+    <string name="period_to">По</string>
+
+    <plurals name="people">
+        <item quantity="one">человек</item>
+        <item quantity="few">человека</item>
+        <item quantity="many">человек</item>
+        <item quantity="other">человек</item>
+    </plurals>
+
+    <plurals name="lessons_count">
+        <item quantity="one">урок</item>
+        <item quantity="few">урока</item>
+        <item quantity="many">уроков</item>
+        <item quantity="other">уроков</item>
+    </plurals>
+
+    <!-- Lesson statuses -->
+    <string name="status_held">Проведён</string>
+    <string name="status_cancelled">Отменён</string>
+    <string name="status_scheduled">Запланирован</string>
+    <string name="status_rescheduled">Перенесён</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_calendar">Календарь</string>
+    <string name="nav_students">Ученики</string>
+    <string name="nav_profile">Профиль</string>
+
+    <!-- Today -->
+    <string name="today_jump">Сегодня</string>
+    <string name="today_review_header">Требует внимания</string>
+    <string name="today_no_lessons">В этот день занятий нет</string>
+    <string name="today_group_question">Как прошло групповое занятие?</string>
+    <string name="today_lesson_question">Что с этим уроком?</string>
+    <string name="today_held_all">Провести всем</string>
+    <string name="today_cancel_all">Отменить всем</string>
+    <string name="today_mark_each">Отметить по одному →</string>
+    <string name="today_held_paid">Проведён и оплачен</string>
+    <string name="today_held_unpaid">Проведён, не оплачен</string>
+    <string name="today_word">Сегодня</string>
+    <string name="yesterday_word">Вчера</string>
+
+    <!-- Calendar -->
+    <string name="cal_mode_month">Месяц</string>
+    <string name="cal_mode_list">Список</string>
+    <string name="cal_no_lessons_day">В этот день занятий нет</string>
+    <string name="cal_no_lessons_month">В этом месяце занятий нет</string>
+
+    <!-- Students -->
+    <string name="students_title">Ученики</string>
+    <string name="students_lost">Пропали</string>
+    <string name="students_empty">Учеников пока нет</string>
+    <string name="students_add">Добавить ученика</string>
+    <string name="students_last_lesson">Последнее занятие %s</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Профиль</string>
+    <string name="profile_debts">Долги</string>
+    <string name="profile_no_debts">нет долгов</string>
+    <string name="profile_debts_summary">%1$d %2$s · %3$d ₽</string>
+    <string name="profile_earnings">Заработок</string>
+    <string name="profile_earnings_summary">%1$s · %2$d ₽</string>
+    <string name="profile_data">Управление данными</string>
+    <string name="profile_data_subtitle">бэкап, экспорт и импорт</string>
+    <string name="profile_settings">Настройки</string>
+    <string name="profile_settings_subtitle">язык, что нового</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_whats_new">Что нового</string>
+    <string name="settings_whats_new_subtitle">последние изменения</string>
+    <string name="settings_language">Язык</string>
+
+    <!-- What\'s New -->
+    <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v130_title">Версия 1.3.0</string>
+    <string name="whatsnew_v130_1">Выбор языка: русский, английский, испанский</string>
+    <string name="whatsnew_v130_2">Переключение в настройках профиля</string>
+
+    <string name="whatsnew_v120_title">Версия 1.2.0</string>
+    <string name="whatsnew_v120_1">Вкладка «Профиль»: долги, заработок, данные и настройки в одном месте</string>
+    <string name="whatsnew_v120_2">Долги, заработок и резервные копии переехали из «Учеников» в «Профиль»</string>
+    <string name="whatsnew_v110_title">Версия 1.1.0</string>
+    <string name="whatsnew_v110_1">Групповые занятия: одно занятие на несколько учеников</string>
+    <string name="whatsnew_v110_2">Вкладка «Календарь»: месяц и список</string>
+    <string name="whatsnew_v110_3">Отчёт и заработок теперь по месяцам</string>
+    <string name="whatsnew_v110_4">Напоминания до урока и вопрос «как прошёл» после</string>
+    <string name="whatsnew_v110_5">Своя длительность занятия у каждого ученика</string>
+    <string name="whatsnew_v110_6">Новая иконка приложения</string>
+
+    <!-- Add / Edit Lesson -->
+    <string name="lesson_new_title">Новое занятие</string>
+    <string name="lesson_edit_title">Редактировать занятие</string>
+    <string name="lesson_group_toggle">Групповое занятие</string>
+    <string name="lesson_student_label">Ученик</string>
+    <string name="lesson_date_label">Дата (МСК)</string>
+    <string name="lesson_time_label">Время (МСК)</string>
+    <string name="lesson_status_label">Статус</string>
+    <string name="lesson_paid_label">Оплачено</string>
+    <string name="lesson_no_students">Сначала добавьте хотя бы одного ученика</string>
+    <string name="lesson_err_pick_student">Выбери ученика</string>
+    <string name="lesson_err_bad_date">Неверная дата, формат ГГГГ-ММ-ДД</string>
+    <string name="lesson_err_bad_time">Неверное время, формат ЧЧ:MM</string>
+    <string name="lesson_err_bad_duration">Длительность в минутах, больше 0</string>
+    <string name="lesson_err_min_group">Выберите хотя бы двух учеников</string>
+    <string name="lesson_err_student_missing">Ученик не найден</string>
+    <string name="lesson_err_time_format">Неверный формат времени</string>
+    <string name="lesson_err_overlap">Пересечение с занятием: %s</string>
+    <string name="lesson_delete_title">Удалить занятие?</string>
+    <string name="lesson_delete_body">Удалить занятие</string>
+    <string name="lesson_usual_duration">Обычная длительность</string>
+
+    <!-- Add / Edit Student -->
+    <string name="student_new_title">Новый ученик</string>
+    <string name="student_edit_title">Изменить ученика</string>
+    <string name="student_name_label">Имя</string>
+    <string name="student_course_label">Курс</string>
+    <string name="student_tz_label">Часовой пояс</string>
+    <string name="student_rate_label">Ставка ₽/час</string>
+    <string name="student_default_course">Без курса</string>
+
+    <!-- Student Profile -->
+    <string name="sprofile_delete_title">Удалить ученика?</string>
+    <string name="sprofile_delete_body">Будут удалены и все его занятия.</string>
+    <string name="sprofile_schedule">Расписание →</string>
+    <string name="sprofile_report">Отчёт →</string>
+    <string name="sprofile_tab_held">Проведено</string>
+    <string name="sprofile_tab_debt">Долг</string>
+    <string name="sprofile_unpaid">Ждут оплаты · %d ₽</string>
+    <string name="sprofile_pay_all">Оплатить всё</string>
+    <string name="sprofile_no_held">Проведённых занятий нет</string>
+    <string name="sprofile_no_debts">Долгов нет</string>
+    <string name="sprofile_held_prefix">Проведён · </string>
+    <string name="sprofile_group_tag"> · групповое</string>
+    <string name="sprofile_paid">Оплачен</string>
+
+    <!-- Debts -->
+    <string name="debts_title">Долги</string>
+    <string name="debts_empty">Долгов нет</string>
+    <string name="debts_confirm_title">Отметить оплаченными?</string>
+    <string name="debts_confirm_body">%1$d %2$s станут оплаченными.</string>
+
+    <!-- Earnings -->
+    <string name="earnings_title">Заработок</string>
+    <string name="earnings_earned">Заработано</string>
+    <string name="earnings_paid">Оплачено</string>
+    <string name="earnings_debt">Долг</string>
+    <string name="earnings_empty">За период занятий нет</string>
+    <string name="earnings_lessons">%d зан.</string>
+    <string name="earnings_debt_label">долг %d ₽</string>
+
+    <!-- Report -->
+    <string name="report_title">Отчёт</string>
+    <string name="report_total">Проведено: %1$d · Всего: %2$s</string>
+    <string name="report_open">Открыть</string>
+    <string name="report_share">Поделиться</string>
+    <string name="report_pdf_title">Проведённые занятия</string>
+    <string name="report_pdf_empty">Занятий за период нет</string>
+    <string name="report_pdf_total">Занятий: %1$d · Всего: %2$s</string>
+    <string name="report_share_chooser">Отчёт</string>
+    <string name="report_no_pdf_viewer">Нет приложения для просмотра PDF</string>
+
+    <!-- Backup -->
+    <string name="backup_title">Резервная копия</string>
+    <string name="backup_description">Экспорт сохранит всех учеников, занятия и расписания в файл — отправь его себе (в облако или мессенджер). Импорт восстановит данные из такого файла, заменив текущие.</string>
+    <string name="backup_export">Экспорт</string>
+    <string name="backup_import">Импорт</string>
+    <string name="backup_share_chooser">Резервная копия</string>
+    <string name="backup_import_title">Импортировать копию?</string>
+    <string name="backup_import_body">Все текущие данные будут заменены данными из файла. Отменить это будет нельзя.</string>
+    <string name="backup_import_confirm">Заменить</string>
+    <string name="backup_import_ok">Данные восстановлены</string>
+    <string name="backup_import_fail">Файл повреждён или не подходит</string>
+    <string name="backup_read_error">Не удалось прочитать файл</string>
+
+    <!-- Schedule -->
+    <string name="schedule_title">Расписание</string>
+    <string name="schedule_empty">Слотов пока нет</string>
+    <string name="schedule_add_slot">Добавить слот</string>
+    <string name="schedule_day_label">День недели</string>
+    <string name="schedule_time_label">Время (МСК)</string>
+    <string name="schedule_min_label">Мин</string>
+    <string name="schedule_bad_time">Неверное время</string>
+    <string name="schedule_bad_duration">Длительность больше 0</string>
+    <string name="schedule_generate">Заполнить занятия на 4 недели</string>
+    <string name="schedule_no_slots">Нет слотов для генерации</string>
+    <string name="schedule_result">Создано %1$d, Создано ранее %2$d</string>
+    <string name="schedule_slot_msk">%1$s МСК · %2$s</string>
+
+    <!-- Group Lesson -->
+    <string name="group_title">Групповое занятие</string>
+    <string name="group_delete_title">Удалить занятие?</string>
+    <string name="group_delete_body">Удалится у всех участников группы.</string>
+    <string name="group_add_student">Добавить ученика</string>
+    <string name="group_remove">Убрать</string>
+    <string name="group_attended">Был</string>
+    <string name="group_absent">Не пришёл</string>
+    <string name="group_paid">Оплачен</string>
+    <string name="group_pay">Оплатить</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">Напоминания об уроках</string>
+    <string name="notif_channel_desc">Напоминания до и после занятия</string>
+    <string name="notif_reminder_title">Скоро урок в %1$02d:%2$02d</string>
+    <string name="notif_review_title">Как прошёл урок?</string>
+    <string name="notif_group_text">Групповое занятие</string>
+
+    <!-- Weekday names -->
+    <string-array name="weekdays_full">
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+        <item>Воскресенье</item>
+    </string-array>
+    <string-array name="weekdays_short">
+        <item>пн</item>
+        <item>вт</item>
+        <item>ср</item>
+        <item>чт</item>
+        <item>пт</item>
+        <item>сб</item>
+        <item>вс</item>
+    </string-array>
+
+    <!-- Month names -->
+    <string-array name="months_nominative">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+    <string-array name="months_genitive">
+        <item>января</item>
+        <item>февраля</item>
+        <item>марта</item>
+        <item>апреля</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>августа</item>
+        <item>сентября</item>
+        <item>октября</item>
+        <item>ноября</item>
+        <item>декабря</item>
+    </string-array>
+    <string-array name="months_short">
+        <item>Янв</item>
+        <item>Фев</item>
+        <item>Мар</item>
+        <item>Апр</item>
+        <item>Май</item>
+        <item>Июн</item>
+        <item>Июл</item>
+        <item>Авг</item>
+        <item>Сен</item>
+        <item>Окт</item>
+        <item>Ноя</item>
+        <item>Дек</item>
+    </string-array>
+
+    <!-- Timezone labels -->
+    <string name="tz_moscow">Москва</string>
+    <string name="tz_yekaterinburg">Екатеринбург</string>
+    <string name="tz_tbilisi">Тбилиси</string>
+    <string name="tz_montevideo">Монтевидео</string>
+    <string name="tz_kaliningrad">Калининград</string>
+    <string name="tz_novosibirsk">Новосибирск</string>
+
+    <!-- Date format: "Monday, 5 October" -->
+    <string name="date_full">%1$s, %2$d %3$s</string>
+
+    <!-- Language names -->
+    <string name="lang_ru">Русский</string>
+    <string name="lang_en">English</string>
+    <string name="lang_es">Español</string>
 </resources>

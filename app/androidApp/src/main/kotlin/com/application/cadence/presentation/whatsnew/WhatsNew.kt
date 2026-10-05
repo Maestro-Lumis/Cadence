@@ -14,34 +14,34 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 
 data class ReleaseNote(
     val versionCode: Long,
-    val title: String,
-    val changes: List<String>
+    val titleRes: Int,
+    val changeRes: List<Int>
 )
 
-/** Newest first. Add an entry (with a bumped versionCode) for each release. */
 val RELEASE_NOTES: List<ReleaseNote> = listOf(
     ReleaseNote(
+        versionCode = 4,
+        titleRes = R.string.whatsnew_v130_title,
+        changeRes = listOf(R.string.whatsnew_v130_1, R.string.whatsnew_v130_2)
+    ),
+    ReleaseNote(
         versionCode = 3,
-        title = "Версия 1.2.0",
-        changes = listOf(
-            "Вкладка «Профиль»: долги, заработок, данные и настройки в одном месте",
-            "Долги, заработок и резервные копии переехали из «Учеников» в «Профиль»"
-        )
+        titleRes = R.string.whatsnew_v120_title,
+        changeRes = listOf(R.string.whatsnew_v120_1, R.string.whatsnew_v120_2)
     ),
     ReleaseNote(
         versionCode = 2,
-        title = "Версия 1.1.0",
-        changes = listOf(
-            "Групповые занятия: одно занятие на несколько учеников",
-            "Вкладка «Календарь»: месяц и список",
-            "Отчёт и заработок теперь по месяцам",
-            "Напоминания до урока и вопрос «как прошёл» после",
-            "Своя длительность занятия у каждого ученика",
-            "Новая иконка приложения"
+        titleRes = R.string.whatsnew_v110_title,
+        changeRes = listOf(
+            R.string.whatsnew_v110_1, R.string.whatsnew_v110_2,
+            R.string.whatsnew_v110_3, R.string.whatsnew_v110_4,
+            R.string.whatsnew_v110_5, R.string.whatsnew_v110_6
         )
     )
 )
@@ -49,7 +49,6 @@ val RELEASE_NOTES: List<ReleaseNote> = listOf(
 private const val PREFS = "cadence_prefs"
 private const val KEY_SEEN_VERSION = "whats_new_seen_version"
 
-/** Shows the "what's new" dialog once after the app is updated to a newer version. */
 @Composable
 fun WhatsNewGate() {
     val context = LocalContext.current
@@ -74,15 +73,15 @@ fun WhatsNewGate() {
 fun WhatsNewDialog(notes: List<ReleaseNote>, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Понятно") } },
-        title = { Text("Что нового") },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ok)) } },
+        title = { Text(stringResource(R.string.whatsnew_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 notes.forEach { note ->
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(note.title, style = MaterialTheme.typography.titleSmall)
-                        note.changes.forEach { change ->
-                            Text("•  $change", style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(note.titleRes), style = MaterialTheme.typography.titleSmall)
+                        note.changeRes.forEach { res ->
+                            Text("•  ${stringResource(res)}", style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }

@@ -1,8 +1,10 @@
 package com.application.cadence.presentation.grouplesson
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
@@ -34,7 +36,8 @@ data class GroupLessonUi(
 class GroupLessonViewModel(
     private val groupId: Long,
     studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val ctx: Context
 ) : ViewModel() {
 
     val uiState: StateFlow<GroupLessonUi?> = combine(
@@ -54,8 +57,8 @@ class GroupLessonViewModel(
         val addable = students.filter { it.id !in memberIds }.map { it.id to it.name }
         GroupLessonUi(
             dateLabel = first.date.toString(),
-            timeLabel = "${first.time} МСК",
-            durationLabel = formatDuration(first.durationMinutes),
+            timeLabel = "${first.time} ${ctx.getString(R.string.msk)}",
+            durationLabel = formatDuration(ctx, first.durationMinutes),
             participants = participants,
             addable = addable
         )
@@ -113,10 +116,11 @@ class GroupLessonViewModel(
 class GroupLessonViewModelFactory(
     private val groupId: Long,
     private val studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val ctx: Context
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GroupLessonViewModel(groupId, studentRepository, lessonRepository) as T
+        return GroupLessonViewModel(groupId, studentRepository, lessonRepository, ctx) as T
     }
 }

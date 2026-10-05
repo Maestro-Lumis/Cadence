@@ -32,9 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.application.cadence.R
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.presentation.common.AgendaLessonCard
 import com.application.cadence.presentation.common.ScreenContainer
@@ -72,7 +74,7 @@ fun TodayScreen(
                     val onToday = day.week.any { it.isSelected && it.isToday }
                     if (!onToday) {
                         Text(
-                            "Сегодня",
+                            stringResource(R.string.today_jump),
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .clickable { viewModel.goToToday() }
@@ -102,7 +104,7 @@ fun TodayScreen(
             ) {
                 if (reviewQueue.isNotEmpty()) {
                     item(key = "review-header") {
-                        Text("Требует внимания", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.today_review_header), style = MaterialTheme.typography.titleMedium)
                     }
                     items(reviewQueue, key = { "review-${it.lessonId}" }) { review ->
                         ReviewCard(
@@ -129,7 +131,7 @@ fun TodayScreen(
 
                 if (day.lessons.isEmpty()) {
                     item(key = "empty") {
-                        Text("В этот день занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.today_no_lessons), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     items(day.lessons, key = { it.groupId ?: it.lessonId }) { lesson ->
@@ -261,7 +263,7 @@ private fun ReviewCard(
             .padding(14.dp)
     ) {
         Text(
-            if (isGroup) "Как прошло групповое занятие?" else "Что с этим уроком?",
+            if (isGroup) stringResource(R.string.today_group_question) else stringResource(R.string.today_lesson_question),
             style = MaterialTheme.typography.bodyMedium
         )
         Text(
@@ -272,18 +274,18 @@ private fun ReviewCard(
         Spacer(Modifier.height(12.dp))
 
         if (isGroup) {
-            ActionChip("Провести всем", Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onGroupHeld)
+            ActionChip(stringResource(R.string.today_held_all), Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onGroupHeld)
             Spacer(Modifier.height(6.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ActionChip(
-                    "Отменить всем",
+                    stringResource(R.string.today_cancel_all),
                     MaterialTheme.colorScheme.onSurfaceVariant,
                     MaterialTheme.colorScheme.surface,
                     Modifier.weight(1f),
                     onGroupCancelled
                 )
                 ActionChip(
-                    "Отметить по одному →",
+                    stringResource(R.string.today_mark_each),
                     MaterialTheme.colorScheme.primary,
                     MaterialTheme.colorScheme.surface,
                     Modifier.weight(1f),
@@ -291,20 +293,20 @@ private fun ReviewCard(
                 )
             }
         } else {
-            ActionChip("Проведён и оплачен", Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onHeldPaid)
+            ActionChip(stringResource(R.string.today_held_paid), Color(0xFF2E7D32), Color(0xFFE6F3E9), Modifier.fillMaxWidth(), onHeldPaid)
             Spacer(Modifier.height(6.dp))
-            ActionChip("Проведён, не оплачен", Color(0xFF995A1D), Color(0xFFFAEEDA), Modifier.fillMaxWidth(), onHeldUnpaid)
+            ActionChip(stringResource(R.string.today_held_unpaid), Color(0xFF995A1D), Color(0xFFFAEEDA), Modifier.fillMaxWidth(), onHeldUnpaid)
             Spacer(Modifier.height(6.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ActionChip(
-                    "Отменён",
+                    stringResource(R.string.status_cancelled),
                     MaterialTheme.colorScheme.onSurfaceVariant,
                     MaterialTheme.colorScheme.surface,
                     Modifier.weight(1f),
                     onCancelled
                 )
                 ActionChip(
-                    "Перенесён",
+                    stringResource(R.string.status_rescheduled),
                     MaterialTheme.colorScheme.onSurfaceVariant,
                     MaterialTheme.colorScheme.surface,
                     Modifier.weight(1f),

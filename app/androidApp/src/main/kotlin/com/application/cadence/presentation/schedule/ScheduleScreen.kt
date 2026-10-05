@@ -35,7 +35,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.Schedule
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.ScreenContainer
@@ -49,6 +52,7 @@ fun ScheduleScreen(
     studentName: String,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val slots by viewModel.slots.collectAsState()
 
     var selectedDay by remember { mutableStateOf(Weekday.MON) }
@@ -71,7 +75,7 @@ fun ScheduleScreen(
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) { Text("Отмена") }
+                TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
             },
             text = { TimePicker(state = timePickerState) }
         )
@@ -85,13 +89,13 @@ fun ScheduleScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Расписание", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.schedule_title), style = MaterialTheme.typography.titleLarge)
             Text(
                 studentName,
                 style = MaterialTheme.typography.bodyMedium,
@@ -100,7 +104,7 @@ fun ScheduleScreen(
             Spacer(Modifier.height(16.dp))
 
             if (slots.isEmpty()) {
-                Text("Слотов пока нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.schedule_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 Column {
                     slots.forEach { slot ->
@@ -111,7 +115,7 @@ fun ScheduleScreen(
             }
             Spacer(Modifier.height(16.dp))
 
-            Text("Добавить слот", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.schedule_add_slot), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(8.dp))
 
             ExposedDropdownMenuBox(
@@ -119,10 +123,10 @@ fun ScheduleScreen(
                 onExpandedChange = { dayMenuExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = weekdayLabel(selectedDay),
+                    value = weekdayLabel(LocalContext.current, selectedDay),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("День недели") },
+                    label = { Text(stringResource(R.string.schedule_day_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayMenuExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
@@ -132,7 +136,7 @@ fun ScheduleScreen(
                 ) {
                     Weekday.entries.forEach { day ->
                         DropdownMenuItem(
-                            text = { Text(weekdayLabel(day)) },
+                            text = { Text(weekdayLabel(LocalContext.current, day)) },
                             onClick = {
                                 selectedDay = day
                                 dayMenuExpanded = false
@@ -149,7 +153,7 @@ fun ScheduleScreen(
                         value = timeText,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Время (МСК)") },
+                        label = { Text(stringResource(R.string.schedule_time_label)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(
@@ -162,7 +166,7 @@ fun ScheduleScreen(
                 OutlinedTextField(
                     value = durationText,
                     onValueChange = { durationText = it.filter { ch -> ch.isDigit() } },
-                    label = { Text("Мин") },
+                    label = { Text(stringResource(R.string.schedule_min_label)) },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -178,8 +182,8 @@ fun ScheduleScreen(
                     val duration = durationText.toIntOrNull()
                     val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
                     error = when {
-                        !timeValid -> "Неверное время"
-                        duration == null || duration <= 0 -> "Длительность больше 0"
+                        !timeValid -> context.getString(R.string.schedule_bad_time)
+                        duration == null || duration <= 0 -> context.getString(R.string.schedule_bad_duration)
                         else -> null
                     }
                     if (error == null && duration != null) {
@@ -189,7 +193,7 @@ fun ScheduleScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Добавить слот")
+                Text(stringResource(R.string.schedule_add_slot))
             }
             Spacer(Modifier.height(20.dp))
 
@@ -197,16 +201,16 @@ fun ScheduleScreen(
                 onClick = {
                     viewModel.generate { result ->
                         resultText = if (result.created == 0 && result.skipped == 0) {
-                            "Нет слотов для генерации"
+                            context.getString(R.string.schedule_no_slots)
                         } else {
-                            "Создано ${result.created}, Создано ранее  ${result.skipped}"
+                            context.getString(R.string.schedule_result, result.created, result.skipped)
                         }
                     }
                 },
                 enabled = slots.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Заполнить занятия на 4 недели")
+                Text(stringResource(R.string.schedule_generate))
             }
             resultText?.let {
                 Spacer(Modifier.height(8.dp))
@@ -218,6 +222,7 @@ fun ScheduleScreen(
 
 @Composable
 private fun SlotRow(slot: Schedule, onDelete: () -> Unit) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -227,9 +232,9 @@ private fun SlotRow(slot: Schedule, onDelete: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(weekdayLabel(slot.dayOfWeek), style = MaterialTheme.typography.bodyMedium)
+            Text(weekdayLabel(context, slot.dayOfWeek), style = MaterialTheme.typography.bodyMedium)
             Text(
-                "${slot.time} МСК · ${formatDuration(slot.durationMinutes)}",
+                stringResource(R.string.schedule_slot_msk, slot.time, formatDuration(context, slot.durationMinutes)),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

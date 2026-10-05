@@ -1,5 +1,6 @@
 package com.application.cadence.presentation.earnings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,7 @@ data class EarningsUi(
 )
 
 class EarningsViewModel(
+    private val ctx: Context,
     studentRepository: StudentRepository,
     lessonRepository: LessonRepository
 ) : ViewModel() {
@@ -102,18 +104,19 @@ class EarningsViewModel(
     )
 
     private fun periodLabel(from: LocalDate, to: LocalDate): String {
-        val fromStr = "${from.dayOfMonth} ${monthGenitive(from.monthNumber)}"
-        val toStr = "${to.dayOfMonth} ${monthGenitive(to.monthNumber)} ${to.year}"
+        val fromStr = "${from.dayOfMonth} ${monthGenitive(ctx, from.monthNumber)}"
+        val toStr = "${to.dayOfMonth} ${monthGenitive(ctx, to.monthNumber)} ${to.year}"
         return "$fromStr – $toStr"
     }
 }
 
 class EarningsViewModelFactory(
+    private val ctx: Context,
     private val studentRepository: StudentRepository,
     private val lessonRepository: LessonRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return EarningsViewModel(studentRepository, lessonRepository) as T
+        return EarningsViewModel(ctx, studentRepository, lessonRepository) as T
     }
 }

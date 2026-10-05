@@ -29,11 +29,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.application.cadence.R
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.AgendaLessonCard
 import com.application.cadence.presentation.common.ScreenContainer
@@ -47,6 +50,7 @@ fun CalendarScreen(
     onGroupClick: (Long) -> Unit,
     onAddLessonClick: (LocalDate) -> Unit
 ) {
+    val ctx = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
     var listMode by rememberSaveable { mutableStateOf(false) }
@@ -77,8 +81,8 @@ fun CalendarScreen(
                 Spacer(Modifier.height(12.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    ModeChip("Месяц", !listMode, Modifier.weight(1f)) { listMode = false }
-                    ModeChip("Список", listMode, Modifier.weight(1f)) { listMode = true }
+                    ModeChip(stringResource(R.string.cal_mode_month), !listMode, Modifier.weight(1f)) { listMode = false }
+                    ModeChip(stringResource(R.string.cal_mode_list), listMode, Modifier.weight(1f)) { listMode = true }
                 }
                 Spacer(Modifier.height(12.dp))
 
@@ -86,7 +90,7 @@ fun CalendarScreen(
                     Row(modifier = Modifier.fillMaxWidth()) {
                         (0..6).forEach { i ->
                             Text(
-                                weekdayShort(Weekday.entries[i]),
+                                weekdayShort(ctx, Weekday.entries[i]),
                                 modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -113,7 +117,7 @@ fun CalendarScreen(
                     Spacer(Modifier.height(8.dp))
 
                     if (state.lessons.isEmpty()) {
-                        Text("В этот день занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.cal_no_lessons_day), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     } else {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -126,7 +130,7 @@ fun CalendarScreen(
                     }
                 } else {
                     if (state.agenda.isEmpty()) {
-                        Text("В этом месяце занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.cal_no_lessons_month), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     } else {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.application.cadence.CadenceApplication
+import com.application.cadence.R
 import com.application.cadence.presentation.addlesson.AddLessonScreen
 import com.application.cadence.presentation.addlesson.AddLessonViewModelFactory
 import com.application.cadence.presentation.addstudent.AddStudentScreen
@@ -78,25 +80,25 @@ fun AppNavHost(app: CadenceApplication) {
                         selected = onRoute("TodayRoute"),
                         onClick = { switchTab(TodayRoute) },
                         icon = { Text("🏠", fontSize = 18.sp) },
-                        label = { Text("Главная") }
+                        label = { Text(stringResource(R.string.nav_home)) }
                     )
                     NavigationBarItem(
                         selected = onRoute("CalendarRoute"),
                         onClick = { switchTab(CalendarRoute) },
                         icon = { Text("📅", fontSize = 18.sp) },
-                        label = { Text("Календарь") }
+                        label = { Text(stringResource(R.string.nav_calendar)) }
                     )
                     NavigationBarItem(
                         selected = onRoute("StudentsRoute"),
                         onClick = { switchTab(StudentsRoute) },
                         icon = { Text("👥", fontSize = 18.sp) },
-                        label = { Text("Ученики") }
+                        label = { Text(stringResource(R.string.nav_students)) }
                     )
                     NavigationBarItem(
                         selected = onRoute("ProfileRoute"),
                         onClick = { switchTab(ProfileRoute) },
                         icon = { Text("👤", fontSize = 18.sp) },
-                        label = { Text("Профиль") }
+                        label = { Text(stringResource(R.string.nav_profile)) }
                     )
                 }
             }
@@ -108,7 +110,7 @@ fun AppNavHost(app: CadenceApplication) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<TodayRoute> {
-                val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository)
+                val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository, app)
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
@@ -117,7 +119,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<CalendarRoute> {
-                val factory = CalendarViewModelFactory(app.lessonRepository, app.studentRepository)
+                val factory = CalendarViewModelFactory(app.lessonRepository, app.studentRepository, app)
                 CalendarScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
@@ -126,7 +128,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<StudentsRoute> {
-                val factory = StudentsViewModelFactory(app.studentRepository, app.lessonRepository)
+                val factory = StudentsViewModelFactory(app, app.studentRepository, app.lessonRepository)
                 StudentsScreen(
                     viewModel = viewModel(factory = factory),
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
@@ -134,7 +136,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<ProfileRoute> {
-                val factory = ProfileViewModelFactory(app.studentRepository, app.lessonRepository)
+                val factory = ProfileViewModelFactory(app, app.studentRepository, app.lessonRepository)
                 ProfileScreen(
                     viewModel = viewModel(factory = factory),
                     onDebts = { navController.navigate(DebtsRoute) },
@@ -155,7 +157,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<EarningsRoute> {
-                val factory = EarningsViewModelFactory(app.studentRepository, app.lessonRepository)
+                val factory = EarningsViewModelFactory(app, app.studentRepository, app.lessonRepository)
                 EarningsScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
@@ -183,7 +185,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<EditStudentRoute> { backStackEntry ->
                 val route: EditStudentRoute = backStackEntry.toRoute()
-                val factory = EditStudentViewModelFactory(route.studentId, app.studentRepository)
+                val factory = EditStudentViewModelFactory(route.studentId, app, app.studentRepository)
                 EditStudentScreen(
                     viewModel = viewModel(factory = factory),
                     onSaved = { navController.popBackStack() },
@@ -201,7 +203,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<ReportRoute> { backStackEntry ->
                 val route: ReportRoute = backStackEntry.toRoute()
-                val factory = ReportViewModelFactory(route.studentId, app.studentRepository, app.lessonRepository)
+                val factory = ReportViewModelFactory(app, route.studentId, app.studentRepository, app.lessonRepository)
                 ReportScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() }
@@ -209,7 +211,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<GroupLessonRoute> { backStackEntry ->
                 val route: GroupLessonRoute = backStackEntry.toRoute()
-                val factory = GroupLessonViewModelFactory(route.groupId, app.studentRepository, app.lessonRepository)
+                val factory = GroupLessonViewModelFactory(route.groupId, app.studentRepository, app.lessonRepository, app)
                 GroupLessonScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
@@ -218,7 +220,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<EditLessonRoute> { backStackEntry ->
                 val route: EditLessonRoute = backStackEntry.toRoute()
-                val factory = EditLessonViewModelFactory(route.lessonId, app.lessonRepository, app.studentRepository)
+                val factory = EditLessonViewModelFactory(route.lessonId, app.lessonRepository, app.studentRepository, app)
                 EditLessonScreen(
                     viewModel = viewModel(factory = factory),
                     onSaved = { navController.popBackStack() },
@@ -227,7 +229,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<AddStudentRoute> {
-                val factory = AddStudentViewModelFactory(app.studentRepository)
+                val factory = AddStudentViewModelFactory(app, app.studentRepository)
                 AddStudentScreen(
                     viewModel = viewModel(factory = factory),
                     onSaved = { navController.popBackStack() },
@@ -236,7 +238,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<AddLessonRoute> { backStackEntry ->
                 val route: AddLessonRoute = backStackEntry.toRoute()
-                val factory = AddLessonViewModelFactory(app.lessonRepository, app.studentRepository)
+                val factory = AddLessonViewModelFactory(app, app.lessonRepository, app.studentRepository)
                 AddLessonScreen(
                     viewModel = viewModel(factory = factory),
                     onSaved = { navController.popBackStack() },

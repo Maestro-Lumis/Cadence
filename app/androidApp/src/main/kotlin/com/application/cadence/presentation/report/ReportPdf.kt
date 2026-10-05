@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import com.application.cadence.R
 import java.io.File
 import java.io.FileOutputStream
 
@@ -36,7 +37,7 @@ private fun buildReportPdf(context: Context, report: ReportUi): File {
     paint.color = Color.BLACK
     paint.textSize = 13f
     paint.isFakeBoldText = true
-    canvas.drawText("Проведённые занятия", margin, y, paint)
+    canvas.drawText(context.getString(R.string.report_pdf_title), margin, y, paint)
     paint.isFakeBoldText = false
 
     y += 22f
@@ -48,7 +49,7 @@ private fun buildReportPdf(context: Context, report: ReportUi): File {
 
     if (report.rows.isEmpty()) {
         paint.color = Color.DKGRAY
-        canvas.drawText("Занятий за период нет", margin, y, paint)
+        canvas.drawText(context.getString(R.string.report_pdf_empty), margin, y, paint)
         paint.color = Color.BLACK
         y += 20f
     }
@@ -56,7 +57,7 @@ private fun buildReportPdf(context: Context, report: ReportUi): File {
     y += 16f
     paint.textSize = 14f
     paint.isFakeBoldText = true
-    canvas.drawText("Занятий: ${report.totalCount} · Всего: ${report.totalLabel}", margin, y, paint)
+    canvas.drawText(context.getString(R.string.report_pdf_total, report.totalCount, report.totalLabel), margin, y, paint)
 
     document.finishPage(page)
 
@@ -77,7 +78,7 @@ fun shareReportPdf(context: Context, report: ReportUi) {
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(intent, "Отчёт"))
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.report_share_chooser)))
 }
 
 fun openReportPdf(context: Context, report: ReportUi) {
@@ -89,6 +90,6 @@ fun openReportPdf(context: Context, report: ReportUi) {
     try {
         context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-        Toast.makeText(context, "Нет приложения для просмотра PDF", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.report_no_pdf_viewer), Toast.LENGTH_SHORT).show()
     }
 }

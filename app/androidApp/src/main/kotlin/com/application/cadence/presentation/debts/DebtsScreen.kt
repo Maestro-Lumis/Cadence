@@ -26,7 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.ScreenContainer
 
 @Composable
@@ -41,16 +44,16 @@ fun DebtsScreen(
     payConfirm?.let { debt ->
         AlertDialog(
             onDismissRequest = { payConfirm = null },
-            title = { Text("Отметить оплаченными?") },
-            text = { Text("${debt.unpaidCount} ${lessonWord(debt.unpaidCount)} у ${debt.name} станут оплаченными.") },
+            title = { Text(stringResource(R.string.debts_confirm_title)) },
+            text = { Text(stringResource(R.string.debts_confirm_body, debt.unpaidCount, pluralStringResource(R.plurals.lessons_count, debt.unpaidCount))) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPaid(debt.studentId)
                     payConfirm = null
-                }) { Text("Оплачено", color = Color(0xFF2E7D32)) }
+                }) { Text(stringResource(R.string.paid_label), color = Color(0xFF2E7D32)) }
             },
             dismissButton = {
-                TextButton(onClick = { payConfirm = null }) { Text("Отмена") }
+                TextButton(onClick = { payConfirm = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -63,17 +66,17 @@ fun DebtsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Долги", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.debts_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             if (debts.isEmpty()) {
-                Text("Долгов нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.debts_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(debts, key = { it.studentId }) { debt ->
@@ -102,13 +105,13 @@ private fun DebtRow(debt: DebtRowUi, onOpen: () -> Unit, onPay: () -> Unit) {
         Column(modifier = Modifier.clickable { onOpen() }) {
             Text(debt.name, style = MaterialTheme.typography.bodyMedium)
             Text(
-                "${debt.unpaidCount} ${lessonWord(debt.unpaidCount)} · с ${debt.oldestDate}",
+                "${debt.unpaidCount} ${pluralStringResource(R.plurals.lessons_count, debt.unpaidCount)} · с ${debt.oldestDate}",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color(0xFF995A1D)
             )
         }
         Text(
-            "Оплачено",
+            stringResource(R.string.paid_label),
             modifier = Modifier
                 .background(Color(0xFFE6F3E9), RoundedCornerShape(8.dp))
                 .clickable { onPay() }
@@ -116,15 +119,5 @@ private fun DebtRow(debt: DebtRowUi, onOpen: () -> Unit, onPay: () -> Unit) {
             style = MaterialTheme.typography.labelLarge,
             color = Color(0xFF2E7D32)
         )
-    }
-}
-
-private fun lessonWord(n: Int): String {
-    val mod10 = n % 10
-    val mod100 = n % 100
-    return when {
-        mod10 == 1 && mod100 != 11 -> "урок"
-        mod10 in 2..4 && mod100 !in 12..14 -> "урока"
-        else -> "уроков"
     }
 }

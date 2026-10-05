@@ -12,7 +12,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 
 val DURATION_PRESETS = listOf(30, 45, 60, 90, 120)
 
@@ -27,7 +29,7 @@ fun DurationPicker(
     minutes: Int,
     onMinutesChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Длительность (мин)"
+    label: String = stringResource(R.string.duration_label)
 ) {
     Column(modifier = modifier) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -1,8 +1,10 @@
 package com.application.cadence.presentation.addlesson
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
@@ -25,6 +27,7 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Duration.Companion.minutes
 
 class AddLessonViewModel(
+    private val ctx: Context,
     private val lessonRepository: LessonRepository,
     studentRepository: StudentRepository
 ) : ViewModel() {
@@ -46,12 +49,12 @@ class AddLessonViewModel(
             val studentList = students.value
             val student = studentList.find { it.id == studentId }
             if (student == null) {
-                onError("Ученик не найден")
+                onError(ctx.getString(R.string.lesson_err_student_missing))
                 return@launch
             }
             val lessonTime = runCatching { LocalTime.parse(time) }.getOrNull()
             if (lessonTime == null) {
-                onError("Неверный формат времени")
+                onError(ctx.getString(R.string.lesson_err_time_format))
                 return@launch
             }
             val newStart = LocalDateTime(date, lessonTime).toInstant(MSK)
@@ -65,7 +68,7 @@ class AddLessonViewModel(
                 val overlap = findOverlappingLesson(newStart, newEnd, nearby)
                 if (overlap != null) {
                     val ovStudent = studentList.find { it.id == overlap.studentId }
-                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК")
+                    onError(ctx.getString(R.string.lesson_err_overlap, "${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК"))
                     return@launch
                 }
             }
@@ -98,12 +101,12 @@ class AddLessonViewModel(
     ) {
         viewModelScope.launch {
             if (studentIds.size < 2) {
-                onError("Выберите хотя бы двух учеников")
+                onError(ctx.getString(R.string.lesson_err_min_group))
                 return@launch
             }
             val lessonTime = runCatching { LocalTime.parse(time) }.getOrNull()
             if (lessonTime == null) {
-                onError("Неверный формат времени")
+                onError(ctx.getString(R.string.lesson_err_time_format))
                 return@launch
             }
             val newStart = LocalDateTime(date, lessonTime).toInstant(MSK)
@@ -117,7 +120,7 @@ class AddLessonViewModel(
                 val overlap = findOverlappingLesson(newStart, newEnd, nearby)
                 if (overlap != null) {
                     val ovStudent = students.value.find { it.id == overlap.studentId }
-                    onError("Пересечение с занятием: ${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК")
+                    onError(ctx.getString(R.string.lesson_err_overlap, "${ovStudent?.name ?: "?"} ${overlap.date} ${overlap.time} МСК"))
                     return@launch
                 }
             }
@@ -145,11 +148,12 @@ class AddLessonViewModel(
 }
 
 class AddLessonViewModelFactory(
+    private val ctx: Context,
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AddLessonViewModel(lessonRepository, studentRepository) as T
+        return AddLessonViewModel(ctx, lessonRepository, studentRepository) as T
     }
 }

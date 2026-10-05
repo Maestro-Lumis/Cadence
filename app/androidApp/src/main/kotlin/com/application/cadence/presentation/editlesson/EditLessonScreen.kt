@@ -39,12 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.ScreenContainer
+import com.application.cadence.presentation.common.statusLabel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -72,12 +76,12 @@ fun EditLessonScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    "← Назад",
+                    stringResource(R.string.back),
                     modifier = Modifier.clickable { onBack() },
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.height(12.dp))
-                Text("Загрузка...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         return
@@ -95,6 +99,7 @@ private fun EditLessonForm(
     onDeleted: () -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var selectedStudent by remember { mutableStateOf<Student?>(null) }
     var studentMenuExpanded by remember { mutableStateOf(false) }
 
@@ -140,7 +145,7 @@ private fun EditLessonForm(
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -157,7 +162,7 @@ private fun EditLessonForm(
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) { Text("Отмена") }
+                TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
             },
             text = { TimePicker(state = timePickerState) }
         )
@@ -166,15 +171,15 @@ private fun EditLessonForm(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Удалить занятие?") },
+            title = { Text(stringResource(R.string.lesson_delete_title)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     viewModel.delete(onDeleted)
-                }) { Text("Удалить", color = Color(0xFFB71C1C)) }
+                }) { Text(stringResource(R.string.delete), color = Color(0xFFB71C1C)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Отмена") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -187,13 +192,13 @@ private fun EditLessonForm(
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Редактировать занятие", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.lesson_edit_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
@@ -204,7 +209,7 @@ private fun EditLessonForm(
                     value = selectedStudent?.name ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Ученик") },
+                    label = { Text(stringResource(R.string.lesson_student_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentMenuExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
@@ -231,7 +236,7 @@ private fun EditLessonForm(
                         value = dateText,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Дата (МСК)") },
+                        label = { Text(stringResource(R.string.lesson_date_label)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(
@@ -246,7 +251,7 @@ private fun EditLessonForm(
                         value = timeText,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Время (МСК)") },
+                        label = { Text(stringResource(R.string.lesson_time_label)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(
@@ -270,10 +275,10 @@ private fun EditLessonForm(
                 onExpandedChange = { statusMenuExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = status.label(),
+                    value = statusLabel(context, status),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Статус") },
+                    label = { Text(stringResource(R.string.lesson_status_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusMenuExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
@@ -283,7 +288,7 @@ private fun EditLessonForm(
                 ) {
                     LessonStatus.entries.forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option.label()) },
+                            text = { Text(statusLabel(context, option)) },
                             onClick = {
                                 status = option
                                 statusMenuExpanded = false
@@ -296,7 +301,7 @@ private fun EditLessonForm(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = paid, onCheckedChange = { paid = it })
-                Text("Оплачено")
+                Text(stringResource(R.string.lesson_paid_label))
             }
             Spacer(Modifier.height(8.dp))
 
@@ -312,10 +317,10 @@ private fun EditLessonForm(
                     val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
 
                     error = when {
-                        student == null -> "Выбери ученика"
-                        parsedDate == null -> "Неверная дата"
-                        !timeValid -> "Неверное время, формат ЧЧ:MM"
-                        durationMinutes <= 0 -> "Длительность в минутах, больше 0"
+                        student == null -> context.getString(R.string.lesson_err_pick_student)
+                        parsedDate == null -> context.getString(R.string.lesson_err_bad_date)
+                        !timeValid -> context.getString(R.string.lesson_err_bad_time)
+                        durationMinutes <= 0 -> context.getString(R.string.lesson_err_bad_duration)
                         else -> null
                     }
 
@@ -334,7 +339,7 @@ private fun EditLessonForm(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Сохранить")
+                Text(stringResource(R.string.save))
             }
             Spacer(Modifier.height(8.dp))
 
@@ -343,15 +348,8 @@ private fun EditLessonForm(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB71C1C)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Удалить занятие")
+                Text(stringResource(R.string.lesson_delete_body))
             }
         }
     }
-}
-
-private fun LessonStatus.label(): String = when (this) {
-    LessonStatus.HELD -> "Проведён"
-    LessonStatus.CANCELLED -> "Отменён"
-    LessonStatus.SCHEDULED -> "Запланирован"
-    LessonStatus.RESCHEDULED -> "Перенесён"
 }

@@ -1,5 +1,6 @@
 package com.application.cadence.presentation.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ data class ProfileUi(
 )
 
 class ProfileViewModel(
+    private val ctx: Context,
     studentRepository: StudentRepository,
     lessonRepository: LessonRepository
 ) : ViewModel() {
@@ -51,18 +53,19 @@ class ProfileViewModel(
             studentCount = students.size,
             debtTotal = debtTotal,
             debtorCount = debtorCount,
-            earningsMonthLabel = monthNominative(mskToday.monthNumber),
+            earningsMonthLabel = monthNominative(ctx, mskToday.monthNumber),
             earningsMonthTotal = earned
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProfileUi(0, 0, 0, "", 0))
 }
 
 class ProfileViewModelFactory(
+    private val ctx: Context,
     private val studentRepository: StudentRepository,
     private val lessonRepository: LessonRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ProfileViewModel(studentRepository, lessonRepository) as T
+        return ProfileViewModel(ctx, studentRepository, lessonRepository) as T
     }
 }

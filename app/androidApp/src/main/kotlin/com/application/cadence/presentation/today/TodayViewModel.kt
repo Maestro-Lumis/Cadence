@@ -1,7 +1,9 @@
 package com.application.cadence.presentation.today
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
@@ -11,6 +13,7 @@ import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.AgendaCardUi
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.buildLessonCards
+import com.application.cadence.presentation.common.dateFull
 import com.application.cadence.presentation.common.lessonCountByDate
 import com.application.cadence.presentation.common.numberLessons
 import com.application.cadence.presentation.common.peopleWord
@@ -75,7 +78,8 @@ private data class EnrichedLesson(
 
 class TodayViewModel(
     private val lessonRepository: LessonRepository,
-    private val studentRepository: StudentRepository
+    private val studentRepository: StudentRepository,
+    private val ctx: Context
 ) : ViewModel() {
 
     private val tutorTz = TimeZone.currentSystemDefault()
@@ -107,7 +111,7 @@ class TodayViewModel(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        DayUi(monthNominative(today.monthNumber), emptyList(), "", emptyList())
+        DayUi(monthNominative(ctx, today.monthNumber), emptyList(), "", emptyList())
     )
 
     val reviewQueue: StateFlow<List<ReviewLessonUi>> = combine(
@@ -155,14 +159,14 @@ class TodayViewModel(
         val selectedDayLessons = enriched
             .filter { it.date == selected && !it.inReview }
             .map { it.lesson }
-        val selectedLessons = buildLessonCards(selectedDayLessons, byId, tutorTz, numberByLessonId)
+        val selectedLessons = buildLessonCards(ctx, selectedDayLessons, byId, tutorTz, numberByLessonId)
 
         val week = (0..6).map { offset ->
             val date = weekStart.plus(offset, DateTimeUnit.DAY)
             val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
             WeekDayUi(
                 date = date,
-                shortLabel = weekdayShort(weekday),
+                shortLabel = weekdayShort(ctx, weekday),
                 dayNumber = date.dayOfMonth,
                 lessonCount = countByDate[date] ?: 0,
                 isSelected = date == selected,
@@ -172,9 +176,9 @@ class TodayViewModel(
 
         val selectedWeekday = Weekday.entries[selected.dayOfWeek.isoDayNumber - 1]
         val selectedLabel =
-            "${weekdayLabel(selectedWeekday)}, ${selected.dayOfMonth} ${monthGenitive(selected.monthNumber)}"
+            dateFull(ctx, weekdayLabel(ctx, selectedWeekday), selected.dayOfMonth, monthGenitive(ctx, selected.monthNumber))
 
-        return DayUi(monthNominative(selected.monthNumber), week, selectedLabel, selectedLessons)
+        return DayUi(monthNominative(ctx, selected.monthNumber), week, selectedLabel, selectedLessons)
     }
 
     private fun buildReviewQueue(lessons: List<Lesson>, students: List<Student>): List<ReviewLessonUi> {
@@ -198,8 +202,8 @@ class TodayViewModel(
         val first = rows.first()
         val startLocal = first.start.toLocalDateTime(tutorTz)
         val dayWord = when (startLocal.date) {
-            today -> "Сегодня"
-            today.minus(1, DateTimeUnit.DAY) -> "Вчера"
+            today -> ctx.getString(R.string.today_word)
+            today.minus(1, DateTimeUnit.DAY) -> ctx.getString(R.string.yesterday_word)
             else -> startLocal.date.toString()
         }
         val timeStr = "%02d:%02d".format(startLocal.hour, startLocal.minute)
@@ -207,7 +211,7 @@ class TodayViewModel(
         return ReviewLessonUi(
             lessonId = first.lesson.id,
             studentName = if (isGroup) rows.joinToString(", ") { it.student.name } else first.student.name,
-            course = if (isGroup) "Группа · ${rows.size} ${peopleWord(rows.size)}" else first.student.course,
+            course = if (isGroup) ctx.getString(R.string.group_label, rows.size, peopleWord(ctx, rows.size)) else first.student.course,
             whenLabel = "$dayWord, $timeStr",
             groupId = if (isGroup) first.lesson.groupId else null,
             lessonIds = rows.map { it.lesson.id }

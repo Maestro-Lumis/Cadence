@@ -24,20 +24,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.DurationPicker
 import com.application.cadence.presentation.common.ScreenContainer
-import com.application.cadence.presentation.common.TIMEZONE_PRESETS
 import com.application.cadence.presentation.common.timezoneLabel
+import com.application.cadence.presentation.common.timezonePresets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBack: () -> Unit) {
+    val context = LocalContext.current
+    val presets = remember(context) { timezonePresets(context) }
     val student by viewModel.student.collectAsState()
 
     var name by remember { mutableStateOf("") }
     var course by remember { mutableStateOf("") }
-    var timezone by remember { mutableStateOf(TIMEZONE_PRESETS.first().first) }
+    var timezone by remember { mutableStateOf(presets.first().first) }
     var timezoneMenuExpanded by remember { mutableStateOf(false) }
     var rateText by remember { mutableStateOf("") }
     var durationMinutes by remember { mutableStateOf(60) }
@@ -62,16 +67,16 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Text("← Назад", modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.back), modifier = Modifier.clickable { onBack() }, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
 
-            Text("Изменить ученика", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.student_edit_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Имя") },
+                label = { Text(stringResource(R.string.student_name_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -79,7 +84,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
             OutlinedTextField(
                 value = course,
                 onValueChange = { course = it },
-                label = { Text("Курс") },
+                label = { Text(stringResource(R.string.student_course_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -89,10 +94,10 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                 onExpandedChange = { timezoneMenuExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = timezoneLabel(timezone),
+                    value = timezoneLabel(context, timezone),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Часовой пояс") },
+                    label = { Text(stringResource(R.string.student_tz_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = timezoneMenuExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
@@ -100,7 +105,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                     expanded = timezoneMenuExpanded,
                     onDismissRequest = { timezoneMenuExpanded = false }
                 ) {
-                    TIMEZONE_PRESETS.forEach { (id, label) ->
+                    presets.forEach { (id, label) ->
                         DropdownMenuItem(
                             text = { Text(label) },
                             onClick = {
@@ -116,12 +121,12 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
             OutlinedTextField(
                 value = rateText,
                 onValueChange = { rateText = it.filter { ch -> ch.isDigit() } },
-                label = { Text("Ставка ₽/час") },
+                label = { Text(stringResource(R.string.student_rate_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
 
-            Text("Обычная длительность", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(R.string.lesson_usual_duration), style = MaterialTheme.typography.labelLarge)
             Spacer(Modifier.height(4.dp))
             DurationPicker(
                 minutes = durationMinutes,
@@ -136,7 +141,7 @@ fun EditStudentScreen(viewModel: EditStudentViewModel, onSaved: () -> Unit, onBa
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Сохранить")
+                Text(stringResource(R.string.save))
             }
         }
     }

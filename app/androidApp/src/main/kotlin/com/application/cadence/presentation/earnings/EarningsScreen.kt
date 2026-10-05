@@ -32,7 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.MonthPeriodSelector
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.datetime.TimeZone
@@ -70,7 +72,7 @@ fun EarningsScreen(
                     picker = null
                 }) { Text("OK") }
             },
-            dismissButton = { TextButton(onClick = { picker = null }) { Text("Отмена") } }
+            dismissButton = { TextButton(onClick = { picker = null }) { Text(stringResource(R.string.cancel)) } }
         ) {
             DatePicker(state = pickerState)
         }
@@ -84,13 +86,13 @@ fun EarningsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "← Назад",
+                stringResource(R.string.back),
                 modifier = Modifier.clickable { onBack() },
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
 
-            Text("Заработок", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.earnings_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             MonthPeriodSelector(
@@ -101,21 +103,21 @@ fun EarningsScreen(
             Spacer(Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                PeriodField("С", from.toString(), Modifier.weight(1f)) { picker = "from" }
+                PeriodField(stringResource(R.string.period_from), from.toString(), Modifier.weight(1f)) { picker = "from" }
                 Spacer(Modifier.width(8.dp))
-                PeriodField("По", to.toString(), Modifier.weight(1f)) { picker = "to" }
+                PeriodField(stringResource(R.string.period_to), to.toString(), Modifier.weight(1f)) { picker = "to" }
             }
             Spacer(Modifier.height(16.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                TotalBox("Заработано", "${state.totalEarned} ₽", Modifier.weight(1f))
-                TotalBox("Оплачено", "${state.totalPaid} ₽", Modifier.weight(1f), Color(0xFF2E7D32))
-                TotalBox("Долг", "${state.totalDebt} ₽", Modifier.weight(1f), Color(0xFF995A1D))
+                TotalBox(stringResource(R.string.earnings_earned), "${state.totalEarned} ₽", Modifier.weight(1f))
+                TotalBox(stringResource(R.string.earnings_paid), "${state.totalPaid} ₽", Modifier.weight(1f), Color(0xFF2E7D32))
+                TotalBox(stringResource(R.string.earnings_debt), "${state.totalDebt} ₽", Modifier.weight(1f), Color(0xFF995A1D))
             }
             Spacer(Modifier.height(16.dp))
 
             if (state.rows.isEmpty()) {
-                Text("За период занятий нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.earnings_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(state.rows, key = { it.studentId }) { row ->
@@ -157,7 +159,8 @@ private fun EarningsRow(row: EarningsRowUi, onClick: () -> Unit) {
         Column {
             Text(row.name, style = MaterialTheme.typography.bodyMedium)
             Text(
-                "${row.heldCount} зан. · ${row.earned} ₽" + if (row.debt > 0) " · долг ${row.debt} ₽" else "",
+                stringResource(R.string.earnings_lessons, row.heldCount) + " · ${row.earned} ₽" +
+                    if (row.debt > 0) " · " + stringResource(R.string.earnings_debt_label, row.debt) else "",
                 style = MaterialTheme.typography.labelSmall,
                 color = if (row.debt > 0) Color(0xFF995A1D) else MaterialTheme.colorScheme.onSurfaceVariant
             )

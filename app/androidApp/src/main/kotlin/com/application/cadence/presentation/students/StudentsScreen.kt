@@ -23,8 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.application.cadence.R
 import com.application.cadence.presentation.common.ScreenContainer
 import com.application.cadence.presentation.common.timezoneLabel
 
@@ -44,11 +47,11 @@ fun StudentsScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
-            Text("Ученики", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.students_title), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
 
             if (lost.isNotEmpty()) {
-                Text("Пропали", style = MaterialTheme.typography.titleSmall, color = Color(0xFF995A1D))
+                Text(stringResource(R.string.students_lost), style = MaterialTheme.typography.titleSmall, color = Color(0xFF995A1D))
                 Spacer(Modifier.height(8.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     lost.forEach { student ->
@@ -73,7 +76,7 @@ fun StudentsScreen(
             }
 
             if (students.isEmpty()) {
-                Text("Учеников пока нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.students_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -88,7 +91,7 @@ fun StudentsScreen(
             Spacer(Modifier.height(16.dp))
 
             Button(onClick = onAddStudentClick, modifier = Modifier.fillMaxWidth()) {
-                Text("Добавить ученика")
+                Text(stringResource(R.string.students_add))
             }
         }
     }
@@ -96,6 +99,7 @@ fun StudentsScreen(
 
 @Composable
 private fun StudentRow(student: StudentRowUi, onClick: () -> Unit) {
+    val ctx = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -105,7 +109,7 @@ private fun StudentRow(student: StudentRowUi, onClick: () -> Unit) {
     ) {
         Text(student.name, style = MaterialTheme.typography.bodyMedium)
         Text(
-            "${student.course} · ${timezoneLabel(student.timezone)}",
+            "${student.course} · ${timezoneLabel(ctx, student.timezone)}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
