@@ -1,6 +1,6 @@
 package com.application.cadence.presentation.settings
 
-import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.application.cadence.MainActivity
 import com.application.cadence.R
 import com.application.cadence.presentation.common.LocaleHelper
+import kotlin.system.exitProcess
 import com.application.cadence.presentation.common.ScreenContainer
 import com.application.cadence.presentation.whatsnew.RELEASE_NOTES
 import com.application.cadence.presentation.whatsnew.WhatsNewDialog
@@ -74,7 +76,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     showLanguagePicker = false
                                     if (lang != currentLang) {
                                         LocaleHelper.setLanguage(context, lang)
-                                        (context as? Activity)?.recreate()
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        context.startActivity(intent)
+                                        exitProcess(0)
                                     }
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
