@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -43,10 +44,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("cadence-release.jks")
-            storePassword = "cadence2026"
-            keyAlias = "cadence"
-            keyPassword = "cadence2026"
+            val localProps = Properties()
+            rootProject.file("local.properties").inputStream().use(localProps::load)
+            storeFile = file(localProps.getProperty("RELEASE_STORE_FILE"))
+            storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD")
         }
     }
 
