@@ -35,9 +35,6 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui)
     implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.androidx.work.runtime)
-
 }
 
 android {
@@ -48,8 +45,8 @@ android {
         applicationId = "com.application.cadence"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "1.3.1"
+        versionCode = 6
+        versionName = "1.4.0"
     }
     packaging {
         resources {

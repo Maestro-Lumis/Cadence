@@ -88,6 +88,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v140_title">Version 1.4.0</string>
+    <string name="whatsnew_v140_1">Notifications now arrive right on time</string>
+
     <string name="whatsnew_v130_title">Version 1.3.0</string>
     <string name="whatsnew_v130_1">Language selection: Russian, English, Spanish</string>
     <string name="whatsnew_v130_2">Switch language in profile settings</string>

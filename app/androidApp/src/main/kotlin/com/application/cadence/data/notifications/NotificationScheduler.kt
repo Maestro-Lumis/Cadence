@@ -1,12 +1,12 @@
 package com.application.cadence.data.notifications
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
+import android.content.Intent
+import android.os.Build
 import com.application.cadence.R
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonStatus
@@ -14,7 +14,6 @@ import com.application.cadence.presentation.common.MSK
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toInstant
-import java.util.concurrent.TimeUnit
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -31,9 +30,6 @@ object NotificationScheduler {
     const val KIND_REMINDER = "reminder"
     const val KIND_REVIEW = "review"
 
-    private const val REMINDER_PREFIX = "lesson-reminder-"
-    private const val REVIEW_PREFIX = "lesson-review-"
-
     fun ensureChannel(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
         if (manager.getNotificationChannel(CHANNEL_ID) != null) return
@@ -48,7 +44,7 @@ object NotificationScheduler {
     }
 
     fun sync(context: Context, lessons: List<Lesson>) {
-        val wm = WorkManager.getInstance(context)
+        val am = context.getSystemService(AlarmManager::class.java) ?: return
         val now = Clock.System.now()
         val horizon = now + HORIZON_DAYS.days
         val seenGroups = mutableSetOf<Long>()
@@ -56,8 +52,8 @@ object NotificationScheduler {
         lessons.forEach { lesson ->
             val gid = lesson.groupId
             if (gid != null && !seenGroups.add(gid)) {
-                wm.cancelUniqueWork(REMINDER_PREFIX + lesson.id)
-                wm.cancelUniqueWork(REVIEW_PREFIX + lesson.id)
+                cancel(context, am, lesson.id, KIND_REMINDER)
+                cancel(context, am, lesson.id, KIND_REVIEW)
                 return@forEach
             }
             val scheduled = lesson.status == LessonStatus.SCHEDULED
@@ -65,37 +61,59 @@ object NotificationScheduler {
             val start = time?.let { LocalDateTime(lesson.date, it).toInstant(MSK) }
             val end = start?.plus(lesson.durationMinutes.minutes)
 
-            plan(
-                wm, REMINDER_PREFIX + lesson.id, KIND_REMINDER, lesson.id,
+            schedule(
+                context, am, lesson.id, KIND_REMINDER,
                 trigger = start?.minus(LEAD_MINUTES.minutes),
                 enabled = scheduled, now = now, horizon = horizon
             )
-            plan(
-                wm, REVIEW_PREFIX + lesson.id, KIND_REVIEW, lesson.id,
+            schedule(
+                context, am, lesson.id, KIND_REVIEW,
                 trigger = end,
                 enabled = scheduled, now = now, horizon = horizon
             )
         }
     }
 
-    private fun plan(
-        wm: WorkManager,
-        workName: String,
-        kind: String,
+    private fun schedule(
+        context: Context,
+        am: AlarmManager,
         lessonId: Long,
+        kind: String,
         trigger: Instant?,
         enabled: Boolean,
         now: Instant,
         horizon: Instant
     ) {
+        val pi = pendingIntent(context, lessonId, kind)
         if (!enabled || trigger == null || trigger <= now || trigger > horizon) {
-            wm.cancelUniqueWork(workName)
+            am.cancel(pi)
             return
         }
-        val request = OneTimeWorkRequestBuilder<LessonReminderWorker>()
-            .setInitialDelay((trigger - now).inWholeMilliseconds, TimeUnit.MILLISECONDS)
-            .setInputData(workDataOf(LESSON_ID_KEY to lessonId, KIND_KEY to kind))
-            .build()
-        wm.enqueueUniqueWork(workName, ExistingWorkPolicy.REPLACE, request)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+            am.cancel(pi)
+            return
+        }
+        am.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            trigger.toEpochMilliseconds(),
+            pi
+        )
+    }
+
+    private fun cancel(context: Context, am: AlarmManager, lessonId: Long, kind: String) {
+        am.cancel(pendingIntent(context, lessonId, kind))
+    }
+
+    private fun pendingIntent(context: Context, lessonId: Long, kind: String): PendingIntent {
+        val intent = Intent(context, LessonReminderReceiver::class.java).apply {
+            action = "com.application.cadence.LESSON_ALARM"
+            putExtra(LESSON_ID_KEY, lessonId)
+            putExtra(KIND_KEY, kind)
+        }
+        val requestCode = ("$kind-$lessonId").hashCode()
+        return PendingIntent.getBroadcast(
+            context, requestCode, intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 }
