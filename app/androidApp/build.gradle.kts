@@ -41,6 +41,15 @@ android {
     namespace = "com.application.cadence"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("cadence-release.jks")
+            storePassword = "cadence2026"
+            keyAlias = "cadence"
+            keyPassword = "cadence2026"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.application.cadence"
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -56,6 +65,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
