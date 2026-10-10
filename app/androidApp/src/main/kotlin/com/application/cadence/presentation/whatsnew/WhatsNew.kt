@@ -3,6 +3,9 @@ package com.application.cadence.presentation.whatsnew
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Modifier
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -64,7 +67,11 @@ fun WhatsNewGate() {
         val current = currentVersionCode(context)
         val lastSeen = prefs.getLong(KEY_SEEN_VERSION, 0L)
         if (current > lastSeen) {
-            notes = RELEASE_NOTES.filter { it.versionCode > lastSeen }.sortedByDescending { it.versionCode }
+            notes = if (lastSeen == 0L) {
+                RELEASE_NOTES.take(1)
+            } else {
+                RELEASE_NOTES.filter { it.versionCode > lastSeen }.sortedByDescending { it.versionCode }
+            }
             prefs.edit().putLong(KEY_SEEN_VERSION, current).apply()
         }
     }
@@ -81,7 +88,10 @@ fun WhatsNewDialog(notes: List<ReleaseNote>, onDismiss: () -> Unit) {
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ok)) } },
         title = { Text(stringResource(R.string.whatsnew_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 notes.forEach { note ->
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(stringResource(note.titleRes), style = MaterialTheme.typography.titleSmall)
