@@ -89,15 +89,12 @@ object NotificationScheduler {
             am.cancel(pi)
             return
         }
+        val triggerMs = trigger.toEpochMilliseconds()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-            am.cancel(pi)
-            return
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMs, pi)
+        } else {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMs, pi)
         }
-        am.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            trigger.toEpochMilliseconds(),
-            pi
-        )
     }
 
     private fun cancel(context: Context, am: AlarmManager, lessonId: Long, kind: String) {

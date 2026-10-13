@@ -88,6 +88,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v142_title">Versión 1.4.2</string>
+    <string name="whatsnew_v142_1">Notificaciones corregidas en Android 12+</string>
+
     <string name="whatsnew_v140_title">Versión 1.4.0</string>
     <string name="whatsnew_v140_1">Las notificaciones ahora llegan a tiempo</string>
 

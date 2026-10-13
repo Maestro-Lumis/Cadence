@@ -94,6 +94,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v142_title">Версия 1.4.2</string>
+    <string name="whatsnew_v142_1">Исправлены уведомления на Android 12+</string>
+
     <string name="whatsnew_v140_title">Версия 1.4.0</string>
     <string name="whatsnew_v140_1">Уведомления теперь приходят точно вовремя</string>
 
