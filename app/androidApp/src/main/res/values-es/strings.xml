@@ -88,6 +88,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v150_title">Versión 1.5.0</string>
+    <string name="whatsnew_v150_1">Creación automática de clases desde el horario para 8 meses</string>
+    <string name="whatsnew_v150_2">Eliminar un horario elimina las clases futuras</string>
+
     <string name="whatsnew_v142_title">Versión 1.4.2</string>
     <string name="whatsnew_v142_1">Notificaciones corregidas en Android 12+</string>
 
@@ -203,10 +207,14 @@
     <string name="schedule_min_label">Min</string>
     <string name="schedule_bad_time">Hora inválida</string>
     <string name="schedule_bad_duration">Duración debe ser > 0</string>
-    <string name="schedule_generate">Generar clases para 4 semanas</string>
-    <string name="schedule_no_slots">No hay horarios para generar</string>
-    <string name="schedule_result">Creadas %1$d, Ya existían %2$d</string>
     <string name="schedule_slot_msk">%1$s MSK · %2$s</string>
+    <string name="schedule_auto_result">Creadas %1$d, omitidas %2$d</string>
+    <string name="schedule_delete_title">¿Eliminar horario?</string>
+    <string name="schedule_delete_body_zero">Las clases pasadas se conservarán.</string>
+    <plurals name="schedule_delete_body">
+        <item quantity="one">%d clase programada será eliminada. Las clases pasadas se conservarán.</item>
+        <item quantity="other">%d clases programadas serán eliminadas. Las clases pasadas se conservarán.</item>
+    </plurals>
 
     <!-- Group Lesson -->
     <string name="group_title">Clase grupal</string>

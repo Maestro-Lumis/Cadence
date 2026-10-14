@@ -64,6 +64,12 @@ interface LessonDao {
     @Update suspend fun update(l: LessonEntity)
     @Delete suspend fun delete(l: LessonEntity)
     @Query("DELETE FROM lessons WHERE id = :id") suspend fun deleteById(id: Long)
+
+    @Query("SELECT COUNT(*) FROM lessons WHERE studentId = :studentId AND status = 'SCHEDULED' AND date >= :fromDate AND time = :time AND CAST(strftime('%w', date) AS INTEGER) = :sqliteDow")
+    suspend fun countScheduledBySlot(studentId: Long, fromDate: String, time: String, sqliteDow: Int): Int
+
+    @Query("DELETE FROM lessons WHERE studentId = :studentId AND status = 'SCHEDULED' AND date >= :fromDate AND time = :time AND CAST(strftime('%w', date) AS INTEGER) = :sqliteDow")
+    suspend fun deleteScheduledBySlot(studentId: Long, fromDate: String, time: String, sqliteDow: Int)
 }
 
 @Dao

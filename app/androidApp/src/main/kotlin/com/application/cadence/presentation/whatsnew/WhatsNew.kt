@@ -29,6 +29,11 @@ data class ReleaseNote(
 
 val RELEASE_NOTES: List<ReleaseNote> = listOf(
     ReleaseNote(
+        versionCode = 9,
+        titleRes = R.string.whatsnew_v150_title,
+        changeRes = listOf(R.string.whatsnew_v150_1, R.string.whatsnew_v150_2)
+    ),
+    ReleaseNote(
         versionCode = 8,
         titleRes = R.string.whatsnew_v142_title,
         changeRes = listOf(R.string.whatsnew_v142_1)

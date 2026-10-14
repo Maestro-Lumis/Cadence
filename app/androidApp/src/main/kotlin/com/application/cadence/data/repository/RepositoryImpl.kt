@@ -11,6 +11,7 @@ import com.application.cadence.core.Schedule
 import com.application.cadence.core.ScheduleRepository
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
+import com.application.cadence.core.Weekday
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDate
@@ -59,6 +60,12 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
     override suspend fun add(lesson: Lesson) = dao.insert(lesson.toEntity())
     override suspend fun update(lesson: Lesson) = dao.update(lesson.toEntity())
     override suspend fun delete(lessonId: Long) = dao.deleteById(lessonId)
+
+    override suspend fun countScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday): Int =
+        dao.countScheduledBySlot(studentId, fromDate.toString(), time, (dayOfWeek.ordinal + 1) % 7)
+
+    override suspend fun deleteScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday) =
+        dao.deleteScheduledBySlot(studentId, fromDate.toString(), time, (dayOfWeek.ordinal + 1) % 7)
 }
 
 class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository {

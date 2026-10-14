@@ -14,11 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -29,6 +28,7 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +63,9 @@ fun ScheduleScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var resultText by remember { mutableStateOf<String?>(null) }
 
+    var slotToDelete by remember { mutableStateOf<Schedule?>(null) }
+    var deleteLessonCount by remember { mutableIntStateOf(0) }
+
     val timePickerState = rememberTimePickerState(initialHour = 10, initialMinute = 0)
 
     if (showTimePicker) {
@@ -78,6 +81,30 @@ fun ScheduleScreen(
                 TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
             },
             text = { TimePicker(state = timePickerState) }
+        )
+    }
+
+    slotToDelete?.let { slot ->
+        AlertDialog(
+            onDismissRequest = { slotToDelete = null },
+            title = { Text(stringResource(R.string.schedule_delete_title)) },
+            text = {
+                Text(
+                    if (deleteLessonCount > 0)
+                        context.resources.getQuantityString(R.plurals.schedule_delete_body, deleteLessonCount, deleteLessonCount)
+                    else
+                        stringResource(R.string.schedule_delete_body_zero)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteSlot(slot)
+                    slotToDelete = null
+                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { slotToDelete = null }) { Text(stringResource(R.string.cancel)) }
+            }
         )
     }
 
@@ -108,7 +135,12 @@ fun ScheduleScreen(
             } else {
                 Column {
                     slots.forEach { slot ->
-                        SlotRow(slot, onDelete = { viewModel.deleteSlot(slot.id) })
+                        SlotRow(slot, onDelete = {
+                            viewModel.countFutureLessons(slot) { count ->
+                                deleteLessonCount = count
+                                slotToDelete = slot
+                            }
+                        })
                         Spacer(Modifier.height(8.dp))
                     }
                 }
@@ -187,30 +219,14 @@ fun ScheduleScreen(
                         else -> null
                     }
                     if (error == null && duration != null) {
-                        viewModel.addSlot(selectedDay, timeText, duration) {}
-                        resultText = null
+                        viewModel.addSlot(selectedDay, timeText, duration) { result ->
+                            resultText = context.getString(R.string.schedule_auto_result, result.created, result.skipped)
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.schedule_add_slot))
-            }
-            Spacer(Modifier.height(20.dp))
-
-            Button(
-                onClick = {
-                    viewModel.generate { result ->
-                        resultText = if (result.created == 0 && result.skipped == 0) {
-                            context.getString(R.string.schedule_no_slots)
-                        } else {
-                            context.getString(R.string.schedule_result, result.created, result.skipped)
-                        }
-                    }
-                },
-                enabled = slots.isNotEmpty(),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.schedule_generate))
             }
             resultText?.let {
                 Spacer(Modifier.height(8.dp))

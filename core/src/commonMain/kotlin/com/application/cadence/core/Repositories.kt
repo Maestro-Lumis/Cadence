@@ -24,6 +24,8 @@ interface LessonRepository {
     suspend fun add(lesson: Lesson): Long
     suspend fun update(lesson: Lesson)
     suspend fun delete(lessonId: Long)
+    suspend fun countScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday): Int
+    suspend fun deleteScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday)
 }
 
 interface ScheduleRepository {

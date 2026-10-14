@@ -94,6 +94,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v150_title">Версия 1.5.0</string>
+    <string name="whatsnew_v150_1">Автосоздание уроков из расписания на 8 месяцев вперёд</string>
+    <string name="whatsnew_v150_2">Удаление слота расписания удаляет будущие уроки</string>
+
     <string name="whatsnew_v142_title">Версия 1.4.2</string>
     <string name="whatsnew_v142_1">Исправлены уведомления на Android 12+</string>
 
@@ -209,10 +213,16 @@
     <string name="schedule_min_label">Мин</string>
     <string name="schedule_bad_time">Неверное время</string>
     <string name="schedule_bad_duration">Длительность больше 0</string>
-    <string name="schedule_generate">Заполнить занятия на 4 недели</string>
-    <string name="schedule_no_slots">Нет слотов для генерации</string>
-    <string name="schedule_result">Создано %1$d, Создано ранее %2$d</string>
     <string name="schedule_slot_msk">%1$s МСК · %2$s</string>
+    <string name="schedule_auto_result">Создано %1$d, пропущено %2$d</string>
+    <string name="schedule_delete_title">Удалить расписание?</string>
+    <string name="schedule_delete_body_zero">Прошедшие уроки останутся.</string>
+    <plurals name="schedule_delete_body">
+        <item quantity="one">%d запланированный урок будет удалён. Прошедшие уроки останутся.</item>
+        <item quantity="few">%d запланированных урока будут удалены. Прошедшие уроки останутся.</item>
+        <item quantity="many">%d запланированных уроков будут удалены. Прошедшие уроки останутся.</item>
+        <item quantity="other">%d запланированных уроков будут удалены. Прошедшие уроки останутся.</item>
+    </plurals>
 
     <!-- Group Lesson -->
     <string name="group_title">Групповое занятие</string>

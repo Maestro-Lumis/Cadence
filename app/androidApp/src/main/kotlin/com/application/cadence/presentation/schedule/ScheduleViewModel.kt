@@ -27,6 +27,8 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
+private const val HORIZON_WEEKS = 35 // ~8 months
+
 data class GenerationResult(val created: Int, val skipped: Int)
 
 class ScheduleViewModel(
@@ -39,7 +41,7 @@ class ScheduleViewModel(
         .map { list -> list.sortedWith(compareBy({ it.dayOfWeek.ordinal }, { it.time })) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun addSlot(day: Weekday, time: String, durationMinutes: Int, onAdded: () -> Unit) {
+    fun addSlot(day: Weekday, time: String, durationMinutes: Int, onResult: (GenerationResult) -> Unit) {
         viewModelScope.launch {
             scheduleRepository.add(
                 Schedule(
@@ -51,65 +53,68 @@ class ScheduleViewModel(
                     active = true
                 )
             )
-            onAdded()
+            val result = generateForSlot(day, time, durationMinutes)
+            onResult(result)
         }
     }
 
-    fun deleteSlot(scheduleId: Long) {
-        viewModelScope.launch { scheduleRepository.delete(scheduleId) }
+    fun countFutureLessons(slot: Schedule, onResult: (Int) -> Unit) {
+        viewModelScope.launch {
+            val today = Clock.System.todayIn(MSK)
+            val count = lessonRepository.countScheduledBySlot(studentId, today, slot.time, slot.dayOfWeek)
+            onResult(count)
+        }
     }
 
-    fun generate(onResult: (GenerationResult) -> Unit) {
+    fun deleteSlot(slot: Schedule) {
         viewModelScope.launch {
-            val activeSlots = slots.value.filter { it.active }
-            if (activeSlots.isEmpty()) {
-                onResult(GenerationResult(0, 0))
-                return@launch
-            }
-
             val today = Clock.System.todayIn(MSK)
-            val horizon = today.plus(28, DateTimeUnit.DAY)
-            val existing = lessonRepository.observeInDateRange(today, horizon).first().toMutableList()
+            lessonRepository.deleteScheduledBySlot(studentId, today, slot.time, slot.dayOfWeek)
+            scheduleRepository.delete(slot.id)
+        }
+    }
 
-            var created = 0
-            var skipped = 0
-            val toInsert = mutableListOf<Lesson>()
+    private suspend fun generateForSlot(day: Weekday, time: String, durationMinutes: Int): GenerationResult {
+        val parsedTime = runCatching { LocalTime.parse(time) }.getOrNull()
+            ?: return GenerationResult(0, 0)
 
-            var date = today
-            while (date <= horizon) {
-                val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
-                val daySlots = activeSlots.filter { it.dayOfWeek == weekday }.sortedBy { it.time }
-                for (slot in daySlots) {
-                    val time = runCatching { LocalTime.parse(slot.time) }.getOrNull() ?: continue
-                    val start = LocalDateTime(date, time).toInstant(MSK)
-                    val end = start + slot.durationMinutes.minutes
-                    val dup = existing.any { it.studentId == studentId && it.date == date && it.time == slot.time }
-                    val overlap = findOverlappingLesson(start, end, existing) != null
-                    if (dup || overlap) {
-                        skipped++
-                        continue
-                    }
+        val today = Clock.System.todayIn(MSK)
+        val horizon = today.plus(HORIZON_WEEKS * 7, DateTimeUnit.DAY)
+        val existing = lessonRepository.observeInDateRange(today, horizon).first().toMutableList()
+
+        var created = 0
+        var skipped = 0
+        val toInsert = mutableListOf<Lesson>()
+
+        var date = today
+        while (date <= horizon) {
+            val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
+            if (weekday == day) {
+                val start = LocalDateTime(date, parsedTime).toInstant(MSK)
+                val end = start + durationMinutes.minutes
+                val dup = existing.any { it.studentId == studentId && it.date == date && it.time == time }
+                val overlap = findOverlappingLesson(start, end, existing) != null
+                if (dup || overlap) {
+                    skipped++
+                } else {
                     val lesson = Lesson(
                         id = 0,
                         studentId = studentId,
                         date = date,
-                        time = slot.time,
-                        durationMinutes = slot.durationMinutes,
-                        status = LessonStatus.SCHEDULED,
-                        lessonNumber = null,
-                        packageId = null,
-                        paid = false
+                        time = time,
+                        durationMinutes = durationMinutes,
+                        status = LessonStatus.SCHEDULED
                     )
                     existing.add(lesson)
                     toInsert.add(lesson)
                     created++
                 }
-                date = date.plus(1, DateTimeUnit.DAY)
             }
-
-            toInsert.forEach { lessonRepository.add(it) }
-            onResult(GenerationResult(created, skipped))
+            date = date.plus(1, DateTimeUnit.DAY)
         }
+
+        toInsert.forEach { lessonRepository.add(it) }
+        return GenerationResult(created, skipped)
     }
 }
 
