@@ -7,14 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
-import com.application.cadence.presentation.common.MSK
+import com.application.cadence.presentation.common.DateProvider
 import com.application.cadence.presentation.common.monthNominative
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
 
 data class ProfileUi(
     val studentCount: Int,
@@ -27,15 +25,15 @@ data class ProfileUi(
 class ProfileViewModel(
     private val ctx: Context,
     studentRepository: StudentRepository,
-    lessonRepository: LessonRepository
+    lessonRepository: LessonRepository,
+    dateProvider: DateProvider
 ) : ViewModel() {
-
-    private val mskToday = Clock.System.todayIn(MSK)
 
     val uiState: StateFlow<ProfileUi> = combine(
         studentRepository.observeAll(),
-        lessonRepository.observeAll()
-    ) { students, lessons ->
+        lessonRepository.observeAll(),
+        dateProvider.mskToday
+    ) { students, lessons, mskToday ->
         val byId = students.associateBy { it.id }
 
         val unpaid = lessons.filter { it.status == LessonStatus.HELD && !it.paid }
@@ -62,10 +60,11 @@ class ProfileViewModel(
 class ProfileViewModelFactory(
     private val ctx: Context,
     private val studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val dateProvider: DateProvider
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ProfileViewModel(ctx, studentRepository, lessonRepository) as T
+        return ProfileViewModel(ctx, studentRepository, lessonRepository, dateProvider) as T
     }
 }

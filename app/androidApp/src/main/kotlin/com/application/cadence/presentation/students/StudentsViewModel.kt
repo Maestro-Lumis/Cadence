@@ -10,15 +10,13 @@ import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
-import com.application.cadence.presentation.common.MSK
+import com.application.cadence.presentation.common.DateProvider
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.daysUntil
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
 
 data class StudentRowUi(
     val id: Long,
@@ -38,10 +36,9 @@ private const val LOST_THRESHOLD_DAYS = 14
 class StudentsViewModel(
     private val ctx: Context,
     studentRepository: StudentRepository,
-    lessonRepository: LessonRepository
+    lessonRepository: LessonRepository,
+    private val dateProvider: DateProvider
 ) : ViewModel() {
-
-    private val today = Clock.System.todayIn(MSK)
 
     val uiState: StateFlow<List<StudentRowUi>> = studentRepository.observeAll()
         .map { list -> list.map { StudentRowUi(it.id, it.name, it.course, it.timezone) } }
@@ -53,12 +50,13 @@ class StudentsViewModel(
 
     val lostStudents: StateFlow<List<LostStudentUi>> = combine(
         studentRepository.observeAll(),
-        lessonRepository.observeAll()
-    ) { students, lessons ->
-        buildLost(students, lessons)
+        lessonRepository.observeAll(),
+        dateProvider.mskToday
+    ) { students, lessons, today ->
+        buildLost(students, lessons, today)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private fun buildLost(students: List<Student>, lessons: List<Lesson>): List<LostStudentUi> {
+    private fun buildLost(students: List<Student>, lessons: List<Lesson>, today: kotlinx.datetime.LocalDate): List<LostStudentUi> {
         val byStudent = lessons.groupBy { it.studentId }
         return students.mapNotNull { student ->
             val theirs = byStudent[student.id].orEmpty()
@@ -83,10 +81,11 @@ class StudentsViewModel(
 class StudentsViewModelFactory(
     private val ctx: Context,
     private val studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val dateProvider: DateProvider
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return StudentsViewModel(ctx, studentRepository, lessonRepository) as T
+        return StudentsViewModel(ctx, studentRepository, lessonRepository, dateProvider) as T
     }
 }

@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.StudentRepository
+import com.application.cadence.presentation.common.DateProvider
 
 class TodayViewModelFactory(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository,
-    private val ctx: Context
+    private val ctx: Context,
+    private val dateProvider: DateProvider
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return TodayViewModel(lessonRepository, studentRepository, ctx) as T
+        return TodayViewModel(lessonRepository, studentRepository, ctx, dateProvider) as T
     }
 }

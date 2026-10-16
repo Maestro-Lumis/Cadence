@@ -8,6 +8,7 @@ import com.application.cadence.core.ScheduleRepository
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.data.backup.BackupManager
 import com.application.cadence.data.local.AppDatabase
+import com.application.cadence.presentation.common.DateProvider
 import com.application.cadence.data.local.MIGRATION_1_2
 import com.application.cadence.data.local.MIGRATION_2_3
 import com.application.cadence.data.local.MIGRATION_3_4
@@ -43,6 +44,7 @@ class CadenceApplication : Application() {
     val lessonRepository: LessonRepository by lazy { LessonRepositoryImpl(database.lessonDao()) }
     val scheduleRepository: ScheduleRepository by lazy { ScheduleRepositoryImpl(database.scheduleDao()) }
     val backupManager: BackupManager by lazy { BackupManager(database) }
+    val dateProvider = DateProvider()
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 

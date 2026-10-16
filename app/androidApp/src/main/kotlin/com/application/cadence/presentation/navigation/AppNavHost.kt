@@ -110,7 +110,7 @@ fun AppNavHost(app: CadenceApplication) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<TodayRoute> {
-                val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository, app)
+                val factory = TodayViewModelFactory(app.lessonRepository, app.studentRepository, app, app.dateProvider)
                 TodayScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
@@ -119,7 +119,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<CalendarRoute> {
-                val factory = CalendarViewModelFactory(app.lessonRepository, app.studentRepository, app)
+                val factory = CalendarViewModelFactory(app.lessonRepository, app.studentRepository, app, app.dateProvider)
                 CalendarScreen(
                     viewModel = viewModel(factory = factory),
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
@@ -128,7 +128,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<StudentsRoute> {
-                val factory = StudentsViewModelFactory(app, app.studentRepository, app.lessonRepository)
+                val factory = StudentsViewModelFactory(app, app.studentRepository, app.lessonRepository, app.dateProvider)
                 StudentsScreen(
                     viewModel = viewModel(factory = factory),
                     onStudentClick = { studentId -> navController.navigate(StudentProfileRoute(studentId)) },
@@ -136,7 +136,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<ProfileRoute> {
-                val factory = ProfileViewModelFactory(app, app.studentRepository, app.lessonRepository)
+                val factory = ProfileViewModelFactory(app, app.studentRepository, app.lessonRepository, app.dateProvider)
                 ProfileScreen(
                     viewModel = viewModel(factory = factory),
                     onDebts = { navController.navigate(DebtsRoute) },
@@ -157,7 +157,7 @@ fun AppNavHost(app: CadenceApplication) {
                 )
             }
             composable<EarningsRoute> {
-                val factory = EarningsViewModelFactory(app, app.studentRepository, app.lessonRepository)
+                val factory = EarningsViewModelFactory(app, app.studentRepository, app.lessonRepository, app.dateProvider)
                 EarningsScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
@@ -203,7 +203,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<ReportRoute> { backStackEntry ->
                 val route: ReportRoute = backStackEntry.toRoute()
-                val factory = ReportViewModelFactory(app, route.studentId, app.studentRepository, app.lessonRepository)
+                val factory = ReportViewModelFactory(app, route.studentId, app.studentRepository, app.lessonRepository, app.dateProvider)
                 ReportScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() }

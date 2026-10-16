@@ -43,6 +43,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        (application as CadenceApplication).dateProvider.refresh()
+    }
 }
 
 @Composable

@@ -8,6 +8,7 @@ import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.AgendaCardUi
+import com.application.cadence.presentation.common.DateProvider
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.buildLessonCards
 import com.application.cadence.presentation.common.lessonCountByDate
@@ -28,10 +29,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 
 data class CalDayUi(
     val date: LocalDate,
@@ -58,13 +57,13 @@ data class CalendarUi(
 class CalendarViewModel(
     lessonRepository: LessonRepository,
     studentRepository: StudentRepository,
-    private val ctx: Context
+    private val ctx: Context,
+    private val dateProvider: DateProvider
 ) : ViewModel() {
 
     private val tutorTz = TimeZone.currentSystemDefault()
-    private val today = Clock.System.todayIn(tutorTz)
 
-    private val _selectedDate = MutableStateFlow(today)
+    private val _selectedDate = MutableStateFlow(dateProvider.tutorToday.value)
     val selectedDate: StateFlow<LocalDate> = _selectedDate
 
     fun selectDate(date: LocalDate) {
@@ -80,9 +79,10 @@ class CalendarViewModel(
 
     val uiState: StateFlow<CalendarUi> = combine(
         _selectedDate,
+        dateProvider.tutorToday,
         lessonRepository.observeAll(),
         studentRepository.observeAll()
-    ) { selected, lessons, students ->
+    ) { selected, today, lessons, students ->
         val byId = students.associateBy { it.id }
         val numberByLessonId = numberLessons(lessons)
         val countByDate = lessonCountByDate(lessons, tutorTz)
@@ -143,10 +143,11 @@ class CalendarViewModel(
 class CalendarViewModelFactory(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository,
-    private val ctx: Context
+    private val ctx: Context,
+    private val dateProvider: DateProvider
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CalendarViewModel(lessonRepository, studentRepository, ctx) as T
+        return CalendarViewModel(lessonRepository, studentRepository, ctx, dateProvider) as T
     }
 }

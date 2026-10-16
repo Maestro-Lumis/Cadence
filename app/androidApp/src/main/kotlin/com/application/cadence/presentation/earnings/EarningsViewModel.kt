@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
-import com.application.cadence.presentation.common.MSK
+import com.application.cadence.presentation.common.DateProvider
 import com.application.cadence.presentation.common.monthBounds
 import com.application.cadence.presentation.common.monthGenitive
 import com.application.cadence.presentation.common.previousMonthOf
@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
 
 data class EarningsRowUi(
     val studentId: Long,
@@ -40,11 +38,11 @@ data class EarningsUi(
 class EarningsViewModel(
     private val ctx: Context,
     studentRepository: StudentRepository,
-    lessonRepository: LessonRepository
+    lessonRepository: LessonRepository,
+    dateProvider: DateProvider
 ) : ViewModel() {
 
-    private val mskToday = Clock.System.todayIn(MSK)
-    private val defaultBounds = previousMonthOf(mskToday).let { (y, m) -> monthBounds(y, m) }
+    private val defaultBounds = previousMonthOf(dateProvider.mskToday.value).let { (y, m) -> monthBounds(y, m) }
 
     private val _from = MutableStateFlow(defaultBounds.first)
     private val _to = MutableStateFlow(defaultBounds.second)
@@ -113,10 +111,11 @@ class EarningsViewModel(
 class EarningsViewModelFactory(
     private val ctx: Context,
     private val studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val dateProvider: DateProvider
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return EarningsViewModel(ctx, studentRepository, lessonRepository) as T
+        return EarningsViewModel(ctx, studentRepository, lessonRepository, dateProvider) as T
     }
 }

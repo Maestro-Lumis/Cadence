@@ -11,6 +11,7 @@ import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.AgendaCardUi
+import com.application.cadence.presentation.common.DateProvider
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.buildLessonCards
 import com.application.cadence.presentation.common.dateFull
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
@@ -35,7 +37,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -79,14 +80,13 @@ private data class EnrichedLesson(
 class TodayViewModel(
     private val lessonRepository: LessonRepository,
     private val studentRepository: StudentRepository,
-    private val ctx: Context
+    private val ctx: Context,
+    private val dateProvider: DateProvider
 ) : ViewModel() {
 
     private val tutorTz = TimeZone.currentSystemDefault()
-    private val today = Clock.System.todayIn(tutorTz)
-    private val mskToday = Clock.System.todayIn(MSK)
 
-    private val _selectedDate = MutableStateFlow(today)
+    private val _selectedDate = MutableStateFlow(dateProvider.tutorToday.value)
     val selectedDate: StateFlow<LocalDate> = _selectedDate
 
     fun selectDate(date: LocalDate) {
@@ -94,7 +94,7 @@ class TodayViewModel(
     }
 
     fun goToToday() {
-        _selectedDate.value = today
+        _selectedDate.value = dateProvider.tutorToday.value
     }
 
     fun shiftWeek(deltaWeeks: Int) {
@@ -103,22 +103,25 @@ class TodayViewModel(
 
     val dayState: StateFlow<DayUi> = combine(
         _selectedDate,
+        dateProvider.tutorToday,
         lessonRepository.observeAll(),
         studentRepository.observeAll()
-    ) { selected, lessons, students ->
+    ) { selected, today, lessons, students ->
         val weekStart = selected.minus(selected.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
-        buildDayUi(selected, weekStart, lessons, students)
+        buildDayUi(selected, today, weekStart, lessons, students)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        DayUi(monthNominative(ctx, today.monthNumber), emptyList(), "", emptyList())
+        DayUi(monthNominative(ctx, dateProvider.tutorToday.value.monthNumber), emptyList(), "", emptyList())
     )
 
-    val reviewQueue: StateFlow<List<ReviewLessonUi>> = combine(
-        lessonRepository.observeScheduledUpTo(mskToday),
-        studentRepository.observeAll()
-    ) { lessons, students ->
-        buildReviewQueue(lessons, students)
+    val reviewQueue: StateFlow<List<ReviewLessonUi>> = dateProvider.mskToday.flatMapLatest { mskToday ->
+        combine(
+            lessonRepository.observeScheduledUpTo(mskToday),
+            studentRepository.observeAll()
+        ) { lessons, students ->
+            buildReviewQueue(lessons, students)
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun resolve(lessonId: Long, status: LessonStatus, paid: Boolean) {
@@ -139,6 +142,7 @@ class TodayViewModel(
 
     private fun buildDayUi(
         selected: LocalDate,
+        today: LocalDate,
         weekStart: LocalDate,
         lessons: List<Lesson>,
         students: List<Student>
@@ -200,6 +204,7 @@ class TodayViewModel(
 
     private fun buildReviewUi(rows: List<EnrichedLesson>): ReviewLessonUi {
         val first = rows.first()
+        val today = dateProvider.tutorToday.value
         val startLocal = first.start.toLocalDateTime(tutorTz)
         val dayWord = when (startLocal.date) {
             today -> ctx.getString(R.string.today_word)
