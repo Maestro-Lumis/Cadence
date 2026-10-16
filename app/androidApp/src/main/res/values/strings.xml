@@ -94,6 +94,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v153_title">Версия 1.5.3</string>
+    <string name="whatsnew_v153_1">Экраны обновляются при возврате в приложение</string>
+
     <string name="whatsnew_v152_title">Версия 1.5.2</string>
     <string name="whatsnew_v152_1">Расписание автоматически дополняется при запуске</string>
     <string name="whatsnew_v152_2">Резервная копия сохраняется прямо в Загрузки</string>

@@ -88,6 +88,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v153_title">Version 1.5.3</string>
+    <string name="whatsnew_v153_1">Screens refresh when returning to the app</string>
+
     <string name="whatsnew_v152_title">Version 1.5.2</string>
     <string name="whatsnew_v152_1">Schedule auto-fills on app start</string>
     <string name="whatsnew_v152_2">Backup saves directly to Downloads</string>

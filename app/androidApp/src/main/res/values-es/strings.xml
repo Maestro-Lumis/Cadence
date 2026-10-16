@@ -88,6 +88,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v153_title">Versión 1.5.3</string>
+    <string name="whatsnew_v153_1">Las pantallas se actualizan al volver a la app</string>
+
     <string name="whatsnew_v152_title">Versión 1.5.2</string>
     <string name="whatsnew_v152_1">El horario se completa automáticamente al iniciar</string>
     <string name="whatsnew_v152_2">El respaldo se guarda directamente en Descargas</string>
