@@ -84,8 +84,8 @@ interface ScheduleDao {
 }
 
 @Database(
-    entities = [StudentEntity::class, PackageEntity::class, LessonEntity::class, ScheduleEntity::class],
-    version = 7
+    entities = [StudentEntity::class, LessonEntity::class, ScheduleEntity::class],
+    version = 8
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
@@ -136,5 +136,29 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
 val MIGRATION_6_7 = object : Migration(6, 7) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE lessons ADD COLUMN groupId INTEGER")
+    }
+}
+
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS packages")
+        db.execSQL(
+            "CREATE TABLE lessons_new (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "studentId INTEGER NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "time TEXT NOT NULL, " +
+                "durationMinutes INTEGER NOT NULL, " +
+                "status TEXT NOT NULL, " +
+                "lessonNumber INTEGER, " +
+                "packageId INTEGER, " +
+                "paid INTEGER NOT NULL, " +
+                "groupId INTEGER, " +
+                "FOREIGN KEY(studentId) REFERENCES students(id) ON DELETE CASCADE)"
+        )
+        db.execSQL("INSERT INTO lessons_new SELECT * FROM lessons")
+        db.execSQL("DROP TABLE lessons")
+        db.execSQL("ALTER TABLE lessons_new RENAME TO lessons")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_lessons_studentId ON lessons (studentId)")
     }
 }

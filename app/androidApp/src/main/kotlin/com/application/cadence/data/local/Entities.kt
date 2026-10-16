@@ -18,20 +18,6 @@ data class StudentEntity(
     val createdAt: Long
 )
 
-@Entity(
-    tableName = "packages",
-    foreignKeys = [ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE)],
-    indices = [Index("studentId")]
-)
-data class PackageEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val studentId: Long,
-    val totalLessons: Int,
-    val usedLessons: Int,
-    val paid: Boolean,
-    val createdAt: Long
-)
-
 @Serializable
 @Entity(
     tableName = "schedules",
@@ -51,10 +37,9 @@ data class ScheduleEntity(
 @Entity(
     tableName = "lessons",
     foreignKeys = [
-        ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE),
-        ForeignKey(PackageEntity::class, ["id"], ["packageId"], onDelete = ForeignKey.SET_NULL)
+        ForeignKey(StudentEntity::class, ["id"], ["studentId"], onDelete = ForeignKey.CASCADE)
     ],
-    indices = [Index("studentId"), Index("packageId")]
+    indices = [Index("studentId")]
 )
 data class LessonEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

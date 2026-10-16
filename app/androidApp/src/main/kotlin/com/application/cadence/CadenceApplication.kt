@@ -14,6 +14,7 @@ import com.application.cadence.data.local.MIGRATION_3_4
 import com.application.cadence.data.local.MIGRATION_4_5
 import com.application.cadence.data.local.MIGRATION_5_6
 import com.application.cadence.data.local.MIGRATION_6_7
+import com.application.cadence.data.local.MIGRATION_7_8
 import com.application.cadence.data.notifications.NotificationScheduler
 import com.application.cadence.presentation.common.LocaleHelper
 import com.application.cadence.data.repository.LessonRepositoryImpl
@@ -31,7 +32,7 @@ class CadenceApplication : Application() {
         Room.databaseBuilder(this, AppDatabase::class.java, "cadence.db")
             .addMigrations(
                 MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
-                MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7
+                MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8
             )
             .build()
     }
