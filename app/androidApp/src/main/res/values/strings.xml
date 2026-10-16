@@ -94,6 +94,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v152_title">Версия 1.5.2</string>
+    <string name="whatsnew_v152_1">Расписание автоматически дополняется при запуске</string>
+    <string name="whatsnew_v152_2">Резервная копия сохраняется прямо в Загрузки</string>
+
     <string name="whatsnew_v150_title">Версия 1.5.0</string>
     <string name="whatsnew_v150_1">Автосоздание уроков из расписания на 8 месяцев вперёд</string>
     <string name="whatsnew_v150_2">Удаление слота расписания удаляет будущие уроки</string>
@@ -193,8 +197,10 @@
 
     <!-- Backup -->
     <string name="backup_title">Резервная копия</string>
-    <string name="backup_description">Экспорт сохранит всех учеников, занятия и расписания в файл — отправь его себе (в облако или мессенджер). Импорт восстановит данные из такого файла, заменив текущие.</string>
-    <string name="backup_export">Экспорт</string>
+    <string name="backup_description">Экспорт сохранит всех учеников, занятия и расписания в файл в папку Загрузки. Импорт восстановит данные из такого файла, заменив текущие.</string>
+    <string name="backup_export">Сохранить в Загрузки</string>
+    <string name="backup_export_ok">Файл сохранён в Загрузки</string>
+    <string name="backup_export_fail">Не удалось сохранить файл</string>
     <string name="backup_import">Импорт</string>
     <string name="backup_share_chooser">Резервная копия</string>
     <string name="backup_import_title">Импортировать копию?</string>

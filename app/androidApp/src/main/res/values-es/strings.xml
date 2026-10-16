@@ -88,6 +88,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v152_title">Versión 1.5.2</string>
+    <string name="whatsnew_v152_1">El horario se completa automáticamente al iniciar</string>
+    <string name="whatsnew_v152_2">El respaldo se guarda directamente en Descargas</string>
+
     <string name="whatsnew_v150_title">Versión 1.5.0</string>
     <string name="whatsnew_v150_1">Creación automática de clases desde el horario para 8 meses</string>
     <string name="whatsnew_v150_2">Eliminar un horario elimina las clases futuras</string>
@@ -187,8 +191,10 @@
 
     <!-- Backup -->
     <string name="backup_title">Respaldo</string>
-    <string name="backup_description">Exportar guarda todos los alumnos, clases y horarios en un archivo — envíatelo (nube o mensajero). Importar restaura datos de tal archivo, reemplazando los actuales.</string>
-    <string name="backup_export">Exportar</string>
+    <string name="backup_description">Exportar guarda todos los alumnos, clases y horarios en un archivo en la carpeta Descargas. Importar restaura datos de tal archivo, reemplazando los actuales.</string>
+    <string name="backup_export">Guardar en Descargas</string>
+    <string name="backup_export_ok">Archivo guardado en Descargas</string>
+    <string name="backup_export_fail">No se pudo guardar el archivo</string>
     <string name="backup_import">Importar</string>
     <string name="backup_share_chooser">Respaldo</string>
     <string name="backup_import_title">¿Importar respaldo?</string>

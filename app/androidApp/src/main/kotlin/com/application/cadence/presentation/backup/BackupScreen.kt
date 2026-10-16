@@ -1,6 +1,8 @@
 package com.application.cadence.presentation.backup
 
-import android.content.Intent
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,13 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.application.cadence.R
-import androidx.core.content.FileProvider
 import com.application.cadence.data.backup.BackupManager
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.ScreenContainer
 import kotlinx.coroutines.launch
 import kotlinx.datetime.todayIn
-import java.io.File
 import kotlin.time.Clock
 
 @Composable
@@ -111,7 +111,12 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
                 onClick = {
                     scope.launch {
                         val json = backupManager.exportJson()
-                        shareBackup(context, json)
+                        val ok = saveToDownloads(context, json)
+                        Toast.makeText(
+                            context,
+                            if (ok) context.getString(R.string.backup_export_ok) else context.getString(R.string.backup_export_fail),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -129,16 +134,18 @@ fun BackupScreen(backupManager: BackupManager, onBack: () -> Unit) {
     }
 }
 
-private fun shareBackup(context: android.content.Context, json: String) {
+private fun saveToDownloads(context: android.content.Context, json: String): Boolean {
     val date = Clock.System.todayIn(MSK)
-    val dir = File(context.cacheDir, "reports").apply { mkdirs() }
-    val file = File(dir, "cadence_backup_$date.json")
-    file.writeText(json)
-    val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "application/json"
-        putExtra(Intent.EXTRA_STREAM, uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(Intent.createChooser(intent, context.getString(R.string.backup_share_chooser)))
+    val fileName = "cadence_backup_$date.json"
+    return runCatching {
+        val values = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+            put(MediaStore.Downloads.MIME_TYPE, "application/json")
+            put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+        val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            ?: return false
+        context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+        true
+    }.getOrDefault(false)
 }

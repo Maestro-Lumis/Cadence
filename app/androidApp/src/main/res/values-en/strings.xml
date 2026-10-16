@@ -88,6 +88,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v152_title">Version 1.5.2</string>
+    <string name="whatsnew_v152_1">Schedule auto-fills on app start</string>
+    <string name="whatsnew_v152_2">Backup saves directly to Downloads</string>
+
     <string name="whatsnew_v150_title">Version 1.5.0</string>
     <string name="whatsnew_v150_1">Auto-create lessons from schedule for 8 months ahead</string>
     <string name="whatsnew_v150_2">Deleting a schedule slot removes future lessons</string>
@@ -187,8 +191,10 @@
 
     <!-- Backup -->
     <string name="backup_title">Backup</string>
-    <string name="backup_description">Export saves all students, lessons and schedules to a file — send it to yourself (cloud or messenger). Import restores data from such a file, replacing current data.</string>
-    <string name="backup_export">Export</string>
+    <string name="backup_description">Export saves all students, lessons and schedules to a file in the Downloads folder. Import restores data from such a file, replacing current data.</string>
+    <string name="backup_export">Save to Downloads</string>
+    <string name="backup_export_ok">File saved to Downloads</string>
+    <string name="backup_export_fail">Failed to save file</string>
     <string name="backup_import">Import</string>
     <string name="backup_share_chooser">Backup</string>
     <string name="backup_import_title">Import backup?</string>

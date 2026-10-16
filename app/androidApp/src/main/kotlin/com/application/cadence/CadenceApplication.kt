@@ -20,10 +20,12 @@ import com.application.cadence.presentation.common.LocaleHelper
 import com.application.cadence.data.repository.LessonRepositoryImpl
 import com.application.cadence.data.repository.ScheduleRepositoryImpl
 import com.application.cadence.data.repository.StudentRepositoryImpl
+import com.application.cadence.data.schedule.ScheduleGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CadenceApplication : Application() {
@@ -55,6 +57,10 @@ class CadenceApplication : Application() {
             lessonRepository.observeAll().collectLatest { lessons ->
                 NotificationScheduler.sync(this@CadenceApplication, lessons)
             }
+        }
+        appScope.launch {
+            val studentIds = studentRepository.observeAll().first().map { it.id }
+            ScheduleGenerator.topUpAll(scheduleRepository, lessonRepository, studentIds)
         }
     }
 }
