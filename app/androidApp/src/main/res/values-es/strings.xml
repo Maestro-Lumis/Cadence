@@ -213,7 +213,6 @@
     <string name="backup_export_ok">Archivo guardado en Descargas</string>
     <string name="backup_export_fail">No se pudo guardar el archivo</string>
     <string name="backup_import">Importar</string>
-    <string name="backup_share_chooser">Respaldo</string>
     <string name="backup_import_title">¿Importar respaldo?</string>
     <string name="backup_import_body">Todos los datos actuales serán reemplazados con los del archivo. Esto no se puede deshacer.</string>
     <string name="backup_import_confirm">Reemplazar</string>

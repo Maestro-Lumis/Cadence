@@ -213,7 +213,6 @@
     <string name="backup_export_ok">File saved to Downloads</string>
     <string name="backup_export_fail">Failed to save file</string>
     <string name="backup_import">Import</string>
-    <string name="backup_share_chooser">Backup</string>
     <string name="backup_import_title">Import backup?</string>
     <string name="backup_import_body">All current data will be replaced with data from the file. This cannot be undone.</string>
     <string name="backup_import_confirm">Replace</string>

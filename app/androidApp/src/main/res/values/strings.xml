@@ -219,7 +219,6 @@
     <string name="backup_export_ok">Файл сохранён в Загрузки</string>
     <string name="backup_export_fail">Не удалось сохранить файл</string>
     <string name="backup_import">Импорт</string>
-    <string name="backup_share_chooser">Резервная копия</string>
     <string name="backup_import_title">Импортировать копию?</string>
     <string name="backup_import_body">Все текущие данные будут заменены данными из файла. Отменить это будет нельзя.</string>
     <string name="backup_import_confirm">Заменить</string>
