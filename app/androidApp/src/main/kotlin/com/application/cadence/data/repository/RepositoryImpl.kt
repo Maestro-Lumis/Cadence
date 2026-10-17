@@ -21,8 +21,17 @@ class StudentRepositoryImpl(private val dao: StudentDao) : StudentRepository {
     override fun observeAll(): Flow<List<Student>> =
         dao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    override fun observeActive(): Flow<List<Student>> =
+        dao.observeActive().map { list -> list.map { it.toDomain() } }
+
+    override fun observeArchived(): Flow<List<Student>> =
+        dao.observeArchived().map { list -> list.map { it.toDomain() } }
+
     override fun observeById(studentId: Long): Flow<Student?> =
         dao.observeById(studentId).map { it?.toDomain() }
+
+    override suspend fun setArchived(studentId: Long, archived: Boolean) =
+        dao.setArchived(studentId, archived)
 
     override suspend fun add(student: Student) = dao.insert(student.toEntity())
     override suspend fun update(student: Student) = dao.update(student.toEntity())
@@ -69,6 +78,12 @@ class LessonRepositoryImpl(private val dao: LessonDao) : LessonRepository {
 
     override suspend fun deleteScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday) =
         dao.deleteScheduledBySlot(studentId, fromDate.toString(), time, (dayOfWeek.ordinal + 1) % 7)
+
+    override suspend fun countScheduledByStudent(studentId: Long, fromDate: LocalDate): Int =
+        dao.countScheduledByStudent(studentId, fromDate.toString())
+
+    override suspend fun deleteScheduledByStudent(studentId: Long, fromDate: LocalDate) =
+        dao.deleteScheduledByStudent(studentId, fromDate.toString())
 }
 
 class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository {
@@ -77,4 +92,5 @@ class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository 
 
     override suspend fun add(schedule: Schedule) = dao.insert(schedule.toEntity())
     override suspend fun delete(scheduleId: Long) = dao.deleteById(scheduleId)
+    override suspend fun deleteByStudent(studentId: Long) = dao.deleteByStudent(studentId)
 }

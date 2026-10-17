@@ -72,6 +72,7 @@
     <string name="students_lost">Пропали</string>
     <string name="students_empty">Учеников пока нет</string>
     <string name="students_add">Добавить ученика</string>
+    <string name="students_archived">Архив</string>
     <string name="students_last_lesson">Последнее занятие %s</string>
 
     <!-- Profile -->
@@ -94,6 +95,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v160_title">Версия 1.6.0</string>
+    <string name="whatsnew_v160_1">Архивирование учеников</string>
+    <string name="whatsnew_v160_2">Очистка расписания одной кнопкой</string>
+
     <string name="whatsnew_v154_title">Версия 1.5.4</string>
     <string name="whatsnew_v154_1">Редактирование урока обновляется в реальном времени</string>
     <string name="whatsnew_v154_2">Имя ученика на экране расписания обновляется автоматически</string>
@@ -164,6 +169,11 @@
     <!-- Student Profile -->
     <string name="sprofile_delete_title">Удалить ученика?</string>
     <string name="sprofile_delete_body">Будут удалены и все его занятия.</string>
+    <string name="sprofile_archive">Архив</string>
+    <string name="sprofile_unarchive">Восстановить</string>
+    <string name="sprofile_archive_title">Архивировать ученика?</string>
+    <string name="sprofile_archive_body">Будущие занятия будут удалены, расписание очищено. Ученик скроется из основного списка.</string>
+    <string name="sprofile_archive_confirm">Архивировать</string>
     <string name="sprofile_schedule">Расписание →</string>
     <string name="sprofile_report">Отчёт →</string>
     <string name="sprofile_tab_held">Проведено</string>
@@ -235,6 +245,17 @@
         <item quantity="few">%d запланированных урока будут удалены. Прошедшие уроки останутся.</item>
         <item quantity="many">%d запланированных уроков будут удалены. Прошедшие уроки останутся.</item>
         <item quantity="other">%d запланированных уроков будут удалены. Прошедшие уроки останутся.</item>
+    </plurals>
+
+    <string name="schedule_clear">Очистить расписание</string>
+    <string name="schedule_clear_title">Очистить расписание?</string>
+    <string name="schedule_clear_body_zero">Все слоты будут удалены. Прошедшие уроки останутся.</string>
+    <string name="schedule_clear_confirm">Очистить</string>
+    <plurals name="schedule_clear_body">
+        <item quantity="one">%d запланированный урок и все слоты будут удалены. Прошедшие уроки останутся.</item>
+        <item quantity="few">%d запланированных урока и все слоты будут удалены. Прошедшие уроки останутся.</item>
+        <item quantity="many">%d запланированных уроков и все слоты будут удалены. Прошедшие уроки останутся.</item>
+        <item quantity="other">%d запланированных уроков и все слоты будут удалены. Прошедшие уроки останутся.</item>
     </plurals>
 
     <!-- Group Lesson -->

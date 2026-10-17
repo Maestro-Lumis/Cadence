@@ -5,7 +5,10 @@ import kotlinx.datetime.LocalDate
 
 interface StudentRepository {
     fun observeAll(): Flow<List<Student>>
+    fun observeActive(): Flow<List<Student>>
+    fun observeArchived(): Flow<List<Student>>
     fun observeById(studentId: Long): Flow<Student?>
+    suspend fun setArchived(studentId: Long, archived: Boolean)
     suspend fun add(student: Student): Long
     suspend fun update(student: Student)
     suspend fun delete(studentId: Long)
@@ -27,10 +30,15 @@ interface LessonRepository {
     suspend fun delete(lessonId: Long)
     suspend fun countScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday): Int
     suspend fun deleteScheduledBySlot(studentId: Long, fromDate: LocalDate, time: String, dayOfWeek: Weekday)
+    suspend fun countScheduledByStudent(studentId: Long, fromDate: LocalDate): Int
+    suspend fun deleteScheduledByStudent(studentId: Long, fromDate: LocalDate)
 }
+
+
 
 interface ScheduleRepository {
     fun observeByStudent(studentId: Long): Flow<List<Schedule>>
     suspend fun add(schedule: Schedule): Long
     suspend fun delete(scheduleId: Long)
+    suspend fun deleteByStudent(studentId: Long)
 }

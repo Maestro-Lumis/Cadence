@@ -66,6 +66,7 @@
     <string name="students_lost">Lost</string>
     <string name="students_empty">No students yet</string>
     <string name="students_add">Add student</string>
+    <string name="students_archived">Archived</string>
     <string name="students_last_lesson">Last lesson %s</string>
 
     <!-- Profile -->
@@ -88,6 +89,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v160_title">Version 1.6.0</string>
+    <string name="whatsnew_v160_1">Archive students</string>
+    <string name="whatsnew_v160_2">Clear schedule with one tap</string>
+
     <string name="whatsnew_v154_title">Version 1.5.4</string>
     <string name="whatsnew_v154_1">Lesson editing updates in real time</string>
     <string name="whatsnew_v154_2">Student name on schedule screen updates automatically</string>
@@ -158,6 +163,11 @@
     <!-- Student Profile -->
     <string name="sprofile_delete_title">Delete student?</string>
     <string name="sprofile_delete_body">All their lessons will be deleted too.</string>
+    <string name="sprofile_archive">Archive</string>
+    <string name="sprofile_unarchive">Unarchive</string>
+    <string name="sprofile_archive_title">Archive student?</string>
+    <string name="sprofile_archive_body">Future lessons will be deleted and schedule cleared. The student will be hidden from the main list.</string>
+    <string name="sprofile_archive_confirm">Archive</string>
     <string name="sprofile_schedule">Schedule →</string>
     <string name="sprofile_report">Report →</string>
     <string name="sprofile_tab_held">Held</string>
@@ -227,6 +237,15 @@
     <plurals name="schedule_delete_body">
         <item quantity="one">%d scheduled lesson will be deleted. Past lessons will be kept.</item>
         <item quantity="other">%d scheduled lessons will be deleted. Past lessons will be kept.</item>
+    </plurals>
+
+    <string name="schedule_clear">Clear schedule</string>
+    <string name="schedule_clear_title">Clear schedule?</string>
+    <string name="schedule_clear_body_zero">All slots will be deleted. Past lessons will be kept.</string>
+    <string name="schedule_clear_confirm">Clear</string>
+    <plurals name="schedule_clear_body">
+        <item quantity="one">%d scheduled lesson and all slots will be deleted. Past lessons will be kept.</item>
+        <item quantity="other">%d scheduled lessons and all slots will be deleted. Past lessons will be kept.</item>
     </plurals>
 
     <!-- Group Lesson -->

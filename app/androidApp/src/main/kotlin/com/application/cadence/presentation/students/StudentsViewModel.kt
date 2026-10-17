@@ -40,7 +40,11 @@ class StudentsViewModel(
     private val dateProvider: DateProvider
 ) : ViewModel() {
 
-    val uiState: StateFlow<List<StudentRowUi>> = studentRepository.observeAll()
+    val uiState: StateFlow<List<StudentRowUi>> = studentRepository.observeActive()
+        .map { list -> list.map { StudentRowUi(it.id, it.name, it.course, it.timezone) } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val archivedStudents: StateFlow<List<StudentRowUi>> = studentRepository.observeArchived()
         .map { list -> list.map { StudentRowUi(it.id, it.name, it.course, it.timezone) } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -49,7 +53,7 @@ class StudentsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     val lostStudents: StateFlow<List<LostStudentUi>> = combine(
-        studentRepository.observeAll(),
+        studentRepository.observeActive(),
         lessonRepository.observeAll(),
         dateProvider.mskToday
     ) { students, lessons, today ->

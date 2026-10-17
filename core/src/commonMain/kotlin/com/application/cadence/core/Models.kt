@@ -12,6 +12,7 @@ data class Student(
     val timezone: String,
     val hourlyRate: Int,
     val lessonDurationMinutes: Int = 60,
+    val archived: Boolean = false,
     val createdAt: LocalDateTime
 )
 

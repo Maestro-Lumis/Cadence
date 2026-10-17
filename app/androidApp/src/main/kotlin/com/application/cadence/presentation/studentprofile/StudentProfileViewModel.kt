@@ -6,17 +6,22 @@ import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
+import com.application.cadence.core.ScheduleRepository
 import com.application.cadence.core.StudentRepository
+import com.application.cadence.presentation.common.MSK
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 data class StudentProfileUi(
     val studentName: String,
     val course: String,
     val timezone: String,
+    val archived: Boolean,
     val totalLessons: Int,
     val heldLessons: Int,
     val unpaidLessons: Int,
@@ -27,7 +32,8 @@ data class StudentProfileUi(
 class StudentProfileViewModel(
     private val studentId: Long,
     private val studentRepository: StudentRepository,
-    private val lessonRepository: LessonRepository
+    private val lessonRepository: LessonRepository,
+    private val scheduleRepository: ScheduleRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<StudentProfileUi?> = combine(
@@ -40,6 +46,7 @@ class StudentProfileViewModel(
                 studentName = it.name,
                 course = it.course,
                 timezone = it.timezone,
+                archived = it.archived,
                 totalLessons = lessons.size,
                 heldLessons = lessons.count { l -> l.status == LessonStatus.HELD },
                 unpaidLessons = unpaid.size,
@@ -62,6 +69,23 @@ class StudentProfileViewModel(
         }
     }
 
+    fun archive(onDone: () -> Unit) {
+        viewModelScope.launch {
+            val today = Clock.System.todayIn(MSK)
+            lessonRepository.deleteScheduledByStudent(studentId, today)
+            scheduleRepository.deleteByStudent(studentId)
+            studentRepository.setArchived(studentId, true)
+            onDone()
+        }
+    }
+
+    fun unarchive(onDone: () -> Unit) {
+        viewModelScope.launch {
+            studentRepository.setArchived(studentId, false)
+            onDone()
+        }
+    }
+
     fun delete(onDeleted: () -> Unit) {
         viewModelScope.launch {
             studentRepository.delete(studentId)
@@ -73,10 +97,11 @@ class StudentProfileViewModel(
 class StudentProfileViewModelFactory(
     private val studentId: Long,
     private val lessonRepository: LessonRepository,
-    private val studentRepository: StudentRepository
+    private val studentRepository: StudentRepository,
+    private val scheduleRepository: ScheduleRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return StudentProfileViewModel(studentId, studentRepository, lessonRepository) as T
+        return StudentProfileViewModel(studentId, studentRepository, lessonRepository, scheduleRepository) as T
     }
 }

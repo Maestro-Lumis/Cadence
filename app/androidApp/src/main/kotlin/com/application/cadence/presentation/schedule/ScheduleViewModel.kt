@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.Schedule
 import com.application.cadence.core.ScheduleRepository
+import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.data.schedule.ScheduleGenerator
@@ -65,6 +66,22 @@ class ScheduleViewModel(
             val today = Clock.System.todayIn(MSK)
             lessonRepository.deleteScheduledBySlot(studentId, today, slot.time, slot.dayOfWeek)
             scheduleRepository.delete(slot.id)
+        }
+    }
+
+    fun countAllFutureLessons(onResult: (Int) -> Unit) {
+        viewModelScope.launch {
+            val today = Clock.System.todayIn(MSK)
+            onResult(lessonRepository.countScheduledByStudent(studentId, today))
+        }
+    }
+
+    fun clearAll(onDone: () -> Unit) {
+        viewModelScope.launch {
+            val today = Clock.System.todayIn(MSK)
+            lessonRepository.deleteScheduledByStudent(studentId, today)
+            scheduleRepository.deleteByStudent(studentId)
+            onDone()
         }
     }
 }

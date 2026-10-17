@@ -16,8 +16,17 @@ interface StudentDao {
     @Query("SELECT * FROM students ORDER BY name")
     fun observeAll(): Flow<List<StudentEntity>>
 
+    @Query("SELECT * FROM students WHERE archived = 0 ORDER BY name")
+    fun observeActive(): Flow<List<StudentEntity>>
+
+    @Query("SELECT * FROM students WHERE archived = 1 ORDER BY name")
+    fun observeArchived(): Flow<List<StudentEntity>>
+
     @Query("SELECT * FROM students WHERE id = :id")
     fun observeById(id: Long): Flow<StudentEntity?>
+
+    @Query("UPDATE students SET archived = :archived WHERE id = :id")
+    suspend fun setArchived(id: Long, archived: Boolean)
 
     @Query("SELECT * FROM students") suspend fun getAll(): List<StudentEntity>
     @Query("DELETE FROM students") suspend fun deleteAll()
@@ -73,6 +82,12 @@ interface LessonDao {
 
     @Query("DELETE FROM lessons WHERE studentId = :studentId AND status = 'SCHEDULED' AND date >= :fromDate AND time = :time AND CAST(strftime('%w', date) AS INTEGER) = :sqliteDow")
     suspend fun deleteScheduledBySlot(studentId: Long, fromDate: String, time: String, sqliteDow: Int)
+
+    @Query("DELETE FROM lessons WHERE studentId = :studentId AND status = 'SCHEDULED' AND date >= :fromDate")
+    suspend fun deleteScheduledByStudent(studentId: Long, fromDate: String)
+
+    @Query("SELECT COUNT(*) FROM lessons WHERE studentId = :studentId AND status = 'SCHEDULED' AND date >= :fromDate")
+    suspend fun countScheduledByStudent(studentId: Long, fromDate: String): Int
 }
 
 @Dao
@@ -84,11 +99,12 @@ interface ScheduleDao {
 
     @Insert suspend fun insert(s: ScheduleEntity): Long
     @Query("DELETE FROM schedules WHERE id = :id") suspend fun deleteById(id: Long)
+    @Query("DELETE FROM schedules WHERE studentId = :studentId") suspend fun deleteByStudent(studentId: Long)
 }
 
 @Database(
     entities = [StudentEntity::class, LessonEntity::class, ScheduleEntity::class],
-    version = 8
+    version = 9
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
@@ -139,6 +155,12 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
 val MIGRATION_6_7 = object : Migration(6, 7) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE lessons ADD COLUMN groupId INTEGER")
+    }
+}
+
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE students ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
     }
 }
 

@@ -172,7 +172,7 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<StudentProfileRoute> { backStackEntry ->
                 val route: StudentProfileRoute = backStackEntry.toRoute()
-                val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository)
+                val factory = StudentProfileViewModelFactory(route.studentId, app.lessonRepository, app.studentRepository, app.scheduleRepository)
                 StudentProfileScreen(
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },

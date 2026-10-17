@@ -57,8 +57,8 @@ android {
         applicationId = "com.application.cadence"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
-        versionName = "1.5.4"
+        versionCode = 13
+        versionName = "1.6.0"
     }
     packaging {
         resources {

@@ -38,6 +38,7 @@ fun StudentsScreen(
     onAddStudentClick: () -> Unit
 ) {
     val students by viewModel.uiState.collectAsState()
+    val archived by viewModel.archivedStudents.collectAsState()
     val lost by viewModel.lostStudents.collectAsState()
 
     ScreenContainer {
@@ -75,7 +76,7 @@ fun StudentsScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            if (students.isEmpty()) {
+            if (students.isEmpty() && archived.isEmpty()) {
                 Text(stringResource(R.string.students_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(
@@ -84,6 +85,20 @@ fun StudentsScreen(
                 ) {
                     items(students, key = { it.id }) { student ->
                         StudentRow(student, onClick = { onStudentClick(student.id) })
+                    }
+                    if (archived.isNotEmpty()) {
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                stringResource(R.string.students_archived),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.height(4.dp))
+                        }
+                        items(archived, key = { it.id }) { student ->
+                            StudentRow(student, onClick = { onStudentClick(student.id) })
+                        }
                     }
                 }
             }

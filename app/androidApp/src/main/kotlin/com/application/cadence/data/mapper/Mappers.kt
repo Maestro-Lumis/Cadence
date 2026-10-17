@@ -21,6 +21,7 @@ fun StudentEntity.toDomain() = Student(
     timezone = timezone,
     hourlyRate = hourlyRate,
     lessonDurationMinutes = lessonDurationMinutes,
+    archived = archived,
     createdAt = Instant.fromEpochMilliseconds(createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
@@ -31,6 +32,7 @@ fun Student.toEntity() = StudentEntity(
     timezone = timezone,
     hourlyRate = hourlyRate,
     lessonDurationMinutes = lessonDurationMinutes,
+    archived = archived,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 )
 

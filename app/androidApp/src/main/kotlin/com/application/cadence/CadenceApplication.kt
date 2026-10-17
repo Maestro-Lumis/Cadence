@@ -16,6 +16,7 @@ import com.application.cadence.data.local.MIGRATION_4_5
 import com.application.cadence.data.local.MIGRATION_5_6
 import com.application.cadence.data.local.MIGRATION_6_7
 import com.application.cadence.data.local.MIGRATION_7_8
+import com.application.cadence.data.local.MIGRATION_8_9
 import com.application.cadence.data.notifications.NotificationScheduler
 import com.application.cadence.presentation.common.LocaleHelper
 import com.application.cadence.data.repository.LessonRepositoryImpl
@@ -35,7 +36,8 @@ class CadenceApplication : Application() {
         Room.databaseBuilder(this, AppDatabase::class.java, "cadence.db")
             .addMigrations(
                 MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
-                MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8
+                MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8,
+                MIGRATION_8_9
             )
             .build()
     }
@@ -61,7 +63,7 @@ class CadenceApplication : Application() {
             }
         }
         appScope.launch {
-            val studentIds = studentRepository.observeAll().first().map { it.id }
+            val studentIds = studentRepository.observeActive().first().map { it.id }
             ScheduleGenerator.topUpAll(scheduleRepository, lessonRepository, studentIds)
         }
     }

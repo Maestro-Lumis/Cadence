@@ -65,6 +65,8 @@ fun ScheduleScreen(
 
     var slotToDelete by remember { mutableStateOf<Schedule?>(null) }
     var deleteLessonCount by remember { mutableIntStateOf(0) }
+    var showClearConfirm by remember { mutableStateOf(false) }
+    var clearLessonCount by remember { mutableIntStateOf(0) }
 
     val timePickerState = rememberTimePickerState(initialHour = 10, initialMinute = 0)
 
@@ -108,6 +110,30 @@ fun ScheduleScreen(
         )
     }
 
+    if (showClearConfirm) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirm = false },
+            title = { Text(stringResource(R.string.schedule_clear_title)) },
+            text = {
+                Text(
+                    if (clearLessonCount > 0)
+                        context.resources.getQuantityString(R.plurals.schedule_clear_body, clearLessonCount, clearLessonCount)
+                    else
+                        stringResource(R.string.schedule_clear_body_zero)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showClearConfirm = false
+                    viewModel.clearAll { onBack() }
+                }) { Text(stringResource(R.string.schedule_clear_confirm), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirm = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
     ScreenContainer {
         Column(
             modifier = Modifier
@@ -144,6 +170,18 @@ fun ScheduleScreen(
                         Spacer(Modifier.height(8.dp))
                     }
                 }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.schedule_clear),
+                    modifier = Modifier.clickable {
+                        viewModel.countAllFutureLessons { count ->
+                            clearLessonCount = count
+                            showClearConfirm = true
+                        }
+                    },
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
             Spacer(Modifier.height(16.dp))
 

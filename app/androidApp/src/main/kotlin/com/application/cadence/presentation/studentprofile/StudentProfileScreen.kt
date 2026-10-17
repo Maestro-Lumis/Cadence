@@ -50,6 +50,7 @@ fun StudentProfileScreen(
     val ctx = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showArchiveConfirm by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
 
     if (showDeleteConfirm) {
@@ -65,6 +66,23 @@ fun StudentProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showArchiveConfirm) {
+        AlertDialog(
+            onDismissRequest = { showArchiveConfirm = false },
+            title = { Text(stringResource(R.string.sprofile_archive_title)) },
+            text = { Text(stringResource(R.string.sprofile_archive_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showArchiveConfirm = false
+                    viewModel.archive(onDeleted)
+                }) { Text(stringResource(R.string.sprofile_archive_confirm), color = Color(0xFF995A1D)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showArchiveConfirm = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -92,6 +110,21 @@ fun StudentProfileScreen(
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge
                     )
+                    if (state?.archived == true) {
+                        Text(
+                            stringResource(R.string.sprofile_unarchive),
+                            modifier = Modifier.clickable { viewModel.unarchive { } },
+                            color = Color(0xFF2E7D32),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    } else {
+                        Text(
+                            stringResource(R.string.sprofile_archive),
+                            modifier = Modifier.clickable { showArchiveConfirm = true },
+                            color = Color(0xFF995A1D),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                     Text(
                         stringResource(R.string.delete),
                         modifier = Modifier.clickable { showDeleteConfirm = true },

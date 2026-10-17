@@ -66,6 +66,7 @@
     <string name="students_lost">Perdidos</string>
     <string name="students_empty">Aún no hay alumnos</string>
     <string name="students_add">Agregar alumno</string>
+    <string name="students_archived">Archivados</string>
     <string name="students_last_lesson">Última clase %s</string>
 
     <!-- Profile -->
@@ -88,6 +89,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v160_title">Versión 1.6.0</string>
+    <string name="whatsnew_v160_1">Archivar alumnos</string>
+    <string name="whatsnew_v160_2">Limpiar horario con un toque</string>
+
     <string name="whatsnew_v154_title">Versión 1.5.4</string>
     <string name="whatsnew_v154_1">La edición de clases se actualiza en tiempo real</string>
     <string name="whatsnew_v154_2">El nombre del alumno en el horario se actualiza automáticamente</string>
@@ -158,6 +163,11 @@
     <!-- Student Profile -->
     <string name="sprofile_delete_title">¿Eliminar alumno?</string>
     <string name="sprofile_delete_body">Todas sus clases también serán eliminadas.</string>
+    <string name="sprofile_archive">Archivar</string>
+    <string name="sprofile_unarchive">Restaurar</string>
+    <string name="sprofile_archive_title">¿Archivar alumno?</string>
+    <string name="sprofile_archive_body">Las clases futuras serán eliminadas y el horario limpiado. El alumno se ocultará de la lista principal.</string>
+    <string name="sprofile_archive_confirm">Archivar</string>
     <string name="sprofile_schedule">Horario →</string>
     <string name="sprofile_report">Reporte →</string>
     <string name="sprofile_tab_held">Realizadas</string>
@@ -227,6 +237,15 @@
     <plurals name="schedule_delete_body">
         <item quantity="one">%d clase programada será eliminada. Las clases pasadas se conservarán.</item>
         <item quantity="other">%d clases programadas serán eliminadas. Las clases pasadas se conservarán.</item>
+    </plurals>
+
+    <string name="schedule_clear">Limpiar horario</string>
+    <string name="schedule_clear_title">¿Limpiar horario?</string>
+    <string name="schedule_clear_body_zero">Todos los turnos serán eliminados. Las clases pasadas se conservarán.</string>
+    <string name="schedule_clear_confirm">Limpiar</string>
+    <plurals name="schedule_clear_body">
+        <item quantity="one">%d clase programada y todos los turnos serán eliminados. Las clases pasadas se conservarán.</item>
+        <item quantity="other">%d clases programadas y todos los turnos serán eliminados. Las clases pasadas se conservarán.</item>
     </plurals>
 
     <!-- Group Lesson -->
