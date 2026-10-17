@@ -12,7 +12,6 @@ import com.application.cadence.core.Student
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.presentation.common.MSK
 import com.application.cadence.presentation.common.findOverlappingLesson
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -37,14 +36,8 @@ class EditLessonViewModel(
     val students: StateFlow<List<Student>> = studentRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _initialLesson = MutableStateFlow<Lesson?>(null)
-    val initialLesson: StateFlow<Lesson?> = _initialLesson
-
-    init {
-        viewModelScope.launch {
-            _initialLesson.value = lessonRepository.getById(lessonId)
-        }
-    }
+    val initialLesson: StateFlow<Lesson?> = lessonRepository.observeById(lessonId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun save(
         studentId: Long,
@@ -84,6 +77,7 @@ class EditLessonViewModel(
                 }
             }
 
+            val current = initialLesson.value
             lessonRepository.update(
                 Lesson(
                     id = lessonId,
@@ -93,9 +87,9 @@ class EditLessonViewModel(
                     durationMinutes = durationMinutes,
                     status = status,
                     lessonNumber = null,
-                    packageId = _initialLesson.value?.packageId,
+                    packageId = current?.packageId,
                     paid = paid,
-                    groupId = _initialLesson.value?.groupId
+                    groupId = current?.groupId
                 )
             )
             onSaved()

@@ -42,7 +42,7 @@ data class GroupLessonRoute(val groupId: Long)
 data class StudentProfileRoute(val studentId: Long)
 
 @Serializable
-data class ScheduleRoute(val studentId: Long, val studentName: String)
+data class ScheduleRoute(val studentId: Long)
 
 @Serializable
 data class ReportRoute(val studentId: Long)

@@ -42,7 +42,7 @@ fun StudentProfileScreen(
     viewModel: StudentProfileViewModel,
     onBack: () -> Unit,
     onLessonClick: (Long) -> Unit,
-    onScheduleClick: (String) -> Unit,
+    onScheduleClick: () -> Unit,
     onReportClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleted: () -> Unit
@@ -117,7 +117,7 @@ fun StudentProfileScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                     Text(
                         stringResource(R.string.sprofile_schedule),
-                        modifier = Modifier.clickable { onScheduleClick(profile.studentName) },
+                        modifier = Modifier.clickable { onScheduleClick() },
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge
                     )

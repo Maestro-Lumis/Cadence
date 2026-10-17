@@ -49,10 +49,10 @@ import com.application.cadence.presentation.common.weekdayLabel
 @Composable
 fun ScheduleScreen(
     viewModel: ScheduleViewModel,
-    studentName: String,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val studentName by viewModel.studentName.collectAsState()
     val slots by viewModel.slots.collectAsState()
 
     var selectedDay by remember { mutableStateOf(Weekday.MON) }

@@ -177,7 +177,7 @@ fun AppNavHost(app: CadenceApplication) {
                     viewModel = viewModel(factory = factory),
                     onBack = { navController.popBackStack() },
                     onLessonClick = { lessonId -> navController.navigate(EditLessonRoute(lessonId)) },
-                    onScheduleClick = { name -> navController.navigate(ScheduleRoute(route.studentId, name)) },
+                    onScheduleClick = { navController.navigate(ScheduleRoute(route.studentId)) },
                     onReportClick = { navController.navigate(ReportRoute(route.studentId)) },
                     onEditClick = { navController.navigate(EditStudentRoute(route.studentId)) },
                     onDeleted = { navController.popBackStack() }
@@ -194,10 +194,9 @@ fun AppNavHost(app: CadenceApplication) {
             }
             composable<ScheduleRoute> { backStackEntry ->
                 val route: ScheduleRoute = backStackEntry.toRoute()
-                val factory = ScheduleViewModelFactory(route.studentId, app.scheduleRepository, app.lessonRepository)
+                val factory = ScheduleViewModelFactory(route.studentId, app.scheduleRepository, app.lessonRepository, app.studentRepository)
                 ScheduleScreen(
                     viewModel = viewModel(factory = factory),
-                    studentName = route.studentName,
                     onBack = { navController.popBackStack() }
                 )
             }

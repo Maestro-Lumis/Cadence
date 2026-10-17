@@ -58,6 +58,9 @@ interface LessonDao {
     suspend fun getAll(): List<LessonEntity>
 
     @Query("SELECT * FROM lessons WHERE id = :id")
+    fun observeById(id: Long): Flow<LessonEntity?>
+
+    @Query("SELECT * FROM lessons WHERE id = :id")
     suspend fun getById(id: Long): LessonEntity?
 
     @Insert suspend fun insert(l: LessonEntity): Long
