@@ -88,6 +88,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v154_title">Versión 1.5.4</string>
+    <string name="whatsnew_v154_1">La edición de clases se actualiza en tiempo real</string>
+    <string name="whatsnew_v154_2">El nombre del alumno en el horario se actualiza automáticamente</string>
+
     <string name="whatsnew_v153_title">Versión 1.5.3</string>
     <string name="whatsnew_v153_1">Las pantallas se actualizan al volver a la app</string>
 

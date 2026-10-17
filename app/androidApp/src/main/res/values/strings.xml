@@ -94,6 +94,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v154_title">Версия 1.5.4</string>
+    <string name="whatsnew_v154_1">Редактирование урока обновляется в реальном времени</string>
+    <string name="whatsnew_v154_2">Имя ученика на экране расписания обновляется автоматически</string>
+
     <string name="whatsnew_v153_title">Версия 1.5.3</string>
     <string name="whatsnew_v153_1">Экраны обновляются при возврате в приложение</string>
 

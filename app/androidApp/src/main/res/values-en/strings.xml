@@ -88,6 +88,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v154_title">Version 1.5.4</string>
+    <string name="whatsnew_v154_1">Lesson editing updates in real time</string>
+    <string name="whatsnew_v154_2">Student name on schedule screen updates automatically</string>
+
     <string name="whatsnew_v153_title">Version 1.5.3</string>
     <string name="whatsnew_v153_1">Screens refresh when returning to the app</string>
 
