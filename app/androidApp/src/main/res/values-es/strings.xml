@@ -90,6 +90,11 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v170_title">Versión 1.7.0</string>
+    <string name="whatsnew_v170_1">Búsqueda de alumnos en la pantalla de lista</string>
+    <string name="whatsnew_v170_2">Corregida la creación de clases desde el horario cuando los horarios se cruzan</string>
+    <string name="whatsnew_v170_3">Las clases eliminadas ya no reaparecen al reiniciar la app</string>
+
     <string name="whatsnew_v160_title">Versión 1.6.0</string>
     <string name="whatsnew_v160_1">Archivar alumnos</string>
     <string name="whatsnew_v160_2">Limpiar horario con un toque</string>

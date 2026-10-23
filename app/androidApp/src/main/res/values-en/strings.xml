@@ -90,6 +90,11 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v170_title">Version 1.7.0</string>
+    <string name="whatsnew_v170_1">Student search on the list screen</string>
+    <string name="whatsnew_v170_2">Fixed lesson creation from schedule when times overlap</string>
+    <string name="whatsnew_v170_3">Deleted lessons no longer reappear on app restart</string>
+
     <string name="whatsnew_v160_title">Version 1.6.0</string>
     <string name="whatsnew_v160_1">Archive students</string>
     <string name="whatsnew_v160_2">Clear schedule with one tap</string>

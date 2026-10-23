@@ -96,6 +96,11 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v170_title">Версия 1.7.0</string>
+    <string name="whatsnew_v170_1">Поиск учеников на экране списка</string>
+    <string name="whatsnew_v170_2">Исправлено создание уроков из расписания при пересечении времени</string>
+    <string name="whatsnew_v170_3">Удалённые уроки больше не возвращаются при перезапуске</string>
+
     <string name="whatsnew_v160_title">Версия 1.6.0</string>
     <string name="whatsnew_v160_1">Архивирование учеников</string>
     <string name="whatsnew_v160_2">Очистка расписания одной кнопкой</string>
