@@ -66,6 +66,7 @@
     <string name="students_lost">Lost</string>
     <string name="students_empty">No students yet</string>
     <string name="students_add">Add student</string>
+    <string name="students_search">Search</string>
     <string name="students_archived">Archived</string>
     <string name="students_last_lesson">Last lesson %s</string>
 

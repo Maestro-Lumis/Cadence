@@ -107,7 +107,13 @@ class GroupLessonViewModel(
 
     fun deleteGroup(onDeleted: () -> Unit) {
         viewModelScope.launch {
-            lessonRepository.observeByGroup(groupId).first().forEach { lessonRepository.delete(it.id) }
+            lessonRepository.observeByGroup(groupId).first().forEach { lesson ->
+                if (lesson.status == LessonStatus.SCHEDULED) {
+                    lessonRepository.update(lesson.copy(status = LessonStatus.CANCELLED))
+                } else {
+                    lessonRepository.delete(lesson.id)
+                }
+            }
             onDeleted()
         }
     }

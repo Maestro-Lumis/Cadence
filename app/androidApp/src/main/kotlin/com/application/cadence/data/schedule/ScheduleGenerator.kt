@@ -3,21 +3,16 @@ package com.application.cadence.data.schedule
 import com.application.cadence.core.Lesson
 import com.application.cadence.core.LessonRepository
 import com.application.cadence.core.LessonStatus
-import com.application.cadence.core.Schedule
 import com.application.cadence.core.ScheduleRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.MSK
-import com.application.cadence.presentation.common.findOverlappingLesson
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
-import kotlinx.datetime.toInstant
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.minutes
 
 object ScheduleGenerator {
 
@@ -37,7 +32,7 @@ object ScheduleGenerator {
 
         val today = Clock.System.todayIn(MSK)
         val horizon = today.plus(HORIZON_WEEKS * 7, DateTimeUnit.DAY)
-        val existing = lessonRepository.observeInDateRange(today, horizon).first().toMutableList()
+        val existing = lessonRepository.observeInDateRange(today, horizon).first()
 
         var created = 0
         var skipped = 0
@@ -47,11 +42,8 @@ object ScheduleGenerator {
         while (date <= horizon) {
             val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
             if (weekday == day) {
-                val start = LocalDateTime(date, parsedTime).toInstant(MSK)
-                val end = start + durationMinutes.minutes
                 val dup = existing.any { it.studentId == studentId && it.date == date && it.time == time }
-                val overlap = findOverlappingLesson(start, end, existing) != null
-                if (dup || overlap) {
+                if (dup) {
                     skipped++
                 } else {
                     val lesson = Lesson(
@@ -62,7 +54,6 @@ object ScheduleGenerator {
                         durationMinutes = durationMinutes,
                         status = LessonStatus.SCHEDULED
                     )
-                    existing.add(lesson)
                     toInsert.add(lesson)
                     created++
                 }

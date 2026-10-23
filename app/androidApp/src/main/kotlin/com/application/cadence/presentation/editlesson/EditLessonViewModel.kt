@@ -98,7 +98,12 @@ class EditLessonViewModel(
 
     fun delete(onDeleted: () -> Unit) {
         viewModelScope.launch {
-            lessonRepository.delete(lessonId)
+            val lesson = initialLesson.value
+            if (lesson != null && lesson.status == LessonStatus.SCHEDULED) {
+                lessonRepository.update(lesson.copy(status = LessonStatus.CANCELLED))
+            } else {
+                lessonRepository.delete(lessonId)
+            }
             onDeleted()
         }
     }

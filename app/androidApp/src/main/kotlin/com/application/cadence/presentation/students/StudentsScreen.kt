@@ -15,10 +15,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +44,20 @@ fun StudentsScreen(
     val students by viewModel.uiState.collectAsState()
     val archived by viewModel.archivedStudents.collectAsState()
     val lost by viewModel.lostStudents.collectAsState()
+    var query by remember { mutableStateOf("") }
+
+    val filteredStudents = remember(students, query) {
+        if (query.isBlank()) students
+        else students.filter { it.name.contains(query, ignoreCase = true) }
+    }
+    val filteredArchived = remember(archived, query) {
+        if (query.isBlank()) archived
+        else archived.filter { it.name.contains(query, ignoreCase = true) }
+    }
+    val filteredLost = remember(lost, query) {
+        if (query.isBlank()) lost
+        else lost.filter { it.name.contains(query, ignoreCase = true) }
+    }
 
     ScreenContainer {
         Column(
@@ -49,13 +67,24 @@ fun StudentsScreen(
                 .padding(16.dp)
         ) {
             Text(stringResource(R.string.students_title), style = MaterialTheme.typography.titleLarge)
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
-            if (lost.isNotEmpty()) {
+            if (students.size + archived.size + lost.size >= 5) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text(stringResource(R.string.students_search)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
+            if (filteredLost.isNotEmpty()) {
                 Text(stringResource(R.string.students_lost), style = MaterialTheme.typography.titleSmall, color = Color(0xFF995A1D))
                 Spacer(Modifier.height(8.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    lost.forEach { student ->
+                    filteredLost.forEach { student ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -76,17 +105,17 @@ fun StudentsScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            if (students.isEmpty() && archived.isEmpty()) {
+            if (filteredStudents.isEmpty() && filteredArchived.isEmpty() && filteredLost.isEmpty()) {
                 Text(stringResource(R.string.students_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(students, key = { it.id }) { student ->
+                    items(filteredStudents, key = { it.id }) { student ->
                         StudentRow(student, onClick = { onStudentClick(student.id) })
                     }
-                    if (archived.isNotEmpty()) {
+                    if (filteredArchived.isNotEmpty()) {
                         item {
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -96,7 +125,7 @@ fun StudentsScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                         }
-                        items(archived, key = { it.id }) { student ->
+                        items(filteredArchived, key = { it.id }) { student ->
                             StudentRow(student, onClick = { onStudentClick(student.id) })
                         }
                     }

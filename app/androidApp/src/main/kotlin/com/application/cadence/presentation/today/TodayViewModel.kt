@@ -161,7 +161,7 @@ class TodayViewModel(
         }
         val countByDate = lessonCountByDate(lessons, tutorTz)
         val selectedDayLessons = enriched
-            .filter { it.date == selected && !it.inReview }
+            .filter { it.date == selected && !it.inReview && it.lesson.status != LessonStatus.CANCELLED }
             .map { it.lesson }
         val selectedLessons = buildLessonCards(ctx, selectedDayLessons, byId, tutorTz, numberByLessonId)
 

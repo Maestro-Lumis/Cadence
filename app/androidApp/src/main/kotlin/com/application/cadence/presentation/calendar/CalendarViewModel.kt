@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.application.cadence.core.LessonRepository
+import com.application.cadence.core.LessonStatus
 import com.application.cadence.core.StudentRepository
 import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.AgendaCardUi
@@ -103,13 +104,14 @@ class CalendarViewModel(
             }
         }
 
-        val dayLessons = lessons.filter { lesson ->
+        val activeLessons = lessons.filter { it.status != LessonStatus.CANCELLED }
+        val dayLessons = activeLessons.filter { lesson ->
             val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@filter false
             LocalDateTime(lesson.date, time).toInstant(MSK).toLocalDateTime(tutorTz).date == selected
         }
         val cards = buildLessonCards(ctx, dayLessons, byId, tutorTz, numberByLessonId)
 
-        val agenda = lessons
+        val agenda = activeLessons
             .mapNotNull { lesson ->
                 val time = runCatching { LocalTime.parse(lesson.time) }.getOrNull() ?: return@mapNotNull null
                 val date = LocalDateTime(lesson.date, time).toInstant(MSK).toLocalDateTime(tutorTz).date

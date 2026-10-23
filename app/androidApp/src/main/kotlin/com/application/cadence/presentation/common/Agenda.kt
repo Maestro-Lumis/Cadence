@@ -42,6 +42,7 @@ fun numberLessons(lessons: List<Lesson>): Map<Long, Int> =
 
 fun lessonCountByDate(lessons: List<Lesson>, displayTz: TimeZone): Map<LocalDate, Int> =
     lessons
+        .filter { it.status != LessonStatus.CANCELLED }
         .mapNotNull { l ->
             val t = runCatching { LocalTime.parse(l.time) }.getOrNull() ?: return@mapNotNull null
             val date = LocalDateTime(l.date, t).toInstant(MSK).toLocalDateTime(displayTz).date
