@@ -90,6 +90,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v171_title">Versión 1.7.1</string>
+    <string name="whatsnew_v171_1">Las clases reprogramadas ya no se duplican en el horario anterior</string>
+
     <string name="whatsnew_v170_title">Versión 1.7.0</string>
     <string name="whatsnew_v170_1">Búsqueda de alumnos en la pantalla de lista</string>
     <string name="whatsnew_v170_2">Corregida la creación de clases desde el horario cuando los horarios se cruzan</string>

@@ -42,7 +42,7 @@ object ScheduleGenerator {
         while (date <= horizon) {
             val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
             if (weekday == day) {
-                val dup = existing.any { it.studentId == studentId && it.date == date && it.time == time }
+                val dup = existing.any { it.studentId == studentId && it.date == date }
                 if (dup) {
                     skipped++
                 } else {

@@ -90,6 +90,9 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v171_title">Version 1.7.1</string>
+    <string name="whatsnew_v171_1">Rescheduled lessons no longer duplicate at the old time</string>
+
     <string name="whatsnew_v170_title">Version 1.7.0</string>
     <string name="whatsnew_v170_1">Student search on the list screen</string>
     <string name="whatsnew_v170_2">Fixed lesson creation from schedule when times overlap</string>
