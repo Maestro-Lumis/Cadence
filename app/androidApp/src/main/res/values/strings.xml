@@ -96,8 +96,8 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
-    <string name="whatsnew_v171_title">Версия 1.7.1</string>
-    <string name="whatsnew_v171_1">Перенесённые уроки больше не дублируются на старое время</string>
+    <string name="whatsnew_v172_title">Версия 1.7.2</string>
+    <string name="whatsnew_v172_1">Перенесённые уроки больше не дублируются на старое время</string>
 
     <string name="whatsnew_v170_title">Версия 1.7.0</string>
     <string name="whatsnew_v170_1">Поиск учеников на экране списка</string>
