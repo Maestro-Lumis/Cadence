@@ -78,6 +78,11 @@ class EditLessonViewModel(
             }
 
             val current = initialLesson.value
+            if (current != null && current.status == LessonStatus.SCHEDULED &&
+                (current.date != date || current.time != time)
+            ) {
+                lessonRepository.add(current.copy(id = 0, status = LessonStatus.CANCELLED))
+            }
             lessonRepository.update(
                 Lesson(
                     id = lessonId,
