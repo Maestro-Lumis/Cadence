@@ -90,6 +90,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v173_title">Versión 1.7.3</string>
+    <string name="whatsnew_v173_1">Corregido el cambio de idioma</string>
+    <string name="whatsnew_v173_2">Cuadrícula del calendario más compacta</string>
+
     <string name="whatsnew_v172_title">Versión 1.7.2</string>
     <string name="whatsnew_v172_1">Las clases reprogramadas ya no se duplican en el horario anterior</string>
 

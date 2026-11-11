@@ -96,6 +96,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v173_title">Версия 1.7.3</string>
+    <string name="whatsnew_v173_1">Исправлено переключение языка</string>
+    <string name="whatsnew_v173_2">Компактная сетка календаря</string>
+
     <string name="whatsnew_v172_title">Версия 1.7.2</string>
     <string name="whatsnew_v172_1">Перенесённые уроки больше не дублируются на старое время</string>
 

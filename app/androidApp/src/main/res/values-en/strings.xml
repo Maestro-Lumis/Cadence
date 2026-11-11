@@ -90,6 +90,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v173_title">Version 1.7.3</string>
+    <string name="whatsnew_v173_1">Fixed language switching</string>
+    <string name="whatsnew_v173_2">Compact calendar grid</string>
+
     <string name="whatsnew_v172_title">Version 1.7.2</string>
     <string name="whatsnew_v172_1">Rescheduled lessons no longer duplicate at the old time</string>
 
