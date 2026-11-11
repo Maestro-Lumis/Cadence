@@ -84,7 +84,7 @@ fun CalendarScreen(
                     ModeChip(stringResource(R.string.cal_mode_month), !listMode, Modifier.weight(1f)) { listMode = false }
                     ModeChip(stringResource(R.string.cal_mode_list), listMode, Modifier.weight(1f)) { listMode = true }
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
 
                 if (!listMode) {
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -98,7 +98,7 @@ fun CalendarScreen(
                             )
                         }
                     }
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(2.dp))
 
                     state.weeks.forEach { week ->
                         Row(modifier = Modifier.fillMaxWidth()) {
@@ -107,7 +107,7 @@ fun CalendarScreen(
                             }
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(10.dp))
 
                     Text(
                         state.selectedLabel,
@@ -209,16 +209,16 @@ private fun MonthDayCell(day: CalDayUi, modifier: Modifier, onClick: () -> Unit)
 
     Column(
         modifier = modifier
-            .padding(2.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .padding(1.dp)
+            .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
             .background(bg)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(day.dayNumber.toString(), style = MaterialTheme.typography.bodyMedium, color = numberColor)
+        Text(day.dayNumber.toString(), style = MaterialTheme.typography.bodySmall, color = numberColor)
         Row(
-            modifier = Modifier.height(8.dp),
+            modifier = Modifier.height(6.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
