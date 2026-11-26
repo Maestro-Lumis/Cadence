@@ -90,6 +90,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Novedades</string>
+    <string name="whatsnew_v180_title">Versión 1.8.0</string>
+    <string name="whatsnew_v180_1">Los horarios se pueden editar: toca un horario</string>
+    <string name="whatsnew_v180_2">Ya no se pueden crear horarios duplicados</string>
+
     <string name="whatsnew_v173_title">Versión 1.7.3</string>
     <string name="whatsnew_v173_1">Corregido el cambio de idioma</string>
     <string name="whatsnew_v173_2">Cuadrícula del calendario más compacta</string>
@@ -237,6 +241,8 @@
     <string name="schedule_title">Horario</string>
     <string name="schedule_empty">Aún no hay horarios</string>
     <string name="schedule_add_slot">Agregar horario</string>
+    <string name="schedule_edit_slot">Editar horario</string>
+    <string name="schedule_duplicate">Este horario ya existe</string>
     <string name="schedule_day_label">Día de la semana</string>
     <string name="schedule_time_label">Hora (MSK)</string>
     <string name="schedule_min_label">Min</string>

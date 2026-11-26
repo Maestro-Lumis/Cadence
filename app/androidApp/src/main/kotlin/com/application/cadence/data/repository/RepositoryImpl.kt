@@ -91,6 +91,7 @@ class ScheduleRepositoryImpl(private val dao: ScheduleDao) : ScheduleRepository 
         dao.observeByStudent(studentId).map { list -> list.map { it.toDomain() } }
 
     override suspend fun add(schedule: Schedule) = dao.insert(schedule.toEntity())
+    override suspend fun update(schedule: Schedule) = dao.update(schedule.toEntity())
     override suspend fun delete(scheduleId: Long) = dao.deleteById(scheduleId)
     override suspend fun deleteByStudent(studentId: Long) = dao.deleteByStudent(studentId)
 }

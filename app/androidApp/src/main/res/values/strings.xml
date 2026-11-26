@@ -96,6 +96,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">Что нового</string>
+    <string name="whatsnew_v180_title">Версия 1.8.0</string>
+    <string name="whatsnew_v180_1">Слоты расписания можно редактировать — нажми на слот</string>
+    <string name="whatsnew_v180_2">Нельзя создать два одинаковых слота</string>
+
     <string name="whatsnew_v173_title">Версия 1.7.3</string>
     <string name="whatsnew_v173_1">Исправлено переключение языка</string>
     <string name="whatsnew_v173_2">Компактная сетка календаря</string>
@@ -243,6 +247,8 @@
     <string name="schedule_title">Расписание</string>
     <string name="schedule_empty">Слотов пока нет</string>
     <string name="schedule_add_slot">Добавить слот</string>
+    <string name="schedule_edit_slot">Изменить слот</string>
+    <string name="schedule_duplicate">Такой слот уже есть</string>
     <string name="schedule_day_label">День недели</string>
     <string name="schedule_time_label">Время (МСК)</string>
     <string name="schedule_min_label">Мин</string>

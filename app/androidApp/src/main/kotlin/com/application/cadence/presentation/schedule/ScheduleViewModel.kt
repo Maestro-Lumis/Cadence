@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
@@ -49,6 +51,23 @@ class ScheduleViewModel(
                 )
             )
             val result = ScheduleGenerator.generateForSlot(lessonRepository, studentId, day, time, durationMinutes)
+            onResult(GenerationResult(result.created, result.skipped))
+        }
+    }
+
+    fun updateSlot(
+        slot: Schedule,
+        day: Weekday,
+        time: String,
+        durationMinutes: Int,
+        onResult: (GenerationResult) -> Unit
+    ) {
+        viewModelScope.launch {
+            // Today's lesson stays untouched: it may have already happened but not been marked yet.
+            val tomorrow = Clock.System.todayIn(MSK).plus(1, DateTimeUnit.DAY)
+            lessonRepository.deleteScheduledBySlot(studentId, tomorrow, slot.time, slot.dayOfWeek)
+            scheduleRepository.update(slot.copy(dayOfWeek = day, time = time, durationMinutes = durationMinutes))
+            val result = ScheduleGenerator.generateForSlot(lessonRepository, studentId, day, time, durationMinutes, tomorrow)
             onResult(GenerationResult(result.created, result.skipped))
         }
     }

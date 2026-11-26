@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -63,12 +64,23 @@ fun ScheduleScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var resultText by remember { mutableStateOf<String?>(null) }
 
+    var editingSlot by remember { mutableStateOf<Schedule?>(null) }
     var slotToDelete by remember { mutableStateOf<Schedule?>(null) }
     var deleteLessonCount by remember { mutableIntStateOf(0) }
     var showClearConfirm by remember { mutableStateOf(false) }
     var clearLessonCount by remember { mutableIntStateOf(0) }
 
     val timePickerState = rememberTimePickerState(initialHour = 10, initialMinute = 0)
+
+    fun resetForm() {
+        editingSlot = null
+        selectedDay = Weekday.MON
+        timeText = "10:00"
+        durationText = "60"
+        timePickerState.hour = 10
+        timePickerState.minute = 0
+        error = null
+    }
 
     if (showTimePicker) {
         AlertDialog(
@@ -101,6 +113,7 @@ fun ScheduleScreen(
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteSlot(slot)
+                    if (editingSlot?.id == slot.id) resetForm()
                     slotToDelete = null
                 }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
             },
@@ -161,12 +174,28 @@ fun ScheduleScreen(
             } else {
                 Column {
                     slots.forEach { slot ->
-                        SlotRow(slot, onDelete = {
-                            viewModel.countFutureLessons(slot) { count ->
-                                deleteLessonCount = count
-                                slotToDelete = slot
+                        SlotRow(
+                            slot = slot,
+                            selected = editingSlot?.id == slot.id,
+                            onClick = {
+                                editingSlot = slot
+                                selectedDay = slot.dayOfWeek
+                                timeText = slot.time
+                                durationText = slot.durationMinutes.toString()
+                                error = null
+                                resultText = null
+                                slot.time.split(":").let { parts ->
+                                    timePickerState.hour = parts.getOrNull(0)?.toIntOrNull() ?: timePickerState.hour
+                                    timePickerState.minute = parts.getOrNull(1)?.toIntOrNull() ?: timePickerState.minute
+                                }
+                            },
+                            onDelete = {
+                                viewModel.countFutureLessons(slot) { count ->
+                                    deleteLessonCount = count
+                                    slotToDelete = slot
+                                }
                             }
-                        })
+                        )
                         Spacer(Modifier.height(8.dp))
                     }
                 }
@@ -185,7 +214,10 @@ fun ScheduleScreen(
             }
             Spacer(Modifier.height(16.dp))
 
-            Text(stringResource(R.string.schedule_add_slot), style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(if (editingSlot != null) R.string.schedule_edit_slot else R.string.schedule_add_slot),
+                style = MaterialTheme.typography.titleSmall
+            )
             Spacer(Modifier.height(8.dp))
 
             ExposedDropdownMenuBox(
@@ -251,20 +283,37 @@ fun ScheduleScreen(
                 onClick = {
                     val duration = durationText.toIntOrNull()
                     val timeValid = Regex("""^\d{1,2}:\d{2}$""").matches(timeText)
+                    val duplicate = slots.any {
+                        it.id != editingSlot?.id && it.dayOfWeek == selectedDay && it.time == timeText
+                    }
                     error = when {
                         !timeValid -> context.getString(R.string.schedule_bad_time)
                         duration == null || duration <= 0 -> context.getString(R.string.schedule_bad_duration)
+                        duplicate -> context.getString(R.string.schedule_duplicate)
                         else -> null
                     }
                     if (error == null && duration != null) {
-                        viewModel.addSlot(selectedDay, timeText, duration) { result ->
+                        val onResult: (GenerationResult) -> Unit = { result ->
                             resultText = context.getString(R.string.schedule_auto_result, result.created, result.skipped)
+                        }
+                        val editing = editingSlot
+                        if (editing != null) {
+                            viewModel.updateSlot(editing, selectedDay, timeText, duration, onResult)
+                            resetForm()
+                        } else {
+                            viewModel.addSlot(selectedDay, timeText, duration, onResult)
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.schedule_add_slot))
+                Text(stringResource(if (editingSlot != null) R.string.save else R.string.schedule_add_slot))
+            }
+            if (editingSlot != null) {
+                TextButton(
+                    onClick = { resetForm() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(stringResource(R.string.cancel)) }
             }
             resultText?.let {
                 Spacer(Modifier.height(8.dp))
@@ -275,12 +324,17 @@ fun ScheduleScreen(
 }
 
 @Composable
-private fun SlotRow(slot: Schedule, onDelete: () -> Unit) {
+private fun SlotRow(slot: Schedule, selected: Boolean, onClick: () -> Unit, onDelete: () -> Unit) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .background(
+                if (selected) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surfaceVariant
+            )
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

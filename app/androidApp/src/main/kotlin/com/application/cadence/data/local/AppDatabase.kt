@@ -98,6 +98,7 @@ interface ScheduleDao {
     @Query("SELECT * FROM schedules") suspend fun getAll(): List<ScheduleEntity>
 
     @Insert suspend fun insert(s: ScheduleEntity): Long
+    @Update suspend fun update(s: ScheduleEntity)
     @Query("DELETE FROM schedules WHERE id = :id") suspend fun deleteById(id: Long)
     @Query("DELETE FROM schedules WHERE studentId = :studentId") suspend fun deleteByStudent(studentId: Long)
 }

@@ -39,6 +39,7 @@ interface LessonRepository {
 interface ScheduleRepository {
     fun observeByStudent(studentId: Long): Flow<List<Schedule>>
     suspend fun add(schedule: Schedule): Long
+    suspend fun update(schedule: Schedule)
     suspend fun delete(scheduleId: Long)
     suspend fun deleteByStudent(studentId: Long)
 }

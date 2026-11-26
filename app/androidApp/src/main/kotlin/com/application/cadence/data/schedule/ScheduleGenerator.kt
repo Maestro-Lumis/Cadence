@@ -8,6 +8,7 @@ import com.application.cadence.core.Weekday
 import com.application.cadence.presentation.common.MSK
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.plus
@@ -25,20 +26,20 @@ object ScheduleGenerator {
         studentId: Long,
         day: Weekday,
         time: String,
-        durationMinutes: Int
+        durationMinutes: Int,
+        fromDate: LocalDate = Clock.System.todayIn(MSK)
     ): Result {
         val parsedTime = runCatching { LocalTime.parse(time) }.getOrNull()
             ?: return Result(0, 0)
 
-        val today = Clock.System.todayIn(MSK)
-        val horizon = today.plus(HORIZON_WEEKS * 7, DateTimeUnit.DAY)
-        val existing = lessonRepository.observeInDateRange(today, horizon).first()
+        val horizon = fromDate.plus(HORIZON_WEEKS * 7, DateTimeUnit.DAY)
+        val existing = lessonRepository.observeInDateRange(fromDate, horizon).first()
 
         var created = 0
         var skipped = 0
         val toInsert = mutableListOf<Lesson>()
 
-        var date = today
+        var date = fromDate
         while (date <= horizon) {
             val weekday = Weekday.entries[date.dayOfWeek.isoDayNumber - 1]
             if (weekday == day) {
@@ -70,10 +71,13 @@ object ScheduleGenerator {
         lessonRepository: LessonRepository,
         studentIds: List<Long>
     ) {
+        // Today is already covered when a slot is added; regenerating it would resurrect
+        // a lesson at a slot's new time after the slot was edited today.
+        val tomorrow = Clock.System.todayIn(MSK).plus(1, DateTimeUnit.DAY)
         for (studentId in studentIds) {
             val slots = scheduleRepository.observeByStudent(studentId).first()
             for (slot in slots.filter { it.active }) {
-                generateForSlot(lessonRepository, studentId, slot.dayOfWeek, slot.time, slot.durationMinutes)
+                generateForSlot(lessonRepository, studentId, slot.dayOfWeek, slot.time, slot.durationMinutes, tomorrow)
             }
         }
     }

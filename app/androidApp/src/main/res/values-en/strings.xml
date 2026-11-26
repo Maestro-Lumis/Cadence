@@ -90,6 +90,10 @@
 
     <!-- What\'s New -->
     <string name="whatsnew_title">What\'s new</string>
+    <string name="whatsnew_v180_title">Version 1.8.0</string>
+    <string name="whatsnew_v180_1">Schedule slots can be edited — tap a slot</string>
+    <string name="whatsnew_v180_2">Duplicate slots are no longer allowed</string>
+
     <string name="whatsnew_v173_title">Version 1.7.3</string>
     <string name="whatsnew_v173_1">Fixed language switching</string>
     <string name="whatsnew_v173_2">Compact calendar grid</string>
@@ -237,6 +241,8 @@
     <string name="schedule_title">Schedule</string>
     <string name="schedule_empty">No slots yet</string>
     <string name="schedule_add_slot">Add slot</string>
+    <string name="schedule_edit_slot">Edit slot</string>
+    <string name="schedule_duplicate">This slot already exists</string>
     <string name="schedule_day_label">Day of week</string>
     <string name="schedule_time_label">Time (MSK)</string>
     <string name="schedule_min_label">Min</string>
